@@ -33,6 +33,7 @@ node menu.js
 RDRAAgent0.6/
 ├── RDRA_Knowledge/       # ナレッジベース
 ├── .claude/              # Claude Code設定
+├── .cursor/              # Cursor設定
 ├── Samples/              # サンプルプロジェクト
 ├── 初期要望.txt
 └── 妥当性検証環境.csv

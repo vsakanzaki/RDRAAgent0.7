@@ -76,37 +76,6 @@ const phase1Files = [
     '情報.tsv',
     '状態.tsv'
 ];
-/**
- * Phaseのプロンプトファイルと出力ファイルのマッピング（並列実行用）
- */
-const phase1PromptMap = [
-    { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/アクター生成.md', output: '0_RDRAZeroOne/phase1/アクター.tsv' },
-    { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/外部システム生成.md', output: '0_RDRAZeroOne/phase1/外部システム.tsv' },
-    { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/ビジネスポリシー生成.md', output: '0_RDRAZeroOne/phase1/ビジネスポリシー.tsv' },
-    { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/ビジネスパラメータ生成.md', output: '0_RDRAZeroOne/phase1/ビジネスパラメータ.tsv' },
-    { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/業務生成.md', output: '0_RDRAZeroOne/phase1/業務.tsv' },
-    { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/情報生成.md', output: '0_RDRAZeroOne/phase1/情報.tsv' },
-    { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/状態生成.md', output: '0_RDRAZeroOne/phase1/状態.tsv' },
-    { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/初期要望分析.md', output: '0_RDRAZeroOne/phase1/初期要望構造.md' }
-];
-const phase2PromptMap = [
-    { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase2/アクター生成.md', output: '0_RDRAZeroOne/phase2/アクター.tsv' },
-    { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase2/バリエーション生成.md', output: '0_RDRAZeroOne/phase2/バリエーション.tsv' },
-    { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase2/業務生成.md', output: '0_RDRAZeroOne/phase2/業務.tsv' },
-    { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase2/情報生成.md', output: '0_RDRAZeroOne/phase2/情報.tsv' },
-    { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase2/状態生成.md', output: '0_RDRAZeroOne/phase2/状態.tsv' },
-    { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase2/条件生成.md', output: '0_RDRAZeroOne/phase2/条件.md' }
-];
-const phase3PromptMap = [
-    { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase3/BUC生成.md', output: '0_RDRAZeroOne/phase3/BUC.tsv' },
-    { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase3/情報生成.md', output: '0_RDRAZeroOne/phase3/情報.tsv' }
-];
-const phase4PromptMap = [
-    { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase4/BUC生成.md', output: '0_RDRAZeroOne/phase4/BUC.tsv' },
-    { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase4/バリエーション生成.md', output: '0_RDRAZeroOne/phase4/バリエーション.tsv' },
-    { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase4/条件生成.md', output: '0_RDRAZeroOne/phase4/条件.tsv' },
-    { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase4/状態生成.md', output: '0_RDRAZeroOne/phase4/状態.tsv' }
-];
 const phase2Files = [
     '業務.tsv',
     '条件.tsv',
@@ -172,7 +141,7 @@ function waitForEnterThenNext() {
  */
 function showMenu() {
     console.log('■ZeroOne');
-    console.log('1.Phase1並列実行：Phase1のプロンプトを並列実行する');
+    console.log('1.フェーズ単位の要件定義：RDRA定義をフェーズ毎に実行する');
     console.log('2.一括要件定義：RDRA定義を一括実行する');
     console.log('■RDRA');
     console.log('11.RDRAGraphを表示：関連データを作成しRDRAGraphを表示');
@@ -198,7 +167,7 @@ function showMenu() {
 function executeOption(option) {
     switch (option) {
         case '1':
-            executePhaseParallel(1);
+            executeEachPhase();
             break;
         case '2':
             executeAllPhase();
@@ -310,84 +279,6 @@ function executeLLMTerminal(prompt) {
 }
 
 /**
- * Phase番号に対応するファイル配列とプロンプトマップを取得
- */
-function getPhaseConfig(phaseNumber) {
-    const configs = {
-        1: { files: phase1Files, promptMap: phase1PromptMap },
-        2: { files: phase2Files, promptMap: phase2PromptMap },
-        3: { files: phase3Files, promptMap: phase3PromptMap },
-        4: { files: phase4Files, promptMap: phase4PromptMap }
-    };
-    return configs[phaseNumber];
-}
-
-/**
- * 指定されたPhaseを並列実行する（parallel-runner.jsを使用）
- * @param {number} phaseNumber - 実行するPhase番号 (1-4)
- */
-function executePhaseParallel(phaseNumber) {
-    const fs = require('fs');
-    
-    // Phase設定を取得
-    const config = getPhaseConfig(phaseNumber);
-    if (!config) {
-        console.error(`無効なPhase番号です: ${phaseNumber}`);
-        waitForEnterThenNext();
-        return;
-    }
-    
-    console.log(`Phase${phaseNumber}を並列実行します...`);
-    
-    // 出力フォルダが存在しない場合は作成
-    const outputDir = `0_RDRAZeroOne/phase${phaseNumber}`;
-    if (!fs.existsSync(outputDir)) {
-        fs.mkdirSync(outputDir, { recursive: true });
-        console.log(`出力フォルダを作成しました: ${outputDir}`);
-    }
-    
-    // 既にphaseが完了しているか確認
-    const phaseExist = checkAllFilesExistInFolder(config.files, outputDir);
-    if (phaseExist) {
-        console.log(`phase${phaseNumber}は既に定義されています。`);
-        waitForEnterThenNext();
-        return;
-    }
-    
-    // parallel-runner.jsに渡す引数を構築
-    const args = config.promptMap.map(pair => `{${pair.prompt},${pair.output}}`);
-    
-    console.log('実行するプロンプトファイル:');
-    config.promptMap.forEach(pair => {
-        console.log(`  ${pair.prompt} -> ${pair.output}`);
-    });
-    console.log('');
-    
-    const child = spawn('node', [
-        'RDRA_Knowledge/helper_tools/parallelRun/parallel-runner.js',
-        ...args
-    ], {
-        stdio: 'inherit',
-        shell: true
-    });
-    
-    child.on('close', (code) => {
-        if (code === 0) {
-            console.log('');
-            console.log(`Phase${phaseNumber}の並列実行が完了しました。`);
-        } else {
-            console.error(`Phase${phaseNumber}の並列実行がエラーで終了しました。終了コード: ${code}`);
-        }
-        waitForEnterThenNext();
-    });
-    
-    child.on('error', (error) => {
-        console.error(`エラー: ${error.message}`);
-        waitForEnterThenNext();
-    });
-}
-
-/**
  * フェーズ単位のRDRA定義を実行する（定義されていないフェーズがあれば実行する）
  */
 function executeEachPhase() {
@@ -396,28 +287,28 @@ function executeEachPhase() {
     if (phaseExist1) {
         console.log('phase1は定義されています。');
     } else {
-        executePhaseParallel(1);
+        executeLLMTerminal('パス「RDRA_Knowledge/0_ZeroOne指示.md」のファイルを読んで、Phase1を実行してください。注意：このファイルはRDRA_Knowledge直下にあり、0_RDRAZeroOneフォルダ内ではありません');
         return;
     }
     const phaseExist2 = checkAllFilesExistInFolder(phase2Files, '0_RDRAZeroOne/phase2');
     if (phaseExist2) {
         console.log('phase2は定義されています。');
     } else {
-        executePhaseParallel(2);
+        executeLLMTerminal('パス「RDRA_Knowledge/0_ZeroOne指示.md」のファイルを読んで、Phase2を実行してください。注意：このファイルはRDRA_Knowledge直下にあり、0_RDRAZeroOneフォルダ内ではありません');
         return;
     }
     const phaseExist3 = checkAllFilesExistInFolder(phase3Files, '0_RDRAZeroOne/phase3');
     if (phaseExist3) {
         console.log('phase3は定義されています。');
     } else {
-        executePhaseParallel(3);
+        executeLLMTerminal('パス「RDRA_Knowledge/0_ZeroOne指示.md」のファイルを読んで、Phase3を実行してください。注意：このファイルはRDRA_Knowledge直下にあり、0_RDRAZeroOneフォルダ内ではありません');
         return;
     }
     const phaseExist4 = checkAllFilesExistInFolder(phase4Files, '0_RDRAZeroOne/phase4');
     if (phaseExist4) {
         console.log('phase4は定義されています。');
     } else {
-        executePhaseParallel(4);
+        executeLLMTerminal('パス「RDRA_Knowledge/0_ZeroOne指示.md」のファイルを読んで、Phase4とPhase5を実行してください。注意：このファイルはRDRA_Knowledge直下にあり、0_RDRAZeroOneフォルダ内ではありません');
         return;
     }
     const phaseExist5 = checkAllFilesExistInFolder(rdraFiles, '1_RDRA');
@@ -442,16 +333,16 @@ function executeAllPhase() {
     
     // 存在しない最初のフェーズから実行
     if (!phaseExist1) {
-        executePhaseParallel(1);
+        executeLLMTerminal('パス「RDRA_Knowledge/0_ZeroOne指示.md」のファイルを読んで、Phase1からPhase5までを実行してください。注意：このファイルはRDRA_Knowledge直下にあり、0_RDRAZeroOneフォルダ内ではありません');
     } else if (!phaseExist2) {
         console.log('phase1は定義されています。');
-        executePhaseParallel(2);
+        executeLLMTerminal('パス「RDRA_Knowledge/0_ZeroOne指示.md」のファイルを読んで、Phase2からPhase5までを実行してください。注意：このファイルはRDRA_Knowledge直下にあり、0_RDRAZeroOneフォルダ内ではありません');
     } else if (!phaseExist3) {
         console.log('phase1, phase2は定義されています。');
-        executePhaseParallel(3);
+        executeLLMTerminal('パス「RDRA_Knowledge/0_ZeroOne指示.md」のファイルを読んで、Phase3からPhase5までを実行してください。注意：このファイルはRDRA_Knowledge直下にあり、0_RDRAZeroOneフォルダ内ではありません');
     } else if (!phaseExist4) {
         console.log('phase1, phase2, phase3は定義されています。');
-        executePhaseParallel(4);
+        executeLLMTerminal('パス「RDRA_Knowledge/0_ZeroOne指示.md」のファイルを読んで、Phase4からPhase5までを実行してください。注意：このファイルはRDRA_Knowledge直下にあり、0_RDRAZeroOneフォルダ内ではありません');
     } else if (!phaseExist5) {
         console.log('phase1~phase4は定義されています。');
         executeLLMTerminal('パス「RDRA_Knowledge/0_ZeroOne指示.md」のファイルを読んで、Phase5を実行してください。注意：このファイルはRDRA_Knowledge直下にあり、0_RDRAZeroOneフォルダ内ではありません');
