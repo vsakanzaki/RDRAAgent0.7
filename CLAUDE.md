@@ -57,8 +57,8 @@ RDRAAgent is a Node.js-based system that implements the **RDRA (Relationship Dri
 
 4. **Knowledge Base** (RDRA_Knowledge/**)
    - **0_ZeroOne指示.md** - Phase-by-phase requirements extraction instructions
-   - **1_RDRA指示.md** - RDRA definition and validation methodology
-   - **2_Spec指示.md** - Specification creation instructions
+   - **1_RDRA指示.md** - (deprecated) moved under `_no_use/deprecated_menu_13_14_22/`
+   - **2_Spec指示.md** - Specification creation instructions (Phase1 via menu 21; Phase2 is deprecated)
    - **0_RDRAZeroOne/**, **1_RDRA/**, **2_RDRASpec/** - Domain knowledge documentation
 
 ### Data Flow Model
@@ -79,16 +79,16 @@ RDRAAgent is a Node.js-based system that implements the **RDRA (Relationship Dri
     │    makeGraphData.js → RDRAGraph (external tool)
     │
     ├─→ Validation
-    │    RDRA_Knowledge/1_RDRA指示.md
+    │    _no_use/deprecated_menu_13_14_22/RDRA_Knowledge/1_RDRA指示.md
     │    (checks against 妥当性検証環境.csv)
     │
     └─→ Specification
          RDRA_Knowledge/2_Spec指示.md
               ↓
          2_RDRASpec/
-         ├─ 論理データ.tsv (logical data)
-         ├─ ui.json (screen definitions)
-         └─ business_rule.md (rules)
+         ├─ 論理データモデル.md (logical data)
+         ├─ 画面照会.json (screen definitions)
+         └─ ビジネスルール.md (rules)
 ```
 
 ## Cursor/Claude Rules
@@ -97,7 +97,7 @@ Key rules from `.cursor/rules/rdrarules`:
 
 1. **Folder Management**: Check if folders exist before creating; reuse existing directories
 2. **File Formats**:
-   - TSV files use `⇒` as tab delimiter (convert to actual tabs on output)
+   - TSV files use `、` as tab delimiter (convert to actual tabs on output)
    - UTF-8 encoding required
    - TSV files always have header row with column names
 3. **Programming**: JavaScript only (HTML/CSS embedded in HTML)
@@ -141,14 +141,14 @@ These scripts open new terminal windows and run Claude Code with specified instr
 
 ## TSV File Format Rules
 
-- **Delimiter**: `⇒` character in source code becomes actual TAB when written to files
+- **Delimiter**: `、` character in source code becomes actual TAB when written to files
 - **First Row**: Must be headers (column names)
 - **Encoding**: UTF-8 always
 - **Output Location**: Phase outputs go to `0_RDRAZeroOne/phase#/`, final outputs to `1_RDRA/` or `2_RDRASpec/`
 
 Example header transformation:
 ```javascript
-"Column1⇒Column2⇒Column3"  →  "Column1\tColumn2\tColumn3"
+"Column1、Column2、Column3"  →  "Column1\tColumn2\tColumn3"
 ```
 
 ## LLM Integration Points
@@ -159,11 +159,11 @@ The system uses Claude Code (via Terminal execution) for:
    - Reads: `RDRA_Knowledge/0_ZeroOne指示.md`
    - Generates: TSV files in `0_RDRAZeroOne/phase#/`
 
-2. **RDRA Explanation & Validation** (`menu.js:13,14` - options 13,14)
-   - Reads: `RDRA_Knowledge/1_RDRA指示.md`
+2. **RDRA Explanation & Validation** (options 13,14 are deprecated/removed from menu)
+   - Reads: `_no_use/deprecated_menu_13_14_22/RDRA_Knowledge/1_RDRA指示.md` (deprecated)
    - Validates: Against `妥当性検証環境.csv`
 
-3. **Specification Creation** (`menu.js:21,22` - options 21,22)
+3. **Specification Creation** (`menu.js:21` - option 21; option 22 is deprecated/removed from menu)
    - Reads: `RDRA_Knowledge/2_Spec指示.md`
    - Generates: Data models, UI definitions, business rules
 
@@ -220,7 +220,7 @@ The system uses Claude Code (via Terminal execution) for:
 |------|---------|
 | menu.js | Main CLI orchestrator |
 | RDRA_Knowledge/0_ZeroOne指示.md | Requirements generation instructions |
-| RDRA_Knowledge/1_RDRA指示.md | RDRA validation/explanation |
+| _no_use/deprecated_menu_13_14_22/RDRA_Knowledge/1_RDRA指示.md | (deprecated) RDRA validation/explanation |
 | RDRA_Knowledge/2_Spec指示.md | Specification generation |
 | 初期要望.txt | User input: initial requirements |
 | 妥当性検証環境.csv | User input: validation scenarios |

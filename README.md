@@ -117,25 +117,23 @@ node menu.js
   3. ブラウザでGoogle Spreadsheetを開く
   4. SpreadsheetのZeroOneシートに貼り付けて活用
 
-**13. RDRA定義の説明を作成**
-- RDRA定義の各要素について説明文書を生成
+**13. RDRA定義の説明を作成（廃止）**
+- ※このバージョンではメニューから実行できません（関連ファイルは `_no_use/deprecated_menu_13_14_22/` に移動）
 
-**14. RDRA定義の妥当性を検証**
-- `システム導入環境.md` を使用してRDRA定義を検証
-- 要件の整合性や漏れをチェック
+**14. RDRA定義の妥当性を検証（廃止）**
+- ※このバージョンではメニューから実行できません（関連ファイルは `_no_use/deprecated_menu_13_14_22/` に移動）
 
 ### ■仕様
 
 **21. 仕様の作成**
 - 論理データ構造、画面定義、ビジネスルールを生成
 - 出力ファイル：
-  - `2_RDRASpec/論理データ.tsv` - 論理データモデル（TSV形式）
   - `2_RDRASpec/論理データモデル.md` - 論理データモデル（Markdown形式）
-  - `2_RDRASpec/ui.json` - 画面定義
-  - `2_RDRASpec/business_rule.md` - ビジネスルール
+  - `2_RDRASpec/画面照会.json` - 画面定義
+  - `2_RDRASpec/ビジネスルール.md` - ビジネスルール
 
-**22. 仕様の妥当性を検証**
-- 論理データと画面定義の整合性を検証
+**22. 仕様の妥当性を検証（廃止）**
+- ※このバージョンではメニューから実行できません（関連ファイルは `_no_use/deprecated_menu_13_14_22/` に移動）
 
 **23. 画面編集を表示する**
 - UI仕様をブラウザで表示・編集
@@ -145,7 +143,7 @@ node menu.js
 **24. アクター別画面を表示する**
 - アクター（利用者役割）別に画面を整理して表示
 - 処理内容：
-  1. `convertUI2ActorUI.js` でui.jsonをアクター別に変換
+  1. `convertUI2ActorUI.js` で画面照会.jsonをアクター別に変換
   2. `actorUI_server.js` でサーバー起動（ポート3001）
   3. ブラウザで http://localhost:3001/ を開く
 
@@ -177,16 +175,15 @@ node menu.js
    - メニュー「11」でRDRAGraphを表示
    - 要件の関連性を図で確認
 
-4. **RDRA検証**
-   - メニュー「14」で妥当性を検証
-   - 必要に応じて要件を修正
+4. **RDRA検証（任意/手動）**
+   - ※メニュー14は廃止（関連ファイルは `_no_use/deprecated_menu_13_14_22/` に移動）
 
 5. **仕様作成**
    - メニュー「21」で仕様を生成
    - データモデル、画面、ビジネスルールを作成
 
-6. **仕様検証**
-   - メニュー「22」で仕様の妥当性を検証
+6. **仕様検証（任意/手動）**
+   - ※メニュー22は廃止（関連ファイルは `_no_use/deprecated_menu_13_14_22/` に移動）
 
 7. **画面の確認**
    - メニュー「23」で画面の項目を見直す
@@ -236,8 +233,8 @@ node menu.js
 
 # （Phase3、Phase4も同様に実行）
 
-# 6. 全Phase完了後、メニューで「14」を選択（妥当性検証）
-# → 妥当性検証環境.csvを使用して検証
+# 6. （任意）妥当性検証は手動で実行
+# → 廃止機能の関連ファイルは `_no_use/deprecated_menu_13_14_22/` に移動（妥当性検証環境.csvを参照）
 ```
 
 ### 例3: 画面定義のアクター別表示
@@ -282,20 +279,19 @@ node menu.js
 
 ### ナレッジベース
 - `RDRA_Knowledge/0_RDRAZeroOne/` - ZeroOneフェーズの説明
-  - `RDRAZeroOne.md` - ZeroOneの概念説明
-  - `WhatIsZeroOne.md` - ZeroOneとは何か
+  - Phase:1-4 - フェーズ毎の成果物生成Pronpt
+
 - `RDRA_Knowledge/1_RDRA/` - RDRA定義の説明
   - `RDRA.md` - RDRAの基本概念
-  - `HowToUseRDRA.md` - RDRAの使い方
   - `RDRAGraph.md` - RDRAGraphの説明
   - `RDRASheet.md` - RDRASheetの説明
-  - `rdraStory.md` - RDRAストーリー作成方法
-  - `rdraValidation.md` - RDRA妥当性検証方法
+  - `rdraStory.md` - RDRAストーリー作成方法（廃止機能のため `_no_use/deprecated_menu_13_14_22/` に移動）
+  - `rdraValidation.md` - RDRA妥当性検証方法（廃止機能のため `_no_use/deprecated_menu_13_14_22/` に移動）
 - `RDRA_Knowledge/2_RDRASpec/` - 仕様作成の説明
-  - `21_data.md` - 論理データモデル作成方法
-  - `22_ui.md` - UI定義作成方法
-  - `23_business_rule.md` - ビジネスルール作成方法
-  - `specValidation.md` - 仕様妥当性検証方法
+  - `21_論理データ生成.md` - 論理データモデル作成方法
+  - `22_画面生成.md` - UI定義作成方法
+  - `22_ビジネスルール生成.md` - ビジネスルール作成方法
+  - `specValidation.md` - 仕様妥当性検証方法（廃止機能のため `_no_use/deprecated_menu_13_14_22/` に移動）
 - `RDRA_Knowledge/utilityPrompt/` - ユーティリティプロンプト集
 
 ### 設定ファイル
@@ -304,7 +300,6 @@ node menu.js
 ## ファイルフォーマット
 
 ### TSVファイル規則
-- タブ区切り文字：`⇒` をタブに変換して出力
 - UTF-8エンコーディング
 - 1行目：ヘッダー行（カラム名）
 
@@ -353,12 +348,12 @@ node menu.js
 
 ## LLM連携（Windows環境）
 
-メニューの一部機能（1, 2, 13, 14, 21, 22）はLLM（大規模言語モデル）を使用します：
+メニューの一部機能（1, 2, 21）はLLM（大規模言語モデル）を使用します：
 - 自動的に新しいターミナルウィンドウが開きます
 - 実行される指示ファイル：
   - メニュー1, 2: `RDRA_Knowledge/0_ZeroOne指示.md`
-  - メニュー13, 14: `RDRA_Knowledge/1_RDRA指示.md`
-  - メニュー21, 22: `RDRA_Knowledge/2_Spec指示.md`
+  - （廃止メニュー）13, 14: `_no_use/deprecated_menu_13_14_22/` に移動済み
+  - メニュー21: `RDRA_Knowledge/2_Spec指示.md`
 - `RDRA_Knowledge/helper_tools/command/commandRun.bat` を経由して実行
 
 ## トラブルシューティング
@@ -453,13 +448,9 @@ A: Samplesフォルダー内のサンプルの初期要望.txtを、プロジェ
 **現在のバージョン**: RDRAAgent v0.6
 
 ### 変更履歴
-- v0.6: 現行バージョン
+- v0.65: 現行バージョン
   - 4フェーズのRDRA定義プロセス実装
-  - RDRAGraph連携機能
-  - 画面プロトタイプ表示機能
-  - アクター別画面表示機能
-  - 妥当性検証機能
+  - BUCアクター別画面表示機能
 
 ## ライセンス
-
 MIT License

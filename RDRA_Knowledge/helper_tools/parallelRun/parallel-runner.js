@@ -3,20 +3,13 @@
  * 
  * 使用方法:
  *   node parallel-runner.js file1.txt file2.txt file3.txt
- *   node parallel-runner.js {prompt/run1.md,output/run1.tsv} {prompt/run2.md,output/run2.tsv}
+ *   node parallel-runner.js {prompt/run1.md,output/run1.tsv} {prompt/run2.md,output/run2.tsv}   # output 側は無視されます（互換用）
  *   node parallel-runner.js file1.txt file2.txt --provider gemini
  */
 
-const { runAI, runAIWithPrefix } = require('./node-file-runner-V3');
+const { runAIWithPrefix } = require('./node-file-runner-V3');
 const fs = require('fs');
 const path = require('path');
-const { promisify } = require('util');
-
-const writeFileAsync = promisify(fs.writeFile);
-const mkdirAsync = promisify(fs.mkdir);
-
-// 出力フォルダ（デフォルト）
-const OUTPUT_DIR = 'output';
 
 // ========================================
 // ヘルプ表示
@@ -27,11 +20,11 @@ function showHelp() {
 
 使い方:
   node parallel-runner.js <files...> [options]
-  node parallel-runner.js {input,output} {input,output} ... [options]
+  node parallel-runner.js {input,output} {input,output} ... [options]   ※ output 側は無視（互換用）
 
 ファイル指定形式:
-  file.txt                    入力のみ（出力は output/file.txt に自動生成）
-  {input.md,output.tsv}       入力と出力のペアを指定
+  file.txt                    入力のみ
+  {input.md,output.tsv}       互換用（output 側は無視されます）
 
 オプション:
   --provider, -P <name>   AIプロバイダー (claude, gemini, codex)
@@ -41,27 +34,19 @@ function showHelp() {
 
 例:
   node parallel-runner.js file1.txt file2.txt file3.txt
-  node parallel-runner.js {prompt/run1.md,output/run1.tsv} {prompt/run2.md,output/run2.tsv}
+  node parallel-runner.js {prompt/run1.md,output/run1.tsv} {prompt/run2.md,output/run2.tsv}   # output 側は無視（互換用）
   node parallel-runner.js file1.txt --provider gemini
 `);
 }
 
 // ========================================
-// {input,output} 形式をパース
+// 入力ファイルをパース
 // ========================================
 function parseFilePair(arg) {
-    // {input,output} 形式かどうかチェック
-    const match = arg.match(/^\{(.+),(.+)\}$/);
-    if (match) {
-        return {
-            input: match[1].trim(),
-            output: match[2].trim(),
-        };
-    }
-    // 通常のファイルパス（出力は自動生成）
+    // {input,output} 形式が来ても input 側のみを取り出す（互換用）
+    const match = arg.match(/^\{([^,]+),?.*\}$/);
     return {
-        input: arg,
-        output: null,  // 後で自動生成
+        input: match ? match[1].trim() : arg.trim(),
     };
 }
 
@@ -71,7 +56,7 @@ function parseFilePair(arg) {
 function parseArgs(argv) {
     const args = argv.slice(2);
     const config = {
-        filePairs: [],  // { input, output } のペア配列
+        filePairs: [],  // { input } の配列（{input,output} 形式は互換用で input のみ使用）
         options: {
             timeout: 120000, // 2分
         },
@@ -106,59 +91,12 @@ function readPrompt(filePath) {
 }
 
 // ========================================
-// 出力ディレクトリを確保（指定パスに対応）
-// ========================================
-async function ensureDir(filePath) {
-    const dir = path.dirname(filePath);
-    try {
-        await mkdirAsync(dir, { recursive: true });
-    } catch (error) {
-        if (error.code !== 'EEXIST') {
-            throw error;
-        }
-    }
-}
-
-// ========================================
-// デフォルト出力ファイルパスを生成
-// ========================================
-function getDefaultOutputPath(inputFilePath) {
-    const baseName = path.basename(inputFilePath);
-    return path.join(OUTPUT_DIR, baseName);
-}
-
-// ========================================
-// ```tsv ～ ``` で囲まれた部分を抽出
-// ========================================
-function extractTsvContent(text) {
-    // ```tsv と ``` で囲まれた部分を抽出（複数ある場合は全て結合）
-    const regex = /```tsv\n?([\s\S]*?)```/g;
-    const matches = [];
-    let match;
-    
-    while ((match = regex.exec(text)) !== null) {
-        matches.push(match[1].trim());
-    }
-    
-    if (matches.length > 0) {
-        // 複数のTSVブロックがある場合は改行で結合
-        return matches.join('\n');
-    }
-    
-    // TSVブロックが見つからない場合は元のテキストを返す
-    return text;
-}
-
-// ========================================
 // 単一のプロンプトを実行
 // ========================================
 async function executePrompt(filePair, options = {}) {
-    const { input: inputPath, output: outputPath } = filePair;
+    const { input: inputPath } = filePair;
     const startTime = Date.now();
     const baseName = path.basename(inputPath, path.extname(inputPath));
-    
-    // 出力パスを決定（指定がなければデフォルト）
-    const finalOutputPath = outputPath || getDefaultOutputPath(inputPath);
 
     try {
         const prompt = readPrompt(inputPath);
@@ -170,21 +108,13 @@ async function executePrompt(filePair, options = {}) {
         };
         
         // プレフィックス付きリアルタイム出力モードで実行
-        const result = await runAIWithPrefix(prompt, execOptions);
-        
-        // 出力ディレクトリを確保
-        await ensureDir(finalOutputPath);
-        
-        // ```tsv ～ ``` で囲まれた部分を抽出してファイルに保存
-        const tsvContent = extractTsvContent(result.stdout);
-        await writeFileAsync(finalOutputPath, tsvContent, 'utf-8');
+        await runAIWithPrefix(prompt, execOptions);
         
         const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-        console.log(`[${baseName}] ✅ OK (${elapsed}s) -> ${finalOutputPath}`);
+        console.log(`[${baseName}] ✅ OK (${elapsed}s)`);
         
         return {
             input: inputPath,
-            output: finalOutputPath,
             success: true,
             elapsed: elapsed,
         };
@@ -194,7 +124,6 @@ async function executePrompt(filePair, options = {}) {
         
         return {
             input: inputPath,
-            output: finalOutputPath,
             success: false,
             error: error.message,
             elapsed: elapsed,
@@ -245,7 +174,18 @@ async function main() {
     
     try {
         // 並行実行
-        await executeParallel(config.filePairs, config.options);
+        const results = await executeParallel(config.filePairs, config.options);
+
+        // 方式A: 全件実行してから集計し、失敗が1つでもあれば exit code を非0にする
+        const failed = results.filter(r => !r.success);
+        if (failed.length > 0) {
+            console.error(`\n❌ 失敗: ${failed.length}/${results.length}`);
+            failed.forEach(r => {
+                console.error(`- ${r.input}: ${r.error || 'unknown error'}`);
+            });
+            process.exitCode = 1;
+            return;
+        }
     } catch (error) {
         console.error('fatal:', error.message);
         process.exit(1);

@@ -1,15 +1,14 @@
 # AI Code Runner
 
 Node.js で Claude / Gemini / Codex CLI を実行するツール群です。  
-並行実行、リアルタイム出力、TSV抽出機能をサポートしています。
+並行実行とリアルタイム出力（プレフィックス付き）をサポートしています。
 
 ## 特徴
 
 - **マルチプロバイダー対応**: Claude / Gemini / Codex を切り替え可能
 - **並行実行**: 複数プロンプトを同時実行
 - **リアルタイム出力**: プレフィックス付きで各プロセスの出力を識別
-- **TSV抽出**: ```` ```tsv ```` ブロックのみをファイルに保存
-- **柔軟な出力指定**: 入力と出力のペアを `{input,output}` 形式で指定可能
+- **互換引数対応**: `{input,output}` 形式も受け付けます（※output 側は無視されます）
 
 ---
 
@@ -20,13 +19,13 @@ Node.js で Claude / Gemini / Codex CLI を実行するツール群です。
 ### 基本的な使い方
 
 ```bash
-# 従来形式（出力は output/ に自動生成）
+# 入力ファイルを複数指定
 node parallel-runner.js prompt/run1.md prompt/run2.md prompt/run3.md
 
-# 新形式（入力と出力のペアを指定）
+# 互換形式（入力と出力のペアを指定できるが、output 側は無視される）
 node parallel-runner.js "{prompt/run1.md,output/run1.tsv}" "{prompt/run2.md,output/run2.tsv}"
 
-# 混在形式
+# 混在形式（output 側は無視）
 node parallel-runner.js prompt/run1.md "{prompt/run2.md,output/custom.tsv}"
 ```
 
@@ -57,9 +56,9 @@ files: 3, provider: (default), model: (default), timeout: 120000ms
 [run3] アクター	役割
 [run3] エンドユーザー	ウォレットアプリを利用して...
 [run2] 了解しました。情報を洗い出します...
-[run3] ✅ OK (15.2s) -> output/run3.tsv
-[run2] ✅ OK (17.0s) -> output/run2.tsv
-[run1] ✅ OK (18.6s) -> output/run1.tsv
+[run3] ✅ OK (15.2s)
+[run2] ✅ OK (17.0s)
+[run1] ✅ OK (18.6s)
 
 🏁 並行実行完了 (合計: 18.6秒)
 
@@ -68,83 +67,14 @@ OK: 3/3
 total: 18.6s
 ```
 
-### TSV抽出機能
-
-出力ファイルには ```` ```tsv ```` と ```` ``` ```` で囲まれた部分のみが保存されます。
-
-**コンソール出力（全体）:**
-```
-[run3] 「初期要望.md」を理解しました...
-[run3] ```tsv
-[run3] アクター	役割
-[run3] エンドユーザー	ウォレットアプリを利用して...
-[run3] ```
-[run3] 以上です。
-```
-
-**ファイル出力（TSVのみ）:**
-```
-アクター	役割
-エンドユーザー	ウォレットアプリを利用して...
-```
-
----
-
-## 単体実行 (node-file-runner-V3.js)
-
-単一のプロンプトファイルを実行します。
-
-### 基本的な使い方
-
-```bash
-# 基本（プロンプトファイルを指定）
-node node-file-runner-V3.js prompt.txt
-
-# プロバイダー指定
-node node-file-runner-V3.js prompt.txt --provider claude
-node node-file-runner-V3.js prompt.txt --provider gemini
-node node-file-runner-V3.js prompt.txt --provider codex
-
-# 結果をファイルに保存
-node node-file-runner-V3.js prompt.txt --output result.txt
-
-# システムプロンプトも指定
-node node-file-runner-V3.js prompt.txt --system-file system.txt -o result.txt
-
-# 実行方法を変更
-node node-file-runner-V3.js prompt.txt --method default
-node node-file-runner-V3.js prompt.txt --method pipe
-node node-file-runner-V3.js prompt.txt --method echo
-```
-
-### オプション一覧
-
-| オプション | 短縮形 | 説明 |
-|-----------|-------|------|
-| `--provider` | `-P` | プロバイダー（claude / gemini / codex） |
-| `--output` | `-o` | 出力ファイル |
-| `--system-file` | `-s` | システムプロンプトファイル |
-| `--method` | | 実行方法（default / pipe / echo） |
-| `--model` | | モデル指定 |
-| `--timeout` | | タイムアウト（ms） |
-| `--auto-approve-number` | | Claude番号選択式確認で入力する番号 |
-| `--debug` | | デバッグ出力 |
-| `--sync` | | ファイルI/Oを同期処理 |
-
 ---
 
 ## ファイル構成
 
 ```
-nodeClaudeRun/
-├── node-file-runner-V3.js   # 単体実行スクリプト（マルチプロバイダー対応）
+parallelRun/
+├── node-file-runner-V3.js   # ライブラリ（runAIWithPrefix を提供）
 ├── parallel-runner.js       # 並行実行ランナー
-├── prompt/                  # プロンプトファイル
-│   ├── run1.md
-│   ├── run2.md
-│   └── run3.md
-├── output/                  # 出力フォルダ（自動作成）
-├── sample-system.txt        # システムプロンプト例
 └── README.md
 ```
 
@@ -154,15 +84,8 @@ nodeClaudeRun/
 
 ```javascript
 const { 
-    runAI,           // 基本実行
     runAIWithPrefix, // プレフィックス付きリアルタイム出力
-    runAIWithPipe,   // パイプ方式
-    runAIWithEcho    // echo方式
 } = require('./node-file-runner-V3');
-
-// 基本的な使い方
-const result = await runAI('こんにちは', { provider: 'claude' });
-console.log(result.stdout);
 
 // プレフィックス付き（並行実行時に便利）
 const result2 = await runAIWithPrefix('分析してください', {
@@ -186,7 +109,3 @@ const result2 = await runAIWithPrefix('分析してください', {
   ```bash
   node parallel-runner.js "{prompt/run1.md,output/run1.tsv}"
   ```
-
-### 出力ディレクトリ
-
-- 指定した出力パスのディレクトリが存在しない場合、自動的に作成されます。

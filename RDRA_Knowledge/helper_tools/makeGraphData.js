@@ -2295,7 +2295,6 @@ var require_RdraSheet2Graph_res = __commonJS({
           if (bucRec.uc !== "") {
             uc.contents = bucRec.uc;
           }
-          console.log("Current refs:", bucRec);
           if (biz.contents !== "" && bucRec.buc !== "") {
             addPair(bizBuc, biz.contents, buc.contents);
           }
@@ -2323,7 +2322,6 @@ var require_RdraSheet2Graph_res = __commonJS({
             }
           }
           if (uc.contents !== "") {
-            console.log("UC processing:", uc.contents, bucRec.mdl1, bucRec.obj1, bucRec.mdl2);
             if (bucRec.mdl1 === "\u753B\u9762" && bucRec.obj1 !== "") {
               addPair(ucSrn, uc.contents, bucRec.obj1);
             }
@@ -2369,8 +2367,6 @@ var require_RdraSheet2Graph_res = __commonJS({
         evtExs.objectPairs = edgeBeUnique(evtExs);
         jobSrn.objectPairs = edgeBeUnique(jobSrn);
         jobAct.objectPairs = edgeBeUnique(jobAct);
-        console.log("BUC", ucSrn.modelPair, ucSrn.objectPairs, ucInf.modelPair, ucInf.objectPairs);
-        console.log("UC contents:", uc.contents, "ucInf pairs count:", ucInf.objectPairs.length, "");
         return [
           [
             bizBuc,
