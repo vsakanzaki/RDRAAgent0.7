@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Phaseのプロンプトファイルと出力ファイルのマッピング（並列実行用）
+ * Phaseのプロンプトファイル（並列実行用）　実行のプロンプトファイル
  */
 const phase1PromptMap = [
   { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/アクター生成.md'},
@@ -81,10 +81,12 @@ const rdraFiles = [
   'バリエーション.tsv'
 ];
 
-const specFiles = [
-  'ビジネスルール.md',
-  '論理データモデル.md',
-  '画面照会.json'
+const specPhase1Files = [
+  '21_論理データ生成.md',
+  '22_ビジネスルール生成.md'
+];
+const specPhase2Files = [
+  '23_画面生成.md'
 ];
 
 /**

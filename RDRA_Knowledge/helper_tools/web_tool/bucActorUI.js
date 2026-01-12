@@ -16,7 +16,6 @@ function resolveUiJsonPath() {
   return null;
 }
 
-// MIMEタイプのマッピング
 const mimeTypes = {
   '.html': 'text/html',
   '.json': 'application/json',
@@ -30,7 +29,7 @@ const mimeTypes = {
 };
 
 const server = http.createServer((req, res) => {
-  // シャットダウンエンドポイント
+  // シャットダウン（クライアントの「閉じる」ボタン用）
   if (req.url === '/shutdown') {
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify({ message: 'サーバーをシャットダウンします' }), 'utf-8');
@@ -44,7 +43,7 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // UIデータJSON
+  // 画面照会JSON
   if (req.url === '/ui.json') {
     const uiJsonPath = resolveUiJsonPath();
     if (!uiJsonPath) {
@@ -53,7 +52,8 @@ const server = http.createServer((req, res) => {
         JSON.stringify(
           {
             error: 'UI JSON not found',
-            message: '2_RDRASpec/画面照会.json（または ui.json）が存在しません。先にメニュー21で仕様ファイルを作成してください。',
+            message:
+              '2_RDRASpec/画面照会.json（または ui.json）が存在しません。先にメニューで仕様ファイルを作成してください。',
           },
           null,
           2
@@ -75,12 +75,12 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // URLからファイルパスを取得（静的配信）
+  // 静的配信
   let filePath;
   if (req.url === '/' || req.url === '/index.html') {
     filePath = path.join(__dirname, 'bucActorUI.html');
   } else {
-    // 安全のため、web_tool配下のみ配信
+    // 安全のため web_tool 配下のみ配信（パストラバーサル対策）
     const reqPath = decodeURIComponent(req.url);
     const normalized = path.normalize(reqPath).replace(/^(\.\.[/\\])+/, '');
     filePath = path.join(__dirname, normalized);

@@ -114,18 +114,7 @@ function createMenuAction({ rl, promptUser }) {
      */
     function executePhaseParallel(phaseNumber) {
 	    const fs = require('fs');
-	    
-	    // Phase設定を取得
-	    const config = getPhaseConfig(phaseNumber);
-	    if (!config) {
-	        console.error(`無効なPhase番号です: ${phaseNumber}`);
-	        isAllPhaseAutoRunning = false;
-	        autoRunPhase5AfterPhase4 = false;
-	        forceRunPhase5AfterPhase4InAllPhase = false;
-	        waitForEnterThenNext();
-	        return;
-	    }
-	    
+	    	    
 	    console.log(`Phase${phaseNumber}を並列実行します...`);
 	    
 	    // 出力フォルダが存在しない場合は作成
@@ -492,32 +481,40 @@ function createMenuAction({ rl, promptUser }) {
                 console.error(stderr);
             }
             console.log('ZeroOneデータの処理が完了しました。');
-        });
-        exec('node RDRA_Knowledge/helper_tools/copyToClipboard.js zeroone', (error, stdout, stderr) => {
-            if (error) {
-                console.error(`エラー: ${error}`);
-                promptUser();
-                return;
-            }
-            if (stdout) {
-                console.log(stdout);
-            }
-            if (stderr) {
-                console.error(stderr);
-            }
-            console.log('データはクリップボードにコピーされました。スプレッドシートに貼り付けてください。');
-        });
-        const browserCmd = getBrowserCommand('https://docs.google.com/spreadsheets/d/1h7J70l6DyXcuG0FKYqIpXXfdvsaqjdVFwc6jQXSh9fM/edit?gid=1240873646#gid=1240873646');
-        if (browserCmd) {
-            exec(browserCmd, (browserError) => {
-                if (browserError) {
-                    console.error(`ブラウザ起動エラー: ${browserError}`);
+            
+            // makeZeroOneData.jsが完了してからcopyToClipboard.jsを実行
+            exec('node RDRA_Knowledge/helper_tools/copyToClipboard.js zeroone', (error2, stdout2, stderr2) => {
+                if (error2) {
+                    console.error(`エラー: ${error2}`);
+                    promptUser();
+                    return;
+                }
+                if (stdout2) {
+                    console.log(stdout2);
+                }
+                if (stderr2) {
+                    console.error(stderr2);
+                }
+                console.log('データはクリップボードにコピーされました。スプレッドシートに貼り付けてください。');
+                
+                // クリップボードコピーが完了してからブラウザを開き、その後promptUserを呼ぶ
+                const browserCmd = getBrowserCommand('https://docs.google.com/spreadsheets/d/1h7J70l6DyXcuG0FKYqIpXXfdvsaqjdVFwc6jQXSh9fM/edit?gid=1240873646#gid=1240873646');
+                if (browserCmd) {
+                    exec(browserCmd, (browserError) => {
+                        if (browserError) {
+                            console.error(`ブラウザ起動エラー: ${browserError}`);
+                        } else {
+                            console.log('スプレッドシートをブラウザで開きました。');
+                        }
+                        // ブラウザ起動後（成功/失敗問わず）にpromptUserを呼ぶ
+                        promptUser();
+                    });
                 } else {
-                    console.log('スプレッドシートをブラウザで開きました。');
+                    // ブラウザコマンドが無い場合もpromptUserを呼ぶ
+                    promptUser();
                 }
             });
-        }
-        promptUser();
+        });
     }
 
     /**
@@ -667,14 +664,13 @@ function createMenuAction({ rl, promptUser }) {
             case '22':
                 // 画面定義ファイルは「画面照会.json」を正としつつ、過去互換で ui.json も許容する
                 if (
-                    checkAllFilesExistInFolder(specFiles, '2_RDRASpec') &&
-                    (fs.existsSync('2_RDRASpec/画面照会.json') || fs.existsSync('2_RDRASpec/ui.json'))
+                    checkAllFilesExistInFolder(specPhase2Files, '2_RDRASpec/phase1')
                 ) {
                     console.log('画面照会（BUC/アクター）を表示する。');
                     showActorUI();
                 } else {
                     console.log('2_RDRASpecフォルダーに仕様ファイルが生成されていません。');
-                    console.log('必要ファイル: 論理データモデル.md / ビジネスルール.md / 画面照会.json（または ui.json）');
+                    console.log('必要ファイル: 論理データモデル.md / ビジネスルール.md / 画面照会.json');
                     waitForEnterThenNext();
                 }
                 break;
