@@ -5,99 +5,146 @@
  */
 
 const { spawn } = require('child_process');
+const fs = require('fs');
+const path = require('path');
 
 const DEFAULT_TIMEOUT_MS = 120000;
 
 // ========================================
-// AIプロバイダー設定
+// 設定ファイル（モデル設定.json）読み込み
+// - 「初期要望.txt」と同じフォルダをプロジェクトルートとみなす
+// - モデル設定.json も同フォルダに置く
 // ========================================
-const AI_PROVIDERS = {
-    claude: {
-        name: 'Claude',
-        command: 'claude',
-        buildArgs: (_prompt, options) => {
-            const args = [
-                '-p',                              // print mode
-                '--output-format', 'text',
-                '--permission-mode', 'bypassPermissions',
-            ];
-            if (options.model) {
-                args.push('--model', options.model);
-            }
-            if (options.maxTurns) {
-                args.push('--max-turns', options.maxTurns.toString());
-            }
-            if (options.systemPrompt) {
-                args.push('--system-prompt', options.systemPrompt);
-            }
-            // claude は stdin で渡す（Windowsでマルチライン安定）
-            return args;
-        },
-        useStdin: true,
-        env: {
-            NO_COLOR: '1',
-            FORCE_COLOR: '0',
-        },
-    },
+function findProjectRootByInitialRequest(startDir) {
+    let dir = path.resolve(startDir);
+    const { root } = path.parse(dir);
 
-    gemini: {
-        name: 'Gemini',
-        command: 'gemini',
-        buildArgs: (prompt, options) => {
-            const args = [];
-            const finalPrompt = options.systemPrompt
-                ? `${options.systemPrompt}\n\n${prompt}`
-                : prompt;
-            if (options.model) {
-                args.push('--model', options.model);
-            }
-            // 実行前確認などを出さない
-            if (options.yolo !== false) {
-                args.push('--yolo');
-            }
-            // 非対話（one-shot）プロンプトは位置引数で渡す
-            args.push(finalPrompt);
-            return args;
-        },
-        useStdin: false,
-        env: {
-            NO_COLOR: '1',
-            CI: '1',
-        },
-    },
+    while (true) {
+        const marker = path.join(dir, '初期要望.txt');
+        if (fs.existsSync(marker)) {
+            return dir;
+        }
+        if (dir === root) {
+            throw new Error('初期要望.txt が見つからず、プロジェクトルートを特定できません');
+        }
+        dir = path.dirname(dir);
+    }
+}
 
-    codex: {
-        name: 'Codex',
-        command: 'codex',
-        buildArgs: (prompt, options) => {
-            const args = [
-                '--approval-mode', 'full-auto',
-            ];
-            if (options.model) {
-                args.push('--model', options.model);
-            }
-            args.push(prompt);
-            return args;
-        },
-        useStdin: false,
-        env: {
-            NO_COLOR: '1',
-        },
-    },
-};
+function getModelConfigPath() {
+    const projectRoot = findProjectRootByInitialRequest(__dirname);
+    return path.join(projectRoot, 'モデル設定.json');
+}
 
-const DEFAULT_PROVIDER = 'claude';
+function loadModelConfig() {
+    const configPath = getModelConfigPath();
+    if (!fs.existsSync(configPath)) {
+        throw new Error(`モデル設定ファイルが見つかりません: ${configPath}`);
+    }
+
+    try {
+        const jsonText = fs.readFileSync(configPath, 'utf-8');
+        const parsed = JSON.parse(jsonText);
+        return parsed;
+    } catch (e) {
+        throw new Error(`モデル設定ファイルの読み込みに失敗しました: ${e.message}\npath: ${configPath}`);
+    }
+}
+
+function assertObject(name, value) {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+        throw new Error(`モデル設定の形式エラー: ${name} は object である必要があります`);
+    }
+}
+
+function isTruthyConfigValue(v) {
+    if (v === undefined || v === null) return false;
+    if (typeof v === 'boolean') return v;
+    if (typeof v === 'number') return !Number.isNaN(v);
+    if (typeof v === 'string') return v.trim().length > 0;
+    // object/array は存在していれば true 扱い（必要なら厳格化）
+    return true;
+}
+
+function templateReplace(token, vars) {
+    return token.replace(/\{([A-Za-z0-9_-]+)\}/g, (_m, key) => {
+        if (!(key in vars)) {
+            throw new Error(`モデル設定のテンプレート解決に失敗: {${key}} が未定義です`);
+        }
+        const v = vars[key];
+        if (v === undefined || v === null) return '';
+        return String(v);
+    });
+}
+
+function buildArgsFromTemplate(providerConfig, prompt, runtimeOptions) {
+    const providerVars = (providerConfig.vars && typeof providerConfig.vars === 'object')
+        ? providerConfig.vars
+        : {};
+
+    // 実行時の補助変数（必要最低限）
+    const vars = {
+        ...providerVars,
+        prompt,
+        // 将来拡張：設定や呼び出し側から渡したい場合に備え、optionsも拾えるようにしておく
+        ...(runtimeOptions || {}),
+    };
+
+    const args = [];
+
+    const baseArgs = Array.isArray(providerConfig.args) ? providerConfig.args : [];
+    for (const t of baseArgs) {
+        if (typeof t !== 'string') {
+            throw new Error('モデル設定の形式エラー: args は string の配列である必要があります');
+        }
+        args.push(templateReplace(t, vars));
+    }
+
+    const argsIf = providerConfig.argsIf || {};
+    if (argsIf !== null && argsIf !== undefined) {
+        assertObject('providers.<name>.argsIf', argsIf);
+        for (const [k, templArr] of Object.entries(argsIf)) {
+            if (!Array.isArray(templArr)) {
+                throw new Error('モデル設定の形式エラー: argsIf の値は string 配列である必要があります');
+            }
+            if (!isTruthyConfigValue(vars[k])) continue;
+            for (const t of templArr) {
+                if (typeof t !== 'string') {
+                    throw new Error('モデル設定の形式エラー: argsIf の配列要素は string である必要があります');
+                }
+                args.push(templateReplace(t, vars));
+            }
+        }
+    }
+
+    return args;
+}
+
+const MODEL_CONFIG = loadModelConfig();
+assertObject('モデル設定', MODEL_CONFIG);
+assertObject('default', MODEL_CONFIG.default);
+assertObject('providers', MODEL_CONFIG.providers);
+
+const DEFAULT_PROVIDER = String(MODEL_CONFIG.default.provider || '').toLowerCase().trim();
+if (!DEFAULT_PROVIDER) {
+    throw new Error('モデル設定の形式エラー: default.provider が必要です');
+}
 
 function getAvailableProviders() {
-    return Object.keys(AI_PROVIDERS);
+    return Object.keys(MODEL_CONFIG.providers);
+}
+
+function getResolvedDefaultProvider() {
+    return DEFAULT_PROVIDER;
 }
 
 // ========================================
 // プレフィックス付きリアルタイム出力でAI実行（並行実行対応）
 // ========================================
 async function runAIWithPrefix(prompt, options = {}) {
-    const providerName = options.provider || DEFAULT_PROVIDER;
-    const provider = AI_PROVIDERS[providerName];
+    // provider/model はCLIから受け付けない方針のため、設定から決定
+    const providerName = DEFAULT_PROVIDER;
+    const provider = MODEL_CONFIG.providers[providerName];
 
     if (!provider) {
         throw new Error(`不明なプロバイダー: ${providerName}\n利用可能: ${getAvailableProviders().join(', ')}`);
@@ -108,17 +155,23 @@ async function runAIWithPrefix(prompt, options = {}) {
     const prefixStr = prefix ? `[${prefix}] ` : '';
 
     return new Promise((resolve, reject) => {
-        const promptForArgs = provider.useStdin ? '' : prompt;
-        const args = provider.buildArgs(promptForArgs, options);
+        const useStdin = provider.useStdin === true;
+        const promptForArgs = useStdin ? '' : prompt;
+        const args = buildArgsFromTemplate(provider, promptForArgs, options);
 
         process.stdout.write(`${prefixStr}---\n`);
 
-        const child = spawn(provider.command, args, {
+        const command = provider.command;
+        if (!command || typeof command !== 'string') {
+            throw new Error(`モデル設定の形式エラー: providers.${providerName}.command が不正です`);
+        }
+
+        const child = spawn(command, args, {
             stdio: ['pipe', 'pipe', 'pipe'],
             shell: true, // Windows互換のため
             env: {
                 ...process.env,
-                ...provider.env,
+                ...(provider.env && typeof provider.env === 'object' ? provider.env : {}),
             },
         });
 
@@ -201,7 +254,7 @@ async function runAIWithPrefix(prompt, options = {}) {
         });
 
         // stdin経由でプロンプトを渡す場合
-        if (provider.useStdin) {
+        if (useStdin) {
             child.stdin.write(prompt);
             child.stdin.end();
         }
@@ -210,9 +263,10 @@ async function runAIWithPrefix(prompt, options = {}) {
 
 module.exports = {
     runAIWithPrefix,
-    AI_PROVIDERS,
     DEFAULT_PROVIDER,
     getAvailableProviders,
+    getModelConfigPath,
+    getResolvedDefaultProvider,
 };
 
 

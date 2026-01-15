@@ -7,6 +7,7 @@ const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
+rl.setPrompt('> ');
 
 /**
  * メニューを表示する
@@ -30,15 +31,32 @@ function showMenu() {
 }
 
 let executeOption;
+// 入力の受け口を切り替える（Enter待ち / メニュー入力）
+let inputHandler = null;
+
+function handleMenuInput(line) {
+    executeOption(line.trim());
+}
+
+function waitForEnterThenNext() {
+    console.log('続行するにはEnterキーを押してください...');
+    inputHandler = () => {
+        promptUser();
+    };
+    rl.prompt();
+}
 
 function promptUser() {
     showMenu();
-    rl.question('> ', (answer) => {
-        executeOption(answer.trim());
-    });
+    inputHandler = handleMenuInput;
+    rl.prompt();
 }
 
-executeOption = createMenuAction({ rl, promptUser });
+rl.on('line', (line) => {
+    if (inputHandler) inputHandler(line);
+});
+
+executeOption = createMenuAction({ rl, promptUser, waitForEnterThenNext });
 
 console.log('コマンド実行メニュー');
 promptUser();

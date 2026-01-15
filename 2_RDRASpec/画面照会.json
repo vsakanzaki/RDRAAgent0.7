@@ -7,8 +7,12 @@
           "buc_name": "介護会員登録フロー",
           "actors": [
             {
-              "actor_name": "管理者",
-              "screen_names": ["介護会員登録画面", "介護会員分類設定画面", "介護会員承認画面"]
+              "actor_name": "事業所管理者",
+              "screen_names": ["介護会員登録画面", "介護会員状態設定画面"]
+            },
+            {
+              "actor_name": "事業所スタッフ",
+              "screen_names": ["介護会員登録画面", "介護会員状態設定画面"]
             }
           ]
         },
@@ -16,8 +20,12 @@
           "buc_name": "介護会員情報更新フロー",
           "actors": [
             {
-              "actor_name": "管理者",
-              "screen_names": ["介護会員情報更新画面", "介護会員状態変更画面"]
+              "actor_name": "事業所管理者",
+              "screen_names": ["介護会員参照画面", "介護会員更新画面", "介護会員状態変更画面"]
+            },
+            {
+              "actor_name": "事業所スタッフ",
+              "screen_names": ["介護会員参照画面", "介護会員更新画面", "介護会員状態変更画面"]
             }
           ]
         }
@@ -30,12 +38,16 @@
           "buc_name": "訪問介護スケジュール作成フロー",
           "actors": [
             {
-              "actor_name": "管理者",
-              "screen_names": ["スタッフスキル照会画面", "介護会員要望照会画面", "訪問介護計画作成画面", "訪問介護計画承認申請画面", "訪問介護計画承認画面"]
+              "actor_name": "事業所管理者",
+              "screen_names": ["介護会員要望確認画面", "サービススタッフ状況確認画面", "訪問介護計画作成画面", "訪問介護計画承認申請画面", "訪問介護計画承認画面"]
+            },
+            {
+              "actor_name": "事業所スタッフ",
+              "screen_names": ["介護会員要望確認画面", "サービススタッフ状況確認画面", "訪問介護計画作成画面", "訪問介護計画承認申請画面", "訪問介護計画承認画面"]
             },
             {
               "actor_name": "サービススタッフ",
-              "screen_names": ["スタッフスキル照会画面", "介護会員要望照会画面", "訪問介護計画作成画面", "訪問介護計画承認申請画面"]
+              "screen_names": ["介護会員要望確認画面", "サービススタッフ状況確認画面", "訪問介護計画作成画面", "訪問介護計画承認申請画面", "訪問介護計画承認画面"]
             }
           ]
         },
@@ -43,56 +55,42 @@
           "buc_name": "訪問介護スケジュール調整フロー",
           "actors": [
             {
-              "actor_name": "管理者",
-              "screen_names": ["スケジュール調整要求登録画面", "訪問介護計画更新画面"]
+              "actor_name": "事業所管理者",
+              "screen_names": ["訪問介護計画調整画面", "訪問介護計画変更承認画面"]
+            },
+            {
+              "actor_name": "事業所スタッフ",
+              "screen_names": ["訪問介護計画調整画面", "訪問介護計画変更承認画面"]
             },
             {
               "actor_name": "サービススタッフ",
-              "screen_names": ["スケジュール調整要求登録画面", "訪問介護計画更新画面"]
+              "screen_names": ["訪問介護計画調整画面", "訪問介護計画変更承認画面"]
             },
             {
               "actor_name": "介護会員",
-              "screen_names": ["スケジュール調整要求登録画面", "訪問介護計画更新画面"]
+              "screen_names": ["訪問介護計画調整画面", "訪問介護計画変更承認画面"]
             }
           ]
         }
       ]
     },
     {
-      "business_name": "訪問介護実施",
+      "business_name": "訪問介護実施管理",
       "BUCs": [
         {
-          "buc_name": "訪問介護記録登録フロー",
+          "buc_name": "訪問介護実施記録フロー",
           "actors": [
             {
               "actor_name": "サービススタッフ",
-              "screen_names": ["訪問介護実施開始画面", "訪問介護記録登録画面", "訪問介護記録承認申請画面"]
+              "screen_names": ["訪問介護開始画面", "訪問介護記録登録画面", "訪問介護完了画面"]
             },
             {
-              "actor_name": "管理者",
-              "screen_names": ["訪問介護記録承認画面"]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "business_name": "スタッフ教育",
-      "BUCs": [
-        {
-          "buc_name": "新人スタッフ教育フロー",
-          "actors": [
-            {
-              "actor_name": "教育担当スタッフ",
-              "screen_names": ["教育対象登録画面", "教育記録登録画面", "試用期間設定画面", "独り立ち承認画面", "指導者承認画面"]
+              "actor_name": "事業所管理者",
+              "screen_names": ["訪問介護開始画面", "訪問介護記録登録画面", "訪問介護完了画面", "訪問介護記録参照画面"]
             },
             {
-              "actor_name": "新人サービススタッフ",
-              "screen_names": ["教育対象登録画面", "教育記録登録画面", "試用期間設定画面", "独り立ち承認画面"]
-            },
-            {
-              "actor_name": "サービススタッフ",
-              "screen_names": ["指導者承認画面"]
+              "actor_name": "事業所スタッフ",
+              "screen_names": ["訪問介護開始画面", "訪問介護記録登録画面", "訪問介護完了画面", "訪問介護記録参照画面"]
             }
           ]
         }
@@ -105,40 +103,56 @@
           "buc_name": "介護費用計算フロー",
           "actors": [
             {
-              "actor_name": "管理者",
-              "screen_names": ["訪問介護実績照会画面", "介護費用計算画面", "請求データ作成画面"]
+              "actor_name": "事業所管理者",
+              "screen_names": ["介護費用計算画面", "計算結果確定画面"]
+            },
+            {
+              "actor_name": "事業所スタッフ",
+              "screen_names": ["介護費用計算画面", "計算結果確定画面"]
             }
           ]
         },
         {
-          "buc_name": "介護費用請求フロー",
+          "buc_name": "請求書発行フロー",
           "actors": [
             {
-              "actor_name": "管理者",
-              "screen_names": ["請求書発行画面", "請求状態更新画面"]
+              "actor_name": "事業所管理者",
+              "screen_names": ["請求書発行画面", "請求書発行記録画面"]
+            },
+            {
+              "actor_name": "事業所スタッフ",
+              "screen_names": ["請求書発行画面", "請求書発行記録画面"]
             }
           ]
         },
         {
-          "buc_name": "介護費用回収フロー",
+          "buc_name": "入金督促フロー",
           "actors": [
             {
-              "actor_name": "管理者",
-              "screen_names": ["入金確認画面", "入金記録登録画面", "未回収管理画面"]
+              "actor_name": "事業所管理者",
+              "screen_names": ["入金記録画面", "未入金督促画面"]
+            },
+            {
+              "actor_name": "事業所スタッフ",
+              "screen_names": ["入金記録画面", "未入金督促画面"]
             }
           ]
         }
       ]
     },
     {
-      "business_name": "スタッフ管理",
+      "business_name": "サービススタッフ管理",
       "BUCs": [
         {
           "buc_name": "サービススタッフ登録フロー",
           "actors": [
             {
-              "actor_name": "管理者",
-              "screen_names": ["サービススタッフ登録画面", "働き方分類設定画面", "スキル分類設定画面"]
+              "actor_name": "事業所管理者",
+              "screen_names": ["サービススタッフ登録画面", "サービススタッフ状態設定画面"]
+            },
+            {
+              "actor_name": "事業所スタッフ",
+              "screen_names": ["サービススタッフ登録画面", "サービススタッフ状態設定画面"]
             }
           ]
         },
@@ -146,26 +160,34 @@
           "buc_name": "サービススタッフ情報更新フロー",
           "actors": [
             {
-              "actor_name": "管理者",
-              "screen_names": ["サービススタッフ情報更新画面", "スタッフスキル更新画面"]
+              "actor_name": "事業所管理者",
+              "screen_names": ["サービススタッフ参照画面", "サービススタッフ更新画面", "サービススタッフ状態変更画面"]
             },
             {
-              "actor_name": "サービススタッフ",
-              "screen_names": ["サービススタッフ情報更新画面", "スタッフスキル更新画面"]
+              "actor_name": "事業所スタッフ",
+              "screen_names": ["サービススタッフ参照画面", "サービススタッフ更新画面", "サービススタッフ状態変更画面"]
             }
           ]
         }
       ]
     },
     {
-      "business_name": "事業所管理",
+      "business_name": "介護施設管理",
       "BUCs": [
         {
-          "buc_name": "事業所一元管理フロー",
+          "buc_name": "介護施設管理フロー",
           "actors": [
             {
-              "actor_name": "統括管理者",
-              "screen_names": ["事業所登録画面", "事業所統合管理画面", "事業所情報照会画面"]
+              "actor_name": "本部管理者",
+              "screen_names": ["介護施設状態管理画面"]
+            },
+            {
+              "actor_name": "事業所管理者",
+              "screen_names": ["介護施設状態管理画面"]
+            },
+            {
+              "actor_name": "事業所スタッフ",
+              "screen_names": ["介護施設状態管理画面"]
             }
           ]
         }
@@ -178,37 +200,127 @@
       "actors": [
         {
           "actor_name": "介護会員",
-          "screen_names": ["スケジュール調整要求登録画面", "訪問介護計画更新画面"]
+          "screen_names": ["訪問介護計画調整画面", "訪問介護計画変更承認画面"]
+        },
+        {
+          "actor_name": "介護会員家族",
+          "screen_names": []
         }
       ]
     },
     {
-      "group_name": "サービス提供",
+      "group_name": "訪問介護事業所",
       "actors": [
         {
           "actor_name": "サービススタッフ",
-          "screen_names": ["スタッフスキル照会画面", "介護会員要望照会画面", "訪問介護計画作成画面", "訪問介護計画承認申請画面", "スケジュール調整要求登録画面", "訪問介護計画更新画面", "訪問介護実施開始画面", "訪問介護記録登録画面", "訪問介護記録承認申請画面", "サービススタッフ情報更新画面", "スタッフスキル更新画面", "指導者承認画面"]
+          "screen_names": [
+            "介護会員要望確認画面",
+            "サービススタッフ状況確認画面",
+            "訪問介護計画作成画面",
+            "訪問介護計画承認申請画面",
+            "訪問介護計画承認画面",
+            "訪問介護計画調整画面",
+            "訪問介護計画変更承認画面",
+            "訪問介護開始画面",
+            "訪問介護記録登録画面",
+            "訪問介護完了画面"
+          ]
         },
         {
-          "actor_name": "新人サービススタッフ",
-          "screen_names": ["教育対象登録画面", "教育記録登録画面", "試用期間設定画面", "独り立ち承認画面"]
+          "actor_name": "事業所管理者",
+          "screen_names": [
+            "介護会員登録画面",
+            "介護会員状態設定画面",
+            "介護会員参照画面",
+            "介護会員更新画面",
+            "介護会員状態変更画面",
+            "介護会員要望確認画面",
+            "サービススタッフ状況確認画面",
+            "訪問介護計画作成画面",
+            "訪問介護計画承認申請画面",
+            "訪問介護計画承認画面",
+            "訪問介護計画調整画面",
+            "訪問介護計画変更承認画面",
+            "訪問介護開始画面",
+            "訪問介護記録登録画面",
+            "訪問介護完了画面",
+            "訪問介護記録参照画面",
+            "介護費用計算画面",
+            "計算結果確定画面",
+            "請求書発行画面",
+            "請求書発行記録画面",
+            "入金記録画面",
+            "未入金督促画面",
+            "サービススタッフ登録画面",
+            "サービススタッフ状態設定画面",
+            "サービススタッフ参照画面",
+            "サービススタッフ更新画面",
+            "サービススタッフ状態変更画面",
+            "介護施設状態管理画面"
+          ]
         },
         {
-          "actor_name": "教育担当スタッフ",
-          "screen_names": ["教育対象登録画面", "教育記録登録画面", "試用期間設定画面", "独り立ち承認画面", "指導者承認画面"]
+          "actor_name": "事業所スタッフ",
+          "screen_names": [
+            "介護会員登録画面",
+            "介護会員状態設定画面",
+            "介護会員参照画面",
+            "介護会員更新画面",
+            "介護会員状態変更画面",
+            "介護会員要望確認画面",
+            "サービススタッフ状況確認画面",
+            "訪問介護計画作成画面",
+            "訪問介護計画承認申請画面",
+            "訪問介護計画承認画面",
+            "訪問介護計画調整画面",
+            "訪問介護計画変更承認画面",
+            "訪問介護開始画面",
+            "訪問介護記録登録画面",
+            "訪問介護完了画面",
+            "訪問介護記録参照画面",
+            "介護費用計算画面",
+            "計算結果確定画面",
+            "請求書発行画面",
+            "請求書発行記録画面",
+            "入金記録画面",
+            "未入金督促画面",
+            "サービススタッフ登録画面",
+            "サービススタッフ状態設定画面",
+            "サービススタッフ参照画面",
+            "サービススタッフ更新画面",
+            "サービススタッフ状態変更画面",
+            "介護施設状態管理画面"
+          ]
+        },
+        {
+          "actor_name": "スケジュール管理者",
+          "screen_names": []
+        },
+        {
+          "actor_name": "現場責任者",
+          "screen_names": []
         }
       ]
     },
     {
-      "group_name": "事業所管理",
+      "group_name": "統括事業所",
       "actors": [
         {
-          "actor_name": "管理者",
-          "screen_names": ["介護会員登録画面", "介護会員分類設定画面", "介護会員承認画面", "介護会員情報更新画面", "介護会員状態変更画面", "スタッフスキル照会画面", "介護会員要望照会画面", "訪問介護計画作成画面", "訪問介護計画承認申請画面", "訪問介護計画承認画面", "スケジュール調整要求登録画面", "訪問介護計画更新画面", "訪問介護記録承認画面", "訪問介護実績照会画面", "介護費用計算画面", "請求データ作成画面", "請求書発行画面", "請求状態更新画面", "入金確認画面", "入金記録登録画面", "未回収管理画面", "サービススタッフ登録画面", "働き方分類設定画面", "スキル分類設定画面", "サービススタッフ情報更新画面", "スタッフスキル更新画面"]
+          "actor_name": "本部管理者",
+          "screen_names": ["介護施設状態管理画面"]
         },
         {
           "actor_name": "統括管理者",
-          "screen_names": ["事業所登録画面", "事業所統合管理画面", "事業所情報照会画面"]
+          "screen_names": []
+        }
+      ]
+    },
+    {
+      "group_name": "経理部門",
+      "actors": [
+        {
+          "actor_name": "経理担当者",
+          "screen_names": []
         }
       ]
     }
@@ -216,225 +328,615 @@
   "screens": [
     {
       "screen_name": "介護会員登録画面",
-      "operation": "登録",
       "fields": [
-        {"項目名": "名前", "type": "string", "tooltip": "介護会員の氏名"},
-        {"項目名": "連絡先", "type": "string", "tooltip": "電話番号やメールアドレス"},
-        {"項目名": "住所", "type": "string", "tooltip": "介護会員の住所"},
-        {"項目名": "介護度", "type": "string", "tooltip": "要介護度のレベル"},
-        {"項目名": "介護会員状況分類", "type": "バリエーション", "tooltip": "未契約、契約中、契約終了、休止中"},
-        {"項目名": "介護施設分類", "type": "バリエーション", "tooltip": "訪問介護専門、小規模多機能型、複合型"},
-        {"項目名": "要望内容", "type": "string", "tooltip": "介護会員の要望や希望事項"},
-        {"項目名": "契約開始日", "type": "date", "tooltip": "サービス契約の開始日"},
-        {"項目名": "契約終了日", "type": "date", "tooltip": "サービス契約の終了日"}
+        { "field_name": "名前", "type": "string", "tooltip": "介護会員の氏名" },
+        { "field_name": "連絡先", "type": "string", "tooltip": "電話番号など" },
+        { "field_name": "住所", "type": "string", "tooltip": "現住所" },
+        { "field_name": "生年月日", "type": "string", "tooltip": "YYYY/MM/DD" },
+        { "field_name": "性別", "type": "enum", "tooltip": "男性, 女性, その他" },
+        { "field_name": "介護度", "type": "enum", "tooltip": "要支援1, 要支援2, 要介護1, 要介護2, 要介護3, 要介護4, 要介護5" },
+        { "field_name": "状況分類", "type": "enum", "tooltip": "要支援1〜要介護5" },
+        { "field_name": "要望内容", "type": "string", "tooltip": "サービスへの要望" },
+        { "field_name": "契約日", "type": "string", "tooltip": "契約開始日" },
+        { "field_name": "緊急連絡先", "type": "string", "tooltip": "緊急時の連絡先" },
+        { "field_name": "保険証番号", "type": "string", "tooltip": "介護保険証番号" }
       ],
       "screen_datas": [
         {
-          "display_name": "田中花子",
+          "display_name": "山田 太郎",
           "dummy_data": [
-            {"項目名": "名前", "値": "田中花子"},
-            {"項目名": "連絡先", "値": "090-1234-5678"},
-            {"項目名": "住所", "値": "東京都渋谷区1-1-1"},
-            {"項目名": "介護度", "値": "要介護2"},
-            {"項目名": "介護会員状況分類", "値": "契約中"},
-            {"項目名": "介護施設分類", "値": "訪問介護専門"},
-            {"項目名": "要望内容", "値": "午前中の訪問希望"},
-            {"項目名": "契約開始日", "値": "2024-01-01"},
-            {"項目名": "契約終了日", "値": "2024-12-31"}
-          ]
-        },
-        {
-          "display_name": "佐藤太郎",
-          "dummy_data": [
-            {"項目名": "名前", "値": "佐藤太郎"},
-            {"項目名": "連絡先", "値": "080-2345-6789"},
-            {"項目名": "住所", "値": "東京都新宿区2-2-2"},
-            {"項目名": "介護度", "値": "要介護1"},
-            {"項目名": "介護会員状況分類", "値": "契約中"},
-            {"項目名": "介護施設分類", "値": "小規模多機能型"},
-            {"項目名": "要望内容", "値": "週3回の訪問希望"},
-            {"項目名": "契約開始日", "値": "2024-02-01"},
-            {"項目名": "契約終了日", "値": "2025-01-31"}
-          ]
-        },
-        {
-          "display_name": "鈴木一郎",
-          "dummy_data": [
-            {"項目名": "名前", "値": "鈴木一郎"},
-            {"項目名": "連絡先", "値": "070-3456-7890"},
-            {"項目名": "住所", "値": "東京都港区3-3-3"},
-            {"項目名": "介護度", "値": "要介護3"},
-            {"項目名": "介護会員状況分類", "値": "契約中"},
-            {"項目名": "介護施設分類", "値": "複合型"},
-            {"項目名": "要望内容", "値": "身体介護中心"},
-            {"項目名": "契約開始日", "値": "2024-03-01"},
-            {"項目名": "契約終了日", "値": "2025-02-28"}
+            { "field_name": "名前", "value": "山田 太郎" },
+            { "field_name": "連絡先", "value": "090-1111-2222" },
+            { "field_name": "住所", "value": "東京都世田谷区1-1" },
+            { "field_name": "生年月日", "value": "1945/05/20" },
+            { "field_name": "性別", "value": "男性" },
+            { "field_name": "介護度", "value": "要介護2" },
+            { "field_name": "状況分類", "value": "要介護2" },
+            { "field_name": "要望内容", "value": "週2回の入浴介助希望" },
+            { "field_name": "契約日", "value": "2025/04/01" },
+            { "field_name": "緊急連絡先", "value": "03-3333-4444 (長男)" },
+            { "field_name": "保険証番号", "value": "1234567890" }
           ]
         }
       ],
+      "operation": "登録",
       "data_access": [
-        {"entity": "介護会員", "CRUD": ["C", "R"], "isMain": true}
+        { "entity": "介護会員", "CRUD": ["C", "R"], "isMain": true },
+        { "entity": "個人情報", "CRUD": ["C", "R"], "isMain": false }
+      ]
+    },
+    {
+      "screen_name": "介護会員参照画面",
+      "fields": [
+        { "field_name": "会員ID", "type": "string", "tooltip": "会員ID" },
+        { "field_name": "名前", "type": "string", "tooltip": "介護会員の氏名" },
+        { "field_name": "介護度", "type": "enum", "tooltip": "現在の介護度" },
+        { "field_name": "介護会員状態", "type": "enum", "tooltip": "見込み, 契約中, 休止中, 解約済み" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "会員: 山田 太郎",
+          "dummy_data": [
+            { "field_name": "会員ID", "value": "C001" },
+            { "field_name": "名前", "value": "山田 太郎" },
+            { "field_name": "介護度", "value": "要介護2" },
+            { "field_name": "介護会員状態", "value": "契約中" }
+          ]
+        }
+      ],
+      "operation": "照会",
+      "data_access": [
+        { "entity": "介護会員", "CRUD": ["R"], "isMain": true }
       ]
     },
     {
       "screen_name": "訪問介護計画作成画面",
-      "operation": "登録",
       "fields": [
-        {"項目名": "訪問日時", "type": "datetime", "tooltip": "訪問予定の日時"},
-        {"項目名": "訪問時間", "type": "number", "tooltip": "訪問予定の時間（分）"},
-        {"項目名": "サービス内容", "type": "string", "tooltip": "提供するサービスの内容"},
-        {"項目名": "スケジュール状態", "type": "バリエーション", "tooltip": "仮予約、確定、変更申請中、キャンセル"},
-        {"項目名": "介護会員名", "type": "string", "tooltip": "介護会員の名前"},
-        {"項目名": "担当スタッフ名", "type": "string", "tooltip": "担当サービススタッフの名前"},
-        {"項目名": "介護施設名", "type": "string", "tooltip": "介護施設の名称"}
+        { "field_name": "介護会員ID", "type": "string", "tooltip": "対象会員ID" },
+        { "field_name": "サービススタッフID", "type": "string", "tooltip": "担当スタッフID" },
+        { "field_name": "訪問日時", "type": "string", "tooltip": "開始日時" },
+        { "field_name": "訪問内容", "type": "string", "tooltip": "実施予定のサービス" },
+        { "field_name": "所要時間", "type": "number", "tooltip": "分単位" }
       ],
       "screen_datas": [
         {
-          "display_name": "2024-04-01 10:00 訪問計画",
+          "display_name": "山田様 入浴介助計画",
           "dummy_data": [
-            {"項目名": "訪問日時", "値": "2024-04-01 10:00"},
-            {"項目名": "訪問時間", "値": "60"},
-            {"項目名": "サービス内容", "値": "身体介護、入浴介助"},
-            {"項目名": "スケジュール状態", "値": "確定"},
-            {"項目名": "介護会員名", "値": "田中花子"},
-            {"項目名": "担当スタッフ名", "値": "山田スタッフ"},
-            {"項目名": "介護施設名", "値": "訪問介護事業所A"}
-          ]
-        },
-        {
-          "display_name": "2024-04-02 14:00 訪問計画",
-          "dummy_data": [
-            {"項目名": "訪問日時", "値": "2024-04-02 14:00"},
-            {"項目名": "訪問時間", "値": "90"},
-            {"項目名": "サービス内容", "値": "生活援助、掃除、洗濯"},
-            {"項目名": "スケジュール状態", "値": "確定"},
-            {"項目名": "介護会員名", "値": "佐藤太郎"},
-            {"項目名": "担当スタッフ名", "値": "佐藤スタッフ"},
-            {"項目名": "介護施設名", "値": "訪問介護事業所B"}
-          ]
-        },
-        {
-          "display_name": "2024-04-03 09:00 訪問計画",
-          "dummy_data": [
-            {"項目名": "訪問日時", "値": "2024-04-03 09:00"},
-            {"項目名": "訪問時間", "値": "120"},
-            {"項目名": "サービス内容", "値": "身体介護、食事介助、移動支援"},
-            {"項目名": "スケジュール状態", "値": "仮予約"},
-            {"項目名": "介護会員名", "値": "鈴木一郎"},
-            {"項目名": "担当スタッフ名", "値": "鈴木スタッフ"},
-            {"項目名": "介護施設名", "値": "訪問介護事業所C"}
+            { "field_name": "介護会員ID", "value": "C001" },
+            { "field_name": "サービススタッフID", "value": "S001" },
+            { "field_name": "訪問日時", "value": "2025/07/01 10:00" },
+            { "field_name": "訪問内容", "value": "身体介護 (入浴)" },
+            { "field_name": "所要時間", "value": 60 }
           ]
         }
       ],
+      "operation": "登録",
       "data_access": [
-        {"entity": "訪問介護スケジュール", "CRUD": ["C", "R", "U"], "isMain": true},
-        {"entity": "介護会員", "CRUD": ["R"], "isMain": false},
-        {"entity": "サービススタッフ", "CRUD": ["R"], "isMain": false},
-        {"entity": "介護施設", "CRUD": ["R"], "isMain": false}
+        { "entity": "訪問介護計画", "CRUD": ["C", "R"], "isMain": true },
+        { "entity": "介護会員", "CRUD": ["R"], "isMain": false },
+        { "entity": "サービススタッフ", "CRUD": ["R"], "isMain": false }
       ]
     },
     {
       "screen_name": "訪問介護記録登録画面",
-      "operation": "登録",
       "fields": [
-        {"項目名": "実施日時", "type": "datetime", "tooltip": "実際の実施日時"},
-        {"項目名": "実施時間", "type": "number", "tooltip": "実際の実施時間（分）"},
-        {"項目名": "実施内容", "type": "string", "tooltip": "実施したサービスの詳細内容"},
-        {"項目名": "サービス品質評価", "type": "バリエーション", "tooltip": "優良、良好、要改善、問題あり"},
-        {"項目名": "特記事項", "type": "string", "tooltip": "実施時の特記事項や注意点"},
-        {"項目名": "介護会員名", "type": "string", "tooltip": "介護会員の名前"},
-        {"項目名": "担当スタッフ名", "type": "string", "tooltip": "実施したサービススタッフの名前"}
+        { "field_name": "計画ID", "type": "string", "tooltip": "対応する計画ID" },
+        { "field_name": "実施日時", "type": "string", "tooltip": "実際の開始日時" },
+        { "field_name": "実施内容", "type": "string", "tooltip": "実際に行った内容" },
+        { "field_name": "実施時間", "type": "number", "tooltip": "実働時間(分)" }
       ],
       "screen_datas": [
         {
-          "display_name": "2024-04-01 10:00 実施記録",
+          "display_name": "山田様 7/1 実施記録",
           "dummy_data": [
-            {"項目名": "実施日時", "値": "2024-04-01 10:00"},
-            {"項目名": "実施時間", "値": "60"},
-            {"項目名": "実施内容", "値": "身体介護、入浴介助を実施"},
-            {"項目名": "サービス品質評価", "値": "良好"},
-            {"項目名": "特記事項", "値": "特に問題なし"},
-            {"項目名": "介護会員名", "値": "田中花子"},
-            {"項目名": "担当スタッフ名", "値": "山田スタッフ"}
-          ]
-        },
-        {
-          "display_name": "2024-04-02 14:00 実施記録",
-          "dummy_data": [
-            {"項目名": "実施日時", "値": "2024-04-02 14:00"},
-            {"項目名": "実施時間", "値": "90"},
-            {"項目名": "実施内容", "値": "生活援助、掃除、洗濯を実施"},
-            {"項目名": "サービス品質評価", "値": "優良"},
-            {"項目名": "特記事項", "値": "会員が満足していた"},
-            {"項目名": "介護会員名", "値": "佐藤太郎"},
-            {"項目名": "担当スタッフ名", "値": "佐藤スタッフ"}
-          ]
-        },
-        {
-          "display_name": "2024-04-03 09:00 実施記録",
-          "dummy_data": [
-            {"項目名": "実施日時", "値": "2024-04-03 09:00"},
-            {"項目名": "実施時間", "値": "120"},
-            {"項目名": "実施内容", "値": "身体介護、食事介助、移動支援を実施"},
-            {"項目名": "サービス品質評価", "値": "良好"},
-            {"項目名": "特記事項", "値": "順調に実施"},
-            {"項目名": "介護会員名", "値": "鈴木一郎"},
-            {"項目名": "担当スタッフ名", "値": "鈴木スタッフ"}
+            { "field_name": "計画ID", "value": "P001" },
+            { "field_name": "実施日時", "value": "2025/07/01 10:05" },
+            { "field_name": "実施内容", "value": "入浴介助、洗髪" },
+            { "field_name": "実施時間", "value": 55 }
           ]
         }
       ],
+      "operation": "登録",
       "data_access": [
-        {"entity": "訪問介護実施記録", "CRUD": ["C", "R", "U"], "isMain": true},
-        {"entity": "訪問介護スケジュール", "CRUD": ["R"], "isMain": false},
-        {"entity": "介護会員", "CRUD": ["R"], "isMain": false},
-        {"entity": "サービススタッフ", "CRUD": ["R"], "isMain": false}
+        { "entity": "訪問介護記録", "CRUD": ["C", "R"], "isMain": true },
+        { "entity": "訪問介護計画", "CRUD": ["R"], "isMain": false }
       ]
     },
     {
       "screen_name": "介護費用計算画面",
-      "operation": "分析",
       "fields": [
-        {"項目名": "請求対象期間", "type": "string", "tooltip": "請求対象となる期間"},
-        {"項目名": "請求金額", "type": "number", "tooltip": "請求する金額"},
-        {"項目名": "計算基準", "type": "バリエーション", "tooltip": "時間単価、回数単価、月額定額"},
-        {"項目名": "実施回数", "type": "number", "tooltip": "訪問介護の実施回数"},
-        {"項目名": "総実施時間", "type": "number", "tooltip": "総実施時間（分）"}
+        { "field_name": "介護会員ID", "type": "string", "tooltip": "会員ID" },
+        { "field_name": "記録ID", "type": "string", "tooltip": "対象の記録ID" },
+        { "field_name": "計算金額", "type": "number", "tooltip": "法規に基づく計算額" }
       ],
       "screen_datas": [
         {
-          "display_name": "2024年4月分 請求計算",
+          "display_name": "山田様 7月分費用計算",
           "dummy_data": [
-            {"項目名": "請求対象期間", "値": "2024年4月"},
-            {"項目名": "請求金額", "値": "50000"},
-            {"項目名": "計算基準", "値": "時間単価"},
-            {"項目名": "実施回数", "値": "12"},
-            {"項目名": "総実施時間", "値": "720"}
-          ]
-        },
-        {
-          "display_name": "2024年5月分 請求計算",
-          "dummy_data": [
-            {"項目名": "請求対象期間", "値": "2024年5月"},
-            {"項目名": "請求金額", "値": "60000"},
-            {"項目名": "計算基準", "値": "時間単価"},
-            {"項目名": "実施回数", "値": "15"},
-            {"項目名": "総実施時間", "値": "900"}
-          ]
-        },
-        {
-          "display_name": "2024年6月分 請求計算",
-          "dummy_data": [
-            {"項目名": "請求対象期間", "値": "2024年6月"},
-            {"項目名": "請求金額", "値": "55000"},
-            {"項目名": "計算基準", "値": "時間単価"},
-            {"項目名": "実施回数", "値": "13"},
-            {"項目名": "総実施時間", "値": "780"}
+            { "field_name": "介護会員ID", "value": "C001" },
+            { "field_name": "記録ID", "value": "R001" },
+            { "field_name": "計算金額", "value": 8000 }
           ]
         }
       ],
+      "operation": "分析",
       "data_access": [
-        {"entity": "訪問介護実施記録", "CRUD": ["R"], "isMain": false},
-        {"entity": "介護費用請求", "CRUD": ["C", "R"], "isMain": true}
+        { "entity": "介護費用", "CRUD": ["C", "R"], "isMain": true },
+        { "entity": "訪問介護記録", "CRUD": ["R"], "isMain": false },
+        { "entity": "法規情報", "CRUD": ["R"], "isMain": false }
+      ]
+    },
+    {
+      "screen_name": "請求書発行画面",
+      "fields": [
+        { "field_name": "費用ID", "type": "string", "tooltip": "対象費用ID" },
+        { "field_name": "請求先区分", "type": "enum", "tooltip": "介護保険, 自費" },
+        { "field_name": "請求金額", "type": "number", "tooltip": "請求総額" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "山田様 7月請求書",
+          "dummy_data": [
+            { "field_name": "費用ID", "value": "F001" },
+            { "field_name": "請求先区分", "value": "介護保険" },
+            { "field_name": "請求金額", "value": 800 }
+          ]
+        }
+      ],
+      "operation": "登録",
+      "data_access": [
+        { "entity": "請求書", "CRUD": ["C", "R"], "isMain": true },
+        { "entity": "介護費用", "CRUD": ["R"], "isMain": false }
+      ]
+    },
+    {
+      "screen_name": "サービススタッフ登録画面",
+      "fields": [
+        { "field_name": "名前", "type": "string", "tooltip": "スタッフ氏名" },
+        { "field_name": "連絡先", "type": "string", "tooltip": "電話番号" },
+        { "field_name": "働き方分類", "type": "enum", "tooltip": "常勤フルタイム等" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "田中 幸子",
+          "dummy_data": [
+            { "field_name": "名前", "value": "田中 幸子" },
+            { "field_name": "連絡先", "value": "090-2222-3333" },
+            { "field_name": "働き方分類", "value": "常勤フルタイム" }
+          ]
+        }
+      ],
+      "operation": "登録",
+      "data_access": [
+        { "entity": "サービススタッフ", "CRUD": ["C", "R"], "isMain": true },
+        { "entity": "働き方分類", "CRUD": ["R"], "isMain": false }
+      ]
+    },
+    {
+      "screen_name": "介護会員更新画面",
+      "fields": [
+        { "field_name": "会員ID", "type": "string", "tooltip": "会員ID" },
+        { "field_name": "名前", "type": "string", "tooltip": "氏名" },
+        { "field_name": "介護度", "type": "enum", "tooltip": "変更後の介護度" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "山田様 情報更新",
+          "dummy_data": [
+            { "field_name": "会員ID", "value": "C001" },
+            { "field_name": "名前", "value": "山田 太郎" },
+            { "field_name": "介護度", "value": "要介護3" }
+          ]
+        }
+      ],
+      "operation": "登録",
+      "data_access": [
+        { "entity": "介護会員", "CRUD": ["U", "R"], "isMain": true }
+      ]
+    },
+    {
+      "screen_name": "介護会員状態設定画面",
+      "fields": [
+        { "field_name": "会員ID", "type": "string", "tooltip": "会員ID" },
+        { "field_name": "介護会員状態", "type": "enum", "tooltip": "見込み, 契約中" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "新規会員 契約設定",
+          "dummy_data": [
+            { "field_name": "会員ID", "value": "C004" },
+            { "field_name": "介護会員状態", "value": "契約中" }
+          ]
+        }
+      ],
+      "operation": "登録",
+      "data_access": [
+        { "entity": "介護会員", "CRUD": ["U", "R"], "isMain": true }
+      ]
+    },
+    {
+      "screen_name": "介護会員状態変更画面",
+      "fields": [
+        { "field_name": "会員ID", "type": "string", "tooltip": "会員ID" },
+        { "field_name": "介護会員状態", "type": "enum", "tooltip": "契約中, 休止中, 解約済み" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "山田様 休止設定",
+          "dummy_data": [
+            { "field_name": "会員ID", "value": "C001" },
+            { "field_name": "介護会員状態", "value": "休止中" }
+          ]
+        }
+      ],
+      "operation": "登録",
+      "data_access": [
+        { "entity": "介護会員", "CRUD": ["U", "R"], "isMain": true }
+      ]
+    },
+    {
+      "screen_name": "介護会員要望確認画面",
+      "fields": [
+        { "field_name": "会員ID", "type": "string", "tooltip": "会員ID" },
+        { "field_name": "要望内容", "type": "string", "tooltip": "要望の詳細" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "山田様 要望確認",
+          "dummy_data": [
+            { "field_name": "会員ID", "value": "C001" },
+            { "field_name": "要望内容", "value": "週2回の入浴介助希望。" }
+          ]
+        }
+      ],
+      "operation": "照会",
+      "data_access": [
+        { "entity": "介護会員", "CRUD": ["R"], "isMain": true }
+      ]
+    },
+    {
+      "screen_name": "サービススタッフ状況確認画面",
+      "fields": [
+        { "field_name": "スタッフID", "type": "string", "tooltip": "スタッフID" },
+        { "field_name": "名前", "type": "string", "tooltip": "氏名" },
+        { "field_name": "サービススタッフ状態", "type": "enum", "tooltip": "稼働可能等" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "田中スタッフ 状況",
+          "dummy_data": [
+            { "field_name": "スタッフID", "value": "S001" },
+            { "field_name": "名前", "value": "田中 幸子" },
+            { "field_name": "サービススタッフ状態", "value": "稼働可能" }
+          ]
+        }
+      ],
+      "operation": "照会",
+      "data_access": [
+        { "entity": "サービススタッフ", "CRUD": ["R"], "isMain": true }
+      ]
+    },
+    {
+      "screen_name": "訪問介護計画承認申請画面",
+      "fields": [
+        { "field_name": "計画ID", "type": "string", "tooltip": "計画ID" },
+        { "field_name": "訪問介護計画状態", "type": "enum", "tooltip": "承認待ち等" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "P001 承認申請",
+          "dummy_data": [
+            { "field_name": "計画ID", "value": "P001" },
+            { "field_name": "訪問介護計画状態", "value": "承認待ち" }
+          ]
+        }
+      ],
+      "operation": "申請",
+      "data_access": [
+        { "entity": "訪問介護計画", "CRUD": ["U", "R"], "isMain": true }
+      ]
+    },
+    {
+      "screen_name": "訪問介護計画承認画面",
+      "fields": [
+        { "field_name": "計画ID", "type": "string", "tooltip": "計画ID" },
+        { "field_name": "訪問介護計画状態", "type": "enum", "tooltip": "承認済み等" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "P001 承認処理",
+          "dummy_data": [
+            { "field_name": "計画ID", "value": "P001" },
+            { "field_name": "訪問介護計画状態", "value": "承認済み" }
+          ]
+        }
+      ],
+      "operation": "承認",
+      "data_access": [
+        { "entity": "訪問介護計画", "CRUD": ["U", "R"], "isMain": true }
+      ]
+    },
+    {
+      "screen_name": "訪問介護計画調整画面",
+      "fields": [
+        { "field_name": "計画ID", "type": "string", "tooltip": "計画ID" },
+        { "field_name": "訪問日時", "type": "string", "tooltip": "新しい日時" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "P002 時間調整",
+          "dummy_data": [
+            { "field_name": "計画ID", "value": "P002" },
+            { "field_name": "訪問日時", "value": "2025/07/02 15:00" }
+          ]
+        }
+      ],
+      "operation": "登録",
+      "data_access": [
+        { "entity": "訪問介護計画", "CRUD": ["U", "R"], "isMain": true }
+      ]
+    },
+    {
+      "screen_name": "訪問介護計画変更承認画面",
+      "fields": [
+        { "field_name": "計画ID", "type": "string", "tooltip": "計画ID" },
+        { "field_name": "判定", "type": "enum", "tooltip": "承認, 却下" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "P002 変更承認",
+          "dummy_data": [
+            { "field_name": "計画ID", "value": "P002" },
+            { "field_name": "判定", "value": "承認" }
+          ]
+        }
+      ],
+      "operation": "承認",
+      "data_access": [
+        { "entity": "訪問介護計画", "CRUD": ["U", "R"], "isMain": true }
+      ]
+    },
+    {
+      "screen_name": "訪問介護開始画面",
+      "fields": [
+        { "field_name": "計画ID", "type": "string", "tooltip": "計画ID" },
+        { "field_name": "訪問予定状態", "type": "enum", "tooltip": "訪問中" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "山田様 訪問開始",
+          "dummy_data": [
+            { "field_name": "計画ID", "value": "P001" },
+            { "field_name": "訪問予定状態", "value": "訪問中" }
+          ]
+        }
+      ],
+      "operation": "登録",
+      "data_access": [
+        { "entity": "訪問予定", "CRUD": ["U", "R"], "isMain": true },
+        { "entity": "訪問介護計画", "CRUD": ["R"], "isMain": false }
+      ]
+    },
+    {
+      "screen_name": "訪問介護完了画面",
+      "fields": [
+        { "field_name": "計画ID", "type": "string", "tooltip": "計画ID" },
+        { "field_name": "訪問予定状態", "type": "enum", "tooltip": "完了" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "山田様 訪問完了",
+          "dummy_data": [
+            { "field_name": "計画ID", "value": "P001" },
+            { "field_name": "訪問予定状態", "value": "完了" }
+          ]
+        }
+      ],
+      "operation": "登録",
+      "data_access": [
+        { "entity": "訪問予定", "CRUD": ["U", "R"], "isMain": true }
+      ]
+    },
+    {
+      "screen_name": "訪問介護記録参照画面",
+      "fields": [
+        { "field_name": "会員ID", "type": "string", "tooltip": "会員ID" },
+        { "field_name": "実施内容", "type": "string", "tooltip": "記録" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "山田様 記録参照",
+          "dummy_data": [
+            { "field_name": "会員ID", "value": "C001" },
+            { "field_name": "実施内容", "value": "身体介助" }
+          ]
+        }
+      ],
+      "operation": "照会",
+      "data_access": [
+        { "entity": "訪問介護記録", "CRUD": ["R"], "isMain": true }
+      ]
+    },
+    {
+      "screen_name": "計算結果確定画面",
+      "fields": [
+        { "field_name": "費用ID", "type": "string", "tooltip": "費用ID" },
+        { "field_name": "請求状態", "type": "enum", "tooltip": "計算済み" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "7月分費用 確定",
+          "dummy_data": [
+            { "field_name": "費用ID", "value": "F001" },
+            { "field_name": "請求状態", "value": "計算済み" }
+          ]
+        }
+      ],
+      "operation": "登録",
+      "data_access": [
+        { "entity": "介護費用", "CRUD": ["U", "R"], "isMain": true }
+      ]
+    },
+    {
+      "screen_name": "請求書発行記録画面",
+      "fields": [
+        { "field_name": "請求書ID", "type": "string", "tooltip": "請求書ID" },
+        { "field_name": "請求状態", "type": "enum", "tooltip": "請求書発行済み" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "請求書発行 記録",
+          "dummy_data": [
+            { "field_name": "請求書ID", "value": "INV001" },
+            { "field_name": "請求状態", "value": "請求書発行済み" }
+          ]
+        }
+      ],
+      "operation": "照会",
+      "data_access": [
+        { "entity": "請求書", "CRUD": ["R"], "isMain": true },
+        { "entity": "介護費用", "CRUD": ["U", "R"], "isMain": false }
+      ]
+    },
+    {
+      "screen_name": "入金記録画面",
+      "fields": [
+        { "field_name": "請求書ID", "type": "string", "tooltip": "請求書ID" },
+        { "field_name": "請求状態", "type": "enum", "tooltip": "入金済み" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "山田様 入金記録",
+          "dummy_data": [
+            { "field_name": "請求書ID", "value": "INV001" },
+            { "field_name": "請求状態", "value": "入金済み" }
+          ]
+        }
+      ],
+      "operation": "登録",
+      "data_access": [
+        { "entity": "回収記録", "CRUD": ["C", "R"], "isMain": true },
+        { "entity": "介護費用", "CRUD": ["U", "R"], "isMain": false }
+      ]
+    },
+    {
+      "screen_name": "未入金督促画面",
+      "fields": [
+        { "field_name": "請求書ID", "type": "string", "tooltip": "請求書ID" },
+        { "field_name": "請求状態", "type": "enum", "tooltip": "督促中" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "未入金 督促管理",
+          "dummy_data": [
+            { "field_name": "請求書ID", "value": "INV003" },
+            { "field_name": "請求状態", "value": "督促中" }
+          ]
+        }
+      ],
+      "operation": "登録",
+      "data_access": [
+        { "entity": "介護費用", "CRUD": ["U", "R"], "isMain": true }
+      ]
+    },
+    {
+      "screen_name": "サービススタッフ状態設定画面",
+      "fields": [
+        { "field_name": "スタッフID", "type": "string", "tooltip": "スタッフID" },
+        { "field_name": "サービススタッフ状態", "type": "enum", "tooltip": "登録中, 稼働可能" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "新規スタッフ 状態設定",
+          "dummy_data": [
+            { "field_name": "スタッフID", "value": "S004" },
+            { "field_name": "サービススタッフ状態", "value": "稼働可能" }
+          ]
+        }
+      ],
+      "operation": "登録",
+      "data_access": [
+        { "entity": "サービススタッフ", "CRUD": ["U", "R"], "isMain": true }
+      ]
+    },
+    {
+      "screen_name": "サービススタッフ参照画面",
+      "fields": [
+        { "field_name": "スタッフID", "type": "string", "tooltip": "スタッフID" },
+        { "field_name": "名前", "type": "string", "tooltip": "氏名" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "田中スタッフ 参照",
+          "dummy_data": [
+            { "field_name": "スタッフID", "value": "S001" },
+            { "field_name": "名前", "value": "田中 幸子" }
+          ]
+        }
+      ],
+      "operation": "照会",
+      "data_access": [
+        { "entity": "サービススタッフ", "CRUD": ["R"], "isMain": true }
+      ]
+    },
+    {
+      "screen_name": "サービススタッフ更新画面",
+      "fields": [
+        { "field_name": "スタッフID", "type": "string", "tooltip": "スタッフID" },
+        { "field_name": "働き方分類_ID", "type": "number", "tooltip": "分類ID" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "田中スタッフ 情報更新",
+          "dummy_data": [
+            { "field_name": "スタッフID", "value": "S001" },
+            { "field_name": "働き方分類_ID", "value": 1 }
+          ]
+        }
+      ],
+      "operation": "登録",
+      "data_access": [
+        { "entity": "サービススタッフ", "CRUD": ["U", "R"], "isMain": true }
+      ]
+    },
+    {
+      "screen_name": "サービススタッフ状態変更画面",
+      "fields": [
+        { "field_name": "スタッフID", "type": "string", "tooltip": "スタッフID" },
+        { "field_name": "サービススタッフ状態", "type": "enum", "tooltip": "休職中等" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "田中スタッフ 状態変更",
+          "dummy_data": [
+            { "field_name": "スタッフID", "value": "S001" },
+            { "field_name": "サービススタッフ状態", "value": "休職中" }
+          ]
+        }
+      ],
+      "operation": "登録",
+      "data_access": [
+        { "entity": "サービススタッフ", "CRUD": ["U", "R"], "isMain": true }
+      ]
+    },
+    {
+      "screen_name": "介護施設状態管理画面",
+      "fields": [
+        { "field_name": "施設ID", "type": "string", "tooltip": "施設ID" },
+        { "field_name": "介護施設状態", "type": "enum", "tooltip": "契約中等" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "さくら苑 状態管理",
+          "dummy_data": [
+            { "field_name": "施設ID", "value": "F001" },
+            { "field_name": "介護施設状態", "value": "契約中" }
+          ]
+        }
+      ],
+      "operation": "登録",
+      "data_access": [
+        { "entity": "介護施設", "CRUD": ["U", "R"], "isMain": true }
       ]
     }
   ]

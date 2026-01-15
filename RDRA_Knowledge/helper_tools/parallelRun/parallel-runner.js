@@ -4,10 +4,9 @@
  * 使用方法:
  *   node parallel-runner.js file1.txt file2.txt file3.txt
  *   node parallel-runner.js {prompt/run1.md,output/run1.tsv} {prompt/run2.md,output/run2.tsv}   # output 側は無視されます（互換用）
- *   node parallel-runner.js file1.txt file2.txt --provider gemini
  */
 
-const { runAIWithPrefix } = require('./node-file-runner-V3');
+const { runAIWithPrefix, getResolvedDefaultProvider } = require('./node-file-runner-V3');
 const fs = require('fs');
 const path = require('path');
 
@@ -27,15 +26,16 @@ function showHelp() {
   {input.md,output.tsv}       互換用（output 側は無視されます）
 
 オプション:
-  --provider, -P <name>   AIプロバイダー (claude, gemini, codex)
-  --model, -m <model>     モデルを指定
   --timeout <ms>          タイムアウト（ミリ秒、デフォルト: 120000）
   --help, -h              このヘルプを表示
 
 例:
   node parallel-runner.js file1.txt file2.txt file3.txt
   node parallel-runner.js {prompt/run1.md,output/run1.tsv} {prompt/run2.md,output/run2.tsv}   # output 側は無視（互換用）
-  node parallel-runner.js file1.txt --provider gemini
+
+モデル/プロバイダー設定:
+  モデル/プロバイダーおよび各種オプションは、プロジェクトルート（初期要望.txtと同じ階層）の
+  「モデル設定.json」から読み込みます（CLIからは指定しません）。
 `);
 }
 
@@ -58,7 +58,7 @@ function parseArgs(argv) {
     const config = {
         filePairs: [],  // { input } の配列（{input,output} 形式は互換用で input のみ使用）
         options: {
-            timeout: 120000, // 2分
+            timeout: 180000, // 3分
         },
     };
 
@@ -68,10 +68,6 @@ function parseArgs(argv) {
         if (arg === '--help' || arg === '-h') {
             showHelp();
             process.exit(0);
-        } else if (arg === '--provider' || arg === '-P') {
-            config.options.provider = args[++i];
-        } else if (arg === '--model' || arg === '-m') {
-            config.options.model = args[++i];
         } else if (arg === '--timeout') {
             config.options.timeout = parseInt(args[++i], 10);
         } else if (!arg.startsWith('-')) {
@@ -168,7 +164,7 @@ async function main() {
     }
     
     // 設定表示
-    console.log(`files: ${config.filePairs.length}, provider: ${config.options.provider || '(default)'}, model: ${config.options.model || '(default)'}, timeout: ${config.options.timeout}ms`);
+    console.log(`files: ${config.filePairs.length}, provider(from config): ${getResolvedDefaultProvider()}, timeout: ${config.options.timeout}ms`);
     
     const totalStartTime = Date.now();
     

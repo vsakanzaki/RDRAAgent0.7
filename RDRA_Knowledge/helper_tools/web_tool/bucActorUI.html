@@ -457,12 +457,43 @@
     }
 
     function inputKind(field) {
-      const type = String(field?.type ?? '').toLowerCase();
+      const rawType = String(field?.type ?? '').trim();
+      const type = rawType.toLowerCase();
       if (type === 'number') return { kind: 'input', inputType: 'number' };
       if (type === 'date') return { kind: 'input', inputType: 'date' };
       if (type === 'datetime') return { kind: 'input', inputType: 'datetime-local' };
-      if (String(field?.type ?? '') === 'バリエーション') return { kind: 'select', options: parseVariationOptions(field) };
+      // Type=バリエーション/状態 は ComboBox（select）にする
+      if (rawType === 'バリエーション' || rawType === '状態') {
+        return { kind: 'select', options: parseVariationOptions(field) };
+      }
       return { kind: 'input', inputType: 'text' };
+    }
+
+    // Dateコンポーネント（依存なし・ネイティブ入力をラップ）
+    function toDatetimeLocalValue(v) {
+      const s = String(v ?? '').trim();
+      if (!s) return '';
+      // "YYYY-MM-DDTHH:mm" はそのまま、"YYYY-MM-DD HH:mm" は "T" に寄せる
+      if (s.includes('T')) return s;
+      return s.replace(' ', 'T');
+    }
+
+    function createDateInput(value, placeholder) {
+      const el = document.createElement('input');
+      el.className = 'field-input';
+      el.type = 'date';
+      el.value = String(value ?? '');
+      el.placeholder = placeholder ?? '';
+      return el;
+    }
+
+    function createDateTimeInput(value, placeholder) {
+      const el = document.createElement('input');
+      el.className = 'field-input';
+      el.type = 'datetime-local';
+      el.value = toDatetimeLocalValue(value);
+      el.placeholder = placeholder ?? '';
+      return el;
     }
 
     function setTabs() {
@@ -818,7 +849,8 @@
       const fieldDefs = Array.isArray(screen?.fields) ? screen.fields : [];
       const selectedData = screenDatas[state.selectedScreenDataIndex];
       const dummy = Array.isArray(selectedData?.dummy_data) ? selectedData.dummy_data : [];
-      const valueMap = new Map(dummy.map(x => [x?.項目名, x?.値]));
+      // 仕様JSON（2_RDRASpec/画面照会.json）は dummy_data が { field_name, value } 形式
+      const valueMap = new Map(dummy.map(x => [x?.field_name, x?.value]));
 
       if (fieldDefs.length === 0) {
         fields.innerHTML = '<div class="empty-state">項目がありません</div>';
@@ -829,9 +861,9 @@
 
           const label = document.createElement('div');
           label.className = 'field-label';
-          label.textContent = f?.項目名 ?? '';
+          label.textContent = f?.field_name ?? '';
 
-          const value = valueMap.get(f?.項目名) ?? '';
+          const value = valueMap.get(f?.field_name) ?? '';
           const kind = inputKind(f);
 
           let inputEl;
@@ -846,6 +878,13 @@
               opt.textContent = '--（選択肢なし）--';
               inputEl.appendChild(opt);
             } else {
+              // 現在値が選択肢に存在しない場合も表示できるように先頭に補完
+              if (value && !opts.includes(String(value))) {
+                const opt = document.createElement('option');
+                opt.value = String(value);
+                opt.textContent = String(value);
+                inputEl.appendChild(opt);
+              }
               for (const optText of opts) {
                 const opt = document.createElement('option');
                 opt.value = optText;
@@ -855,14 +894,16 @@
             }
             inputEl.value = value;
           } else {
-            inputEl = document.createElement('input');
-            inputEl.className = 'field-input';
-            inputEl.type = kind.inputType;
-            inputEl.placeholder = f?.tooltip ?? f?.type ?? '';
-            // datetime-local は "YYYY-MM-DD HH:mm" 形式が来がちなので雑に整形
-            if (kind.inputType === 'datetime-local') {
-              inputEl.value = String(value).replace(' ', 'T');
+            const placeholder = f?.tooltip ?? f?.type ?? '';
+            if (kind.inputType === 'date') {
+              inputEl = createDateInput(value, placeholder);
+            } else if (kind.inputType === 'datetime-local') {
+              inputEl = createDateTimeInput(value, placeholder);
             } else {
+              inputEl = document.createElement('input');
+              inputEl.className = 'field-input';
+              inputEl.type = kind.inputType;
+              inputEl.placeholder = placeholder;
               inputEl.value = value;
             }
           }

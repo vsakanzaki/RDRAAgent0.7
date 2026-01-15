@@ -13,7 +13,7 @@ const phase1PromptMap = [
   { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/状態生成.md'},
   { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/バリエーション生成.md'},
   { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/条件生成.md'},
-  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/初期要望分析.md'}
+  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/初期要望分析生成.md'}
 ];
 
 const phase2PromptMap = [
@@ -81,12 +81,21 @@ const rdraFiles = [
   'バリエーション.tsv'
 ];
 
+// RDRASpec（仕様）成果物ファイル
+// NOTE: 画面定義は「画面照会.json」を正とする（過去互換で ui.json を扱う箇所は menuAction 側で分岐）
+const specFiles = [
+  '論理データモデル.md',
+  'ビジネスルール.md',
+  '画面照会.json'
+];
+
 const specPhase1Files = [
   '21_論理データ生成.md',
-  '22_ビジネスルール生成.md'
+  '22_ビジネスルール生成.md',
+  '23_画面一覧生成.md'
 ];
 const specPhase2Files = [
-  '23_画面生成.md'
+  '24_画面照会生成.md'
 ];
 
 /**
@@ -94,10 +103,13 @@ const specPhase2Files = [
  */
 const specPhase1PromptMap = [
   { prompt: 'RDRA_Knowledge/2_RDRASpec/phase1/21_論理データ生成.md' },
-  { prompt: 'RDRA_Knowledge/2_RDRASpec/phase1/22_ビジネスルール生成.md' }
+  { prompt: 'RDRA_Knowledge/2_RDRASpec/phase1/22_ビジネスルール生成.md' },
+  { prompt: 'RDRA_Knowledge/2_RDRASpec/phase1/23_画面一覧生成.md' },
+  { prompt: 'RDRA_Knowledge/2_RDRASpec/phase1/24_BUC画面生成.md' },
+  { prompt: 'RDRA_Knowledge/2_RDRASpec/phase1/25_アクター画面生成.md' },
 ];
 const specPhase2PromptMap = [
-  { prompt: 'RDRA_Knowledge/2_RDRASpec/phase2/23_画面生成.md' },
+  { prompt: 'RDRA_Knowledge/2_RDRASpec/phase2/26_画面照会生成.md' },
 ];
 module.exports = {
   phase1PromptMap,
@@ -112,6 +124,8 @@ module.exports = {
   phase4Files,
   rdraFiles,
   specFiles,
+  specPhase1Files,
+  specPhase2Files,
 };
 
 

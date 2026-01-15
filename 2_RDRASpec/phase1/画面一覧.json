@@ -1,0 +1,718 @@
+{
+  "screens": [
+    {
+      "screen_name": "介護会員登録画面",
+      "fields": [
+        { "field_name": "名前", "type": "string", "tooltip": "介護会員の氏名" },
+        { "field_name": "連絡先", "type": "string", "tooltip": "電話番号など" },
+        { "field_name": "住所", "type": "string", "tooltip": "現住所" },
+        { "field_name": "生年月日", "type": "string", "tooltip": "YYYY/MM/DD" },
+        { "field_name": "性別", "type": "enum", "tooltip": "男性, 女性, その他" },
+        { "field_name": "介護度", "type": "enum", "tooltip": "要支援1, 要支援2, 要介護1, 要介護2, 要介護3, 要介護4, 要介護5" },
+        { "field_name": "状況分類", "type": "enum", "tooltip": "要支援1〜要介護5" },
+        { "field_name": "要望内容", "type": "string", "tooltip": "サービスへの要望" },
+        { "field_name": "契約日", "type": "string", "tooltip": "契約開始日" },
+        { "field_name": "緊急連絡先", "type": "string", "tooltip": "緊急時の連絡先" },
+        { "field_name": "保険証番号", "type": "string", "tooltip": "介護保険証番号" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "山田 太郎",
+          "dummy_data": [
+            { "field_name": "名前", "value": "山田 太郎" },
+            { "field_name": "連絡先", "value": "090-1111-2222" },
+            { "field_name": "住所", "value": "東京都世田谷区1-1" },
+            { "field_name": "生年月日", "value": "1945/05/20" },
+            { "field_name": "性別", "value": "男性" },
+            { "field_name": "介護度", "value": "要介護2" },
+            { "field_name": "状況分類", "value": "要介護2" },
+            { "field_name": "要望内容", "value": "週2回の入浴介助希望" },
+            { "field_name": "契約日", "value": "2025/04/01" },
+            { "field_name": "緊急連絡先", "value": "03-3333-4444 (長男)" },
+            { "field_name": "保険証番号", "value": "1234567890" }
+          ]
+        },
+        {
+          "display_name": "佐藤 花子",
+          "dummy_data": [
+            { "field_name": "名前", "value": "佐藤 花子" },
+            { "field_name": "連絡先", "value": "080-5555-6666" },
+            { "field_name": "住所", "value": "東京都杉並区2-2" },
+            { "field_name": "生年月日", "value": "1950/10/10" },
+            { "field_name": "性別", "value": "女性" },
+            { "field_name": "介護度", "value": "要支援1" },
+            { "field_name": "状況分類", "value": "要支援1" },
+            { "field_name": "要望内容", "value": "買い物同行を希望" },
+            { "field_name": "契約日", "value": "2025/05/15" },
+            { "field_name": "緊急連絡先", "value": "090-7777-8888 (娘)" },
+            { "field_name": "保険証番号", "value": "0987654321" }
+          ]
+        },
+        {
+          "display_name": "鈴木 一郎",
+          "dummy_data": [
+            { "field_name": "名前", "value": "鈴木 一郎" },
+            { "field_name": "連絡先", "value": "070-9999-0000" },
+            { "field_name": "住所", "value": "東京都練馬区3-3" },
+            { "field_name": "生年月日", "value": "1940/01/01" },
+            { "field_name": "性別", "value": "男性" },
+            { "field_name": "介護度", "value": "要介護4" },
+            { "field_name": "状況分類", "value": "要介護4" },
+            { "field_name": "要望内容", "value": "夜間の見守り希望" },
+            { "field_name": "契約日", "value": "2025/06/01" },
+            { "field_name": "緊急連絡先", "value": "03-1234-5678 (妻)" },
+            { "field_name": "保険証番号", "value": "5566778899" }
+          ]
+        }
+      ],
+      "operation": "登録"
+    },
+    {
+      "screen_name": "介護会員参照画面",
+      "fields": [
+        { "field_name": "会員ID", "type": "string", "tooltip": "会員ID" },
+        { "field_name": "名前", "type": "string", "tooltip": "介護会員の氏名" },
+        { "field_name": "介護度", "type": "enum", "tooltip": "現在の介護度" },
+        { "field_name": "介護会員状態", "type": "enum", "tooltip": "見込み, 契約中, 休止中, 解約済み" },
+        { "field_name": "住所", "type": "string", "tooltip": "現住所" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "会員: 山田 太郎",
+          "dummy_data": [
+            { "field_name": "会員ID", "value": "C001" },
+            { "field_name": "名前", "value": "山田 太郎" },
+            { "field_name": "介護度", "value": "要介護2" },
+            { "field_name": "介護会員状態", "value": "契約中" },
+            { "field_name": "住所", "value": "東京都世田谷区" }
+          ]
+        },
+        {
+          "display_name": "会員: 佐藤 花子",
+          "dummy_data": [
+            { "field_name": "会員ID", "value": "C002" },
+            { "field_name": "名前", "value": "佐藤 花子" },
+            { "field_name": "介護度", "value": "要支援1" },
+            { "field_name": "介護会員状態", "value": "契約中" },
+            { "field_name": "住所", "value": "東京都杉並区" }
+          ]
+        },
+        {
+          "display_name": "会員: 鈴木 一郎",
+          "dummy_data": [
+            { "field_name": "会員ID", "value": "C003" },
+            { "field_name": "名前", "value": "鈴木 一郎" },
+            { "field_name": "介護度", "value": "要介護4" },
+            { "field_name": "介護会員状態", "value": "契約中" },
+            { "field_name": "住所", "value": "東京都練馬区" }
+          ]
+        }
+      ],
+      "operation": "照会"
+    },
+    {
+      "screen_name": "訪問介護計画作成画面",
+      "fields": [
+        { "field_name": "介護会員ID", "type": "string", "tooltip": "対象会員ID" },
+        { "field_name": "サービススタッフID", "type": "string", "tooltip": "担当スタッフID" },
+        { "field_name": "訪問日時", "type": "string", "tooltip": "開始日時" },
+        { "field_name": "訪問内容", "type": "string", "tooltip": "実施予定のサービス" },
+        { "field_name": "所要時間", "type": "number", "tooltip": "分単位" },
+        { "field_name": "計画状態", "type": "enum", "tooltip": "計画中, 承認待ち, 承認済み, 実施中, 完了, 変更中" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "山田様 入浴介助計画",
+          "dummy_data": [
+            { "field_name": "介護会員ID", "value": "C001" },
+            { "field_name": "サービススタッフID", "value": "S001" },
+            { "field_name": "訪問日時", "value": "2025/07/01 10:00" },
+            { "field_name": "訪問内容", "value": "身体介護 (入浴)" },
+            { "field_name": "所要時間", "value": 60 },
+            { "field_name": "計画状態", "value": "計画中" }
+          ]
+        },
+        {
+          "display_name": "佐藤様 買い物同行計画",
+          "dummy_data": [
+            { "field_name": "介護会員ID", "value": "C002" },
+            { "field_name": "サービススタッフID", "value": "S002" },
+            { "field_name": "訪問日時", "value": "2025/07/02 14:00" },
+            { "field_name": "訪問内容", "value": "生活援助 (買い物)" },
+            { "field_name": "所要時間", "value": 90 },
+            { "field_name": "計画状態", "value": "計画中" }
+          ]
+        },
+        {
+          "display_name": "鈴木様 夜間見守り計画",
+          "dummy_data": [
+            { "field_name": "介護会員ID", "value": "C003" },
+            { "field_name": "サービススタッフID", "value": "S003" },
+            { "field_name": "訪問日時", "value": "2025/07/03 22:00" },
+            { "field_name": "訪問内容", "value": "夜間対応型" },
+            { "field_name": "所要時間", "value": 120 },
+            { "field_name": "計画状態", "value": "計画中" }
+          ]
+        }
+      ],
+      "operation": "登録"
+    },
+    {
+      "screen_name": "訪問介護記録登録画面",
+      "fields": [
+        { "field_name": "計画ID", "type": "string", "tooltip": "対応する計画ID" },
+        { "field_name": "実施日時", "type": "string", "tooltip": "実際の開始日時" },
+        { "field_name": "実施内容", "type": "string", "tooltip": "実際に行った内容" },
+        { "field_name": "実施時間", "type": "number", "tooltip": "実働時間(分)" },
+        { "field_name": "特記事項", "type": "string", "tooltip": "様子の変化など" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "山田様 7/1 実施記録",
+          "dummy_data": [
+            { "field_name": "計画ID", "value": "P001" },
+            { "field_name": "実施日時", "value": "2025/07/01 10:05" },
+            { "field_name": "実施内容", "value": "入浴介助、洗髪" },
+            { "field_name": "実施時間", "value": 55 },
+            { "field_name": "特記事項", "value": "少しふらつきあり、注意が必要" }
+          ]
+        },
+        {
+          "display_name": "佐藤様 7/2 実施記録",
+          "dummy_data": [
+            { "field_name": "計画ID", "value": "P002" },
+            { "field_name": "実施日時", "value": "2025/07/02 14:00" },
+            { "field_name": "実施内容", "value": "買い物同行 (スーパー)" },
+            { "field_name": "実施時間", "value": 90 },
+            { "field_name": "特記事項", "value": "元気に過ごされた" }
+          ]
+        },
+        {
+          "display_name": "鈴木様 7/3 実施記録",
+          "dummy_data": [
+            { "field_name": "計画ID", "value": "P003" },
+            { "field_name": "実施日時", "value": "2025/07/03 22:00" },
+            { "field_name": "実施内容", "value": "夜間見守り、体位変換" },
+            { "field_name": "実施時間", "value": 120 },
+            { "field_name": "特記事項", "value": "安眠されていた" }
+          ]
+        }
+      ],
+      "operation": "登録"
+    },
+    {
+      "screen_name": "介護費用計算画面",
+      "fields": [
+        { "field_name": "介護会員ID", "type": "string", "tooltip": "会員ID" },
+        { "field_name": "記録ID", "type": "string", "tooltip": "対象の記録ID" },
+        { "field_name": "計算金額", "type": "number", "tooltip": "法規に基づく計算額" },
+        { "field_name": "請求金額", "type": "number", "tooltip": "利用者負担分を含む請求額" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "山田様 7月分費用計算",
+          "dummy_data": [
+            { "field_name": "介護会員ID", "value": "C001" },
+            { "field_name": "記録ID", "value": "R001" },
+            { "field_name": "計算金額", "value": 8000 },
+            { "field_name": "請求金額", "value": 800 }
+          ]
+        },
+        {
+          "display_name": "佐藤様 7月分費用計算",
+          "dummy_data": [
+            { "field_name": "介護会員ID", "value": "C002" },
+            { "field_name": "記録ID", "value": "R002" },
+            { "field_name": "計算金額", "value": 5000 },
+            { "field_name": "請求金額", "value": 500 }
+          ]
+        },
+        {
+          "display_name": "鈴木様 7月分費用計算",
+          "dummy_data": [
+            { "field_name": "介護会員ID", "value": "C003" },
+            { "field_name": "記録ID", "value": "R003" },
+            { "field_name": "計算金額", "value": 12000 },
+            { "field_name": "請求金額", "value": 1200 }
+          ]
+        }
+      ],
+      "operation": "分析"
+    },
+    {
+      "screen_name": "請求書発行画面",
+      "fields": [
+        { "field_name": "費用ID", "type": "string", "tooltip": "対象費用ID" },
+        { "field_name": "請求先", "type": "enum", "tooltip": "介護保険, 自費" },
+        { "field_name": "請求金額", "type": "number", "tooltip": "請求総額" },
+        { "field_name": "支払期限", "type": "string", "tooltip": "YYYY/MM/DD" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "山田様 7月請求書",
+          "dummy_data": [
+            { "field_name": "費用ID", "value": "F001" },
+            { "field_name": "請求先", "value": "介護保険" },
+            { "field_name": "請求金額", "value": 800 },
+            { "field_name": "支払期限", "value": "2025/08/31" }
+          ]
+        },
+        {
+          "display_name": "佐藤様 7月請求書",
+          "dummy_data": [
+            { "field_name": "費用ID", "value": "F002" },
+            { "field_name": "請求先", "value": "介護保険" },
+            { "field_name": "請求金額", "value": 500 },
+            { "field_name": "支払期限", "value": "2025/08/31" }
+          ]
+        },
+        {
+          "display_name": "鈴木様 7月請求書",
+          "dummy_data": [
+            { "field_name": "費用ID", "value": "F003" },
+            { "field_name": "請求先", "value": "自費" },
+            { "field_name": "請求金額", "value": 12000 },
+            { "field_name": "支払期限", "value": "2025/08/31" }
+          ]
+        }
+      ],
+      "operation": "登録"
+    },
+    {
+      "screen_name": "サービススタッフ登録画面",
+      "fields": [
+        { "field_name": "名前", "type": "string", "tooltip": "スタッフ氏名" },
+        { "field_name": "連絡先", "type": "string", "tooltip": "電話番号" },
+        { "field_name": "スキル", "type": "enum", "tooltip": "介護福祉士, ヘルパー1級, ヘルパー2級, 初任者研修修了, 実務者研修修了" },
+        { "field_name": "資格", "type": "string", "tooltip": "保有資格詳細" },
+        { "field_name": "働き方分類", "type": "enum", "tooltip": "常勤フルタイム, 常勤パートタイム, 非常勤, 登録ヘルパー" },
+        { "field_name": "勤務可能日時", "type": "string", "tooltip": "希望シフト" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "田中 幸子",
+          "dummy_data": [
+            { "field_name": "名前", "value": "田中 幸子" },
+            { "field_name": "連絡先", "value": "090-2222-3333" },
+            { "field_name": "スキル", "value": "介護福祉士" },
+            { "field_name": "資格", "value": "介護福祉士、社会福祉士" },
+            { "field_name": "働き方分類", "value": "常勤フルタイム" },
+            { "field_name": "勤務可能日時", "value": "月-金 9:00-18:00" }
+          ]
+        },
+        {
+          "display_name": "中村 健二",
+          "dummy_data": [
+            { "field_name": "名前", "value": "中村 健二" },
+            { "field_name": "連絡先", "value": "080-4444-5555" },
+            { "field_name": "スキル", "value": "ヘルパー2級" },
+            { "field_name": "資格", "value": "ヘルパー2級" },
+            { "field_name": "働き方分類", "value": "登録ヘルパー" },
+            { "field_name": "勤務可能日時", "value": "土日祝 10:00-16:00" }
+          ]
+        },
+        {
+          "display_name": "小林 美智子",
+          "dummy_data": [
+            { "field_name": "名前", "value": "小林 美智子" },
+            { "field_name": "連絡先", "value": "070-6666-7777" },
+            { "field_name": "スキル", "value": "実務者研修修了" },
+            { "field_name": "資格", "value": "実務者研修修了、ガイドヘルパー" },
+            { "field_name": "働き方分類", "value": "常勤パートタイム" },
+            { "field_name": "勤務可能日時", "value": "火木土 8:00-14:00" }
+          ]
+        }
+      ],
+      "operation": "登録"
+    },
+    {
+      "screen_name": "介護会員更新画面",
+      "fields": [
+        { "field_name": "会員ID", "type": "string", "tooltip": "会員ID" },
+        { "field_name": "名前", "type": "string", "tooltip": "氏名" },
+        { "field_name": "連絡先", "type": "string", "tooltip": "連絡先" },
+        { "field_name": "介護度", "type": "enum", "tooltip": "変更後の介護度" },
+        { "field_name": "要望内容", "type": "string", "tooltip": "更新された要望" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "山田様 情報更新",
+          "dummy_data": [
+            { "field_name": "会員ID", "value": "C001" },
+            { "field_name": "名前", "value": "山田 太郎" },
+            { "field_name": "連絡先", "value": "090-1111-2222" },
+            { "field_name": "介護度", "value": "要介護3" },
+            { "field_name": "要望内容", "value": "歩行介助を追加希望" }
+          ]
+        }
+      ],
+      "operation": "登録"
+    },
+    {
+      "screen_name": "介護会員状態設定画面",
+      "fields": [
+        { "field_name": "会員ID", "type": "string", "tooltip": "会員ID" },
+        { "field_name": "介護会員状態", "type": "enum", "tooltip": "見込み, 契約中" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "新規会員 契約設定",
+          "dummy_data": [
+            { "field_name": "会員ID", "value": "C004" },
+            { "field_name": "介護会員状態", "value": "契約中" }
+          ]
+        }
+      ],
+      "operation": "登録"
+    },
+    {
+      "screen_name": "介護会員状態変更画面",
+      "fields": [
+        { "field_name": "会員ID", "type": "string", "tooltip": "会員ID" },
+        { "field_name": "介護会員状態", "type": "enum", "tooltip": "契約中, 休止中, 解約済み" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "山田様 休止設定",
+          "dummy_data": [
+            { "field_name": "会員ID", "value": "C001" },
+            { "field_name": "介護会員状態", "value": "休止中" }
+          ]
+        }
+      ],
+      "operation": "登録"
+    },
+    {
+      "screen_name": "介護会員要望確認画面",
+      "fields": [
+        { "field_name": "会員ID", "type": "string", "tooltip": "会員ID" },
+        { "field_name": "要望内容", "type": "string", "tooltip": "要望の詳細" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "山田様 要望確認",
+          "dummy_data": [
+            { "field_name": "会員ID", "value": "C001" },
+            { "field_name": "要望内容", "value": "週2回の入浴介助希望。午前中を希望。" }
+          ]
+        }
+      ],
+      "operation": "照会"
+    },
+    {
+      "screen_name": "サービススタッフ状況確認画面",
+      "fields": [
+        { "field_name": "スタッフID", "type": "string", "tooltip": "スタッフID" },
+        { "field_name": "名前", "type": "string", "tooltip": "氏名" },
+        { "field_name": "スキル", "type": "enum", "tooltip": "保有スキル" },
+        { "field_name": "サービススタッフ状態", "type": "enum", "tooltip": "稼働可能, 稼働中, 休職中" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "田中スタッフ 状況",
+          "dummy_data": [
+            { "field_name": "スタッフID", "value": "S001" },
+            { "field_name": "名前", "value": "田中 幸子" },
+            { "field_name": "スキル", "value": "介護福祉士" },
+            { "field_name": "サービススタッフ状態", "value": "稼働可能" }
+          ]
+        }
+      ],
+      "operation": "照会"
+    },
+    {
+      "screen_name": "訪問介護計画承認申請画面",
+      "fields": [
+        { "field_name": "計画ID", "type": "string", "tooltip": "計画ID" },
+        { "field_name": "申請者", "type": "string", "tooltip": "申請スタッフ名" },
+        { "field_name": "申請日", "type": "string", "tooltip": "YYYY/MM/DD" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "P001 承認申請",
+          "dummy_data": [
+            { "field_name": "計画ID", "value": "P001" },
+            { "field_name": "申請者", "value": "田中 幸子" },
+            { "field_name": "申請日", "value": "2025/06/25" }
+          ]
+        }
+      ],
+      "operation": "申請"
+    },
+    {
+      "screen_name": "訪問介護計画承認画面",
+      "fields": [
+        { "field_name": "計画ID", "type": "string", "tooltip": "計画ID" },
+        { "field_name": "承認者", "type": "string", "tooltip": "管理者名" },
+        { "field_name": "判定", "type": "enum", "tooltip": "承認, 却下" },
+        { "field_name": "コメント", "type": "string", "tooltip": "承認時の理由など" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "P001 承認処理",
+          "dummy_data": [
+            { "field_name": "計画ID", "value": "P001" },
+            { "field_name": "承認者", "value": "鈴木 管理者" },
+            { "field_name": "判定", "value": "承認" },
+            { "field_name": "コメント", "value": "内容に問題ありません。" }
+          ]
+        }
+      ],
+      "operation": "承認"
+    },
+    {
+      "screen_name": "訪問介護計画調整画面",
+      "fields": [
+        { "field_name": "計画ID", "type": "string", "tooltip": "計画ID" },
+        { "field_name": "変更後の訪問日時", "type": "string", "tooltip": "YYYY/MM/DD HH:mm" },
+        { "field_name": "調整理由", "type": "string", "tooltip": "変更の理由" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "P002 時間調整",
+          "dummy_data": [
+            { "field_name": "計画ID", "value": "P002" },
+            { "field_name": "変更後の訪問日時", "value": "2025/07/02 15:00" },
+            { "field_name": "調整理由", "value": "介護会員の都合により1時間後ろ倒し" }
+          ]
+        }
+      ],
+      "operation": "登録"
+    },
+    {
+      "screen_name": "訪問介護計画変更承認画面",
+      "fields": [
+        { "field_name": "計画ID", "type": "string", "tooltip": "計画ID" },
+        { "field_name": "変更内容", "type": "string", "tooltip": "変更の要約" },
+        { "field_name": "判定", "type": "enum", "tooltip": "承認, 却下" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "P002 変更承認",
+          "dummy_data": [
+            { "field_name": "計画ID", "value": "P002" },
+            { "field_name": "変更内容", "value": "14:00 -> 15:00 への変更" },
+            { "field_name": "判定", "value": "承認" }
+          ]
+        }
+      ],
+      "operation": "承認"
+    },
+    {
+      "screen_name": "訪問介護開始画面",
+      "fields": [
+        { "field_name": "計画ID", "type": "string", "tooltip": "計画ID" },
+        { "field_name": "開始打刻", "type": "string", "tooltip": "HH:mm" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "山田様 訪問開始",
+          "dummy_data": [
+            { "field_name": "計画ID", "value": "P001" },
+            { "field_name": "開始打刻", "value": "10:05" }
+          ]
+        }
+      ],
+      "operation": "登録"
+    },
+    {
+      "screen_name": "訪問介護完了画面",
+      "fields": [
+        { "field_name": "計画ID", "type": "string", "tooltip": "計画ID" },
+        { "field_name": "完了打刻", "type": "string", "tooltip": "HH:mm" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "山田様 訪問完了",
+          "dummy_data": [
+            { "field_name": "計画ID", "value": "P001" },
+            { "field_name": "完了打刻", "value": "11:00" }
+          ]
+        }
+      ],
+      "operation": "登録"
+    },
+    {
+      "screen_name": "訪問介護記録参照画面",
+      "fields": [
+        { "field_name": "会員ID", "type": "string", "tooltip": "会員ID" },
+        { "field_name": "実施期間", "type": "string", "tooltip": "期間" },
+        { "field_name": "記録一覧", "type": "string", "tooltip": "過去の記録" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "山田様 記録参照",
+          "dummy_data": [
+            { "field_name": "会員ID", "value": "C001" },
+            { "field_name": "実施期間", "value": "2025/07/01-2025/07/31" },
+            { "field_name": "記録一覧", "value": "7/1 身体介助, 7/4 身体介助..." }
+          ]
+        }
+      ],
+      "operation": "照会"
+    },
+    {
+      "screen_name": "計算結果確定画面",
+      "fields": [
+        { "field_name": "費用ID", "type": "string", "tooltip": "費用ID" },
+        { "field_name": "確定フラグ", "type": "enum", "tooltip": "確定, 未確定" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "7月分費用 確定",
+          "dummy_data": [
+            { "field_name": "費用ID", "value": "F001" },
+            { "field_name": "確定フラグ", "value": "確定" }
+          ]
+        }
+      ],
+      "operation": "登録"
+    },
+    {
+      "screen_name": "請求書発行記録画面",
+      "fields": [
+        { "field_name": "請求書ID", "type": "string", "tooltip": "請求書ID" },
+        { "field_name": "発行日時", "type": "string", "tooltip": "発行日" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "請求書発行 記録",
+          "dummy_data": [
+            { "field_name": "請求書ID", "value": "INV001" },
+            { "field_name": "発行日時", "value": "2025/08/05" }
+          ]
+        }
+      ],
+      "operation": "照会"
+    },
+    {
+      "screen_name": "入金記録画面",
+      "fields": [
+        { "field_name": "請求書ID", "type": "string", "tooltip": "請求書ID" },
+        { "field_name": "入金額", "type": "number", "tooltip": "入金額" },
+        { "field_name": "入金日", "type": "string", "tooltip": "YYYY/MM/DD" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "山田様 入金記録",
+          "dummy_data": [
+            { "field_name": "請求書ID", "value": "INV001" },
+            { "field_name": "入金額", "value": 800 },
+            { "field_name": "入金日", "value": "2025/08/20" }
+          ]
+        }
+      ],
+      "operation": "登録"
+    },
+    {
+      "screen_name": "未入金督促画面",
+      "fields": [
+        { "field_name": "請求書ID", "type": "string", "tooltip": "請求書ID" },
+        { "field_name": "督促回数", "type": "number", "tooltip": "回数" },
+        { "field_name": "最終督促日", "type": "string", "tooltip": "YYYY/MM/DD" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "未入金 督促管理",
+          "dummy_data": [
+            { "field_name": "請求書ID", "value": "INV003" },
+            { "field_name": "督促回数", "value": 1 },
+            { "field_name": "最終督促日", "value": "2025/09/01" }
+          ]
+        }
+      ],
+      "operation": "登録"
+    },
+    {
+      "screen_name": "サービススタッフ状態設定画面",
+      "fields": [
+        { "field_name": "スタッフID", "type": "string", "tooltip": "スタッフID" },
+        { "field_name": "サービススタッフ状態", "type": "enum", "tooltip": "登録中, 稼働可能" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "新規スタッフ 状態設定",
+          "dummy_data": [
+            { "field_name": "スタッフID", "value": "S004" },
+            { "field_name": "サービススタッフ状態", "value": "稼働可能" }
+          ]
+        }
+      ],
+      "operation": "登録"
+    },
+    {
+      "screen_name": "サービススタッフ参照画面",
+      "fields": [
+        { "field_name": "スタッフID", "type": "string", "tooltip": "スタッフID" },
+        { "field_name": "名前", "type": "string", "tooltip": "氏名" },
+        { "field_name": "スキル", "type": "enum", "tooltip": "スキル" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "田中スタッフ 参照",
+          "dummy_data": [
+            { "field_name": "スタッフID", "value": "S001" },
+            { "field_name": "名前", "value": "田中 幸子" },
+            { "field_name": "スキル", "value": "介護福祉士" }
+          ]
+        }
+      ],
+      "operation": "照会"
+    },
+    {
+      "screen_name": "サービススタッフ更新画面",
+      "fields": [
+        { "field_name": "スタッフID", "type": "string", "tooltip": "スタッフID" },
+        { "field_name": "スキル", "type": "enum", "tooltip": "更新後のスキル" },
+        { "field_name": "働き方分類", "type": "enum", "tooltip": "更新後の働き方" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "田中スタッフ 情報更新",
+          "dummy_data": [
+            { "field_name": "スタッフID", "value": "S001" },
+            { "field_name": "スキル", "value": "介護福祉士" },
+            { "field_name": "働き方分類", "value": "常勤フルタイム" }
+          ]
+        }
+      ],
+      "operation": "登録"
+    },
+    {
+      "screen_name": "サービススタッフ状態変更画面",
+      "fields": [
+        { "field_name": "スタッフID", "type": "string", "tooltip": "スタッフID" },
+        { "field_name": "サービススタッフ状態", "type": "enum", "tooltip": "稼働可能, 稼働中, 休職中, 退職済み" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "田中スタッフ 状態変更",
+          "dummy_data": [
+            { "field_name": "スタッフID", "value": "S001" },
+            { "field_name": "サービススタッフ状態", "value": "休職中" }
+          ]
+        }
+      ],
+      "operation": "登録"
+    },
+    {
+      "screen_name": "介護施設状態管理画面",
+      "fields": [
+        { "field_name": "施設ID", "type": "string", "tooltip": "施設ID" },
+        { "field_name": "施設名", "type": "string", "tooltip": "施設名" },
+        { "field_name": "介護施設状態", "type": "enum", "tooltip": "検討中, 契約中, 休止中, 契約終了" }
+      ],
+      "screen_datas": [
+        {
+          "display_name": "さくら苑 状態管理",
+          "dummy_data": [
+            { "field_name": "施設ID", "value": "F001" },
+            { "field_name": "施設名", "value": "さくら苑" },
+            { "field_name": "介護施設状態", "value": "契約中" }
+          ]
+        }
+      ],
+      "operation": "登録"
+    }
+  ]
+}
