@@ -2,6 +2,9 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Claudeの実行ルール
+- Claudeの出力のためにProgramを絶対に生成しない
+
 ## Project Overview
 
 RDRAAgent is a Node.js-based system that implements the **RDRA (Relationship Driven Requirement Analysis)** methodology for systematic software requirements definition. It guides users through a 4-phase process to progressively refine business requirements from initial concepts into detailed system specifications.
@@ -14,6 +17,9 @@ RDRAAgent is a Node.js-based system that implements the **RDRA (Relationship Dri
 - Modular phase-based architecture
 
 ## Architecture Overview
+- RDRA_Knowledgeフォルダー
+  - Agentに対する実行Promptを保持する
+  - このフォルダー配下には絶対にファイルを出力しない
 
 ### Core Components
 
@@ -77,10 +83,6 @@ RDRAAgent is a Node.js-based system that implements the **RDRA (Relationship Dri
     │
     ├─→ Visualization
     │    makeGraphData.js → RDRAGraph (external tool)
-    │
-    ├─→ Validation
-    │    _no_use/deprecated_menu_13_14_22/RDRA_Knowledge/1_RDRA指示.md
-    │    (checks against 妥当性検証環境.csv)
     │
     └─→ Specification
          RDRA_Knowledge/2_Spec指示.md
@@ -220,9 +222,7 @@ The system uses Claude Code (via Terminal execution) for:
 |------|---------|
 | menu.js | Main CLI orchestrator |
 | RDRA_Knowledge/0_ZeroOne指示.md | Requirements generation instructions |
-| _no_use/deprecated_menu_13_14_22/RDRA_Knowledge/1_RDRA指示.md | (deprecated) RDRA validation/explanation |
 | RDRA_Knowledge/2_Spec指示.md | Specification generation |
 | 初期要望.txt | User input: initial requirements |
-| 妥当性検証環境.csv | User input: validation scenarios |
 | Samples/ | Reference project templates |
 | helper_tools/ | Data transformation utilities |

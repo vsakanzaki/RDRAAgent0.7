@@ -66,7 +66,7 @@ function parseArgs(argv) {
     const config = {
         filePairs: [],  // { input } の配列（{input,output} 形式は互換用で input のみ使用）
         options: {
-            timeout: 180000, // 3分
+            timeout: 360000, // 6分
             systemPrompt: null,  // System Promptファイルパス
         },
     };

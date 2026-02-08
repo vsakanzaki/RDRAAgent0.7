@@ -135,93 +135,137 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
 	        fs.mkdirSync(outputDir, { recursive: true });
 	        console.log(`出力フォルダを作成しました: ${outputDir}`);
 	    }
-	    
-	    // 既にphaseが完了しているか確認
-	    const phaseExist = checkAllFilesExistInFolder(config.files, outputDir);
-	    if (phaseExist) {
-	        console.log(`phase${phaseNumber}は既に定義されています。`);
-	        // phase4の実行が発生していないので、phase5自動実行フラグは落とす
-	        if (phaseNumber === 4) {
-	            autoRunPhase5AfterPhase4 = false;
-	        }
-	        // メニュー2の自動連続実行中は次の不足フェーズへ進める
-	        if (isAllPhaseAutoRunning) {
-	            executeMissingPhasesTo5();
-	            return;
-	        }
-            waitForEnter();
-	        return;
-	    }
-	    
-	    // System Promptを動的生成
-	    let systemPromptPath = null;
-	    try {
-	        console.log(`Phase${phaseNumber}用のSystem Promptを生成中...`);
-	        systemPromptPath = generateSystemPrompt(phaseNumber);
-	    } catch (err) {
-	        console.warn(`System Prompt生成をスキップ: ${err.message}`);
-	    }
-	    
-	    // parallel-runner.jsに渡す引数を構築
-	    const args = config.promptMap.map(pair => pair.prompt);
-	    
-	    // System Promptオプションを追加
-	    if (systemPromptPath) {
-	        args.push('--system-prompt', systemPromptPath);
-	    }
-	    
-	    console.log('実行するプロンプトファイル:');
-	    config.promptMap.forEach(pair => {
-	        console.log(`  ${pair.prompt}`);
-	    });
-	    if (systemPromptPath) {
-	        console.log(`System Prompt: ${systemPromptPath}`);
-	    }
-	    console.log('');
-	    
-	    const child = spawn('node', [
-	        'RDRA_Knowledge/helper_tools/parallelRun/parallel-runner.js',
-	        ...args
-	    ], {
-	        stdio: 'inherit',
-	        shell: true
-	    });
-	    
-	    child.on('close', (code) => {
-	        if (code === 0) {
-	            console.log('');
-	            console.log(`Phase${phaseNumber}の並列実行が完了しました。`);
-	            // メニュー2の自動連続実行中は次の不足フェーズへ
+
+	    const runPhase = () => {
+	        // 既にphaseが完了しているか確認
+	        const phaseExist = checkAllFilesExistInFolder(config.files, outputDir);
+	        if (phaseExist) {
+	            console.log(`phase${phaseNumber}は既に定義されています。`);
+	            // メニュー2の自動連続実行中は次の不足フェーズへ進める
 	            if (isAllPhaseAutoRunning) {
-	                // Phase4 を今回実行した場合は、1_RDRA が既に揃っていても Phase5 を更新する
+	                // phase4の実行が発生していないので、phase5自動実行フラグは落とす
 	                if (phaseNumber === 4) {
-	                    forceRunPhase5AfterPhase4InAllPhase = true;
+	                    autoRunPhase5AfterPhase4 = false;
 	                }
 	                executeMissingPhasesTo5();
 	                return;
 	            }
-	            // メニュー1：Phase4を実行した直後はPhase5を自動実行
+	            // メニュー1：Phase4が揃ったならPhase5を更新する（Phase4実行の有無に関わらず）
 	            if (phaseNumber === 4 && autoRunPhase5AfterPhase4) {
 	                autoRunPhase5AfterPhase4 = false;
 	                executePhase5Auto();
 	                return;
 	            }
-	        } else {
-	            console.error(`Phase${phaseNumber}の並列実行がエラーで終了しました。終了コード: ${code}`);
+	            if (phaseNumber === 4) {
+	                autoRunPhase5AfterPhase4 = false;
+	            }
+	            waitForEnter();
+	            return;
+	        }
+
+	        // System Promptを動的生成
+	        let systemPromptPath = null;
+	        try {
+	            console.log(`Phase${phaseNumber}用のSystem Promptを生成中...`);
+	            systemPromptPath = generateSystemPrompt(phaseNumber);
+	        } catch (err) {
+	            console.warn(`System Prompt生成をスキップ: ${err.message}`);
+	        }
+
+	        // parallel-runner.jsに渡す引数を構築
+	        const args = config.promptMap.map(pair => pair.prompt);
+
+	        // System Promptオプションを追加
+	        if (systemPromptPath) {
+	            args.push('--system-prompt', systemPromptPath);
+	        }
+
+	        console.log('実行するプロンプトファイル:');
+	        config.promptMap.forEach(pair => {
+	            console.log(`  ${pair.prompt}`);
+	        });
+	        if (systemPromptPath) {
+	            console.log(`System Prompt: ${systemPromptPath}`);
+	        }
+	        console.log('');
+
+	        const child = spawn('node', [
+	            'RDRA_Knowledge/helper_tools/parallelRun/parallel-runner.js',
+	            ...args
+	        ], {
+	            stdio: 'inherit',
+	            shell: true
+	        });
+
+	        child.on('close', (code) => {
+	            if (code === 0) {
+	                console.log('');
+	                console.log(`Phase${phaseNumber}の並列実行が完了しました。`);
+	                // メニュー2の自動連続実行中は次の不足フェーズへ
+	                if (isAllPhaseAutoRunning) {
+	                    // Phase4 を今回実行した場合は、1_RDRA が既に揃っていても Phase5 を更新する
+	                    if (phaseNumber === 4) {
+	                        forceRunPhase5AfterPhase4InAllPhase = true;
+	                    }
+	                    executeMissingPhasesTo5();
+	                    return;
+	                }
+	                // メニュー1：Phase4を実行した直後はPhase5を自動実行
+	                if (phaseNumber === 4 && autoRunPhase5AfterPhase4) {
+	                    autoRunPhase5AfterPhase4 = false;
+	                    executePhase5Auto();
+	                    return;
+	                }
+	            } else {
+	                console.error(`Phase${phaseNumber}の並列実行がエラーで終了しました。終了コード: ${code}`);
+	                isAllPhaseAutoRunning = false;
+	                autoRunPhase5AfterPhase4 = false;
+	                forceRunPhase5AfterPhase4InAllPhase = false;
+	            }
+	            waitForEnter();
+	        });
+
+	        child.on('error', (error) => {
+	            console.error(`エラー: ${error.message}`);
 	            isAllPhaseAutoRunning = false;
 	            autoRunPhase5AfterPhase4 = false;
 	            forceRunPhase5AfterPhase4InAllPhase = false;
-	        }
-        waitForEnter();
-	    });
-	    
-	    child.on('error', (error) => {
-	        console.error(`エラー: ${error.message}`);
-	        isAllPhaseAutoRunning = false;
-	        autoRunPhase5AfterPhase4 = false;
-	        forceRunPhase5AfterPhase4InAllPhase = false;
-        waitForEnter();
-	    });
+	            waitForEnter();
+	        });
+	    };
+
+	    // Phase4の前処理：phase3/条件・状態、phase2/バリエーション → phase4へコンテキスト列を付与して出力
+	    if (phaseNumber === 4) {
+	        console.log('Phase4の前処理を実行します（条件/状態/バリエーションのコンテキスト付与）...');
+	        const pre = spawn('node', ['RDRA_Knowledge/helper_tools/makePhase3to4.js'], {
+	            stdio: 'inherit',
+	            shell: true
+	        });
+
+	        pre.on('close', (code) => {
+	            if (code === 0) {
+	                console.log('Phase4の前処理が完了しました。');
+	                runPhase();
+	            } else {
+	                console.error(`Phase4の前処理がエラーで終了しました。終了コード: ${code}`);
+	                isAllPhaseAutoRunning = false;
+	                autoRunPhase5AfterPhase4 = false;
+	                forceRunPhase5AfterPhase4InAllPhase = false;
+	                waitForEnter();
+	            }
+	        });
+
+	        pre.on('error', (error) => {
+	            console.error(`Phase4の前処理エラー: ${error.message}`);
+	            isAllPhaseAutoRunning = false;
+	            autoRunPhase5AfterPhase4 = false;
+	            forceRunPhase5AfterPhase4InAllPhase = false;
+	            waitForEnter();
+	        });
+	        return;
+	    }
+
+	    runPhase();
     }
 
     /**

@@ -4,64 +4,50 @@
  * Phaseのプロンプトファイル（並列実行用）　実行のプロンプトファイル
  */
 const phase1PromptMap = [
-  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/アクター生成.md'},
   { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/外部システム生成.md'},
   { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/ビジネスポリシー生成.md'},
   { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/ビジネスパラメータ生成.md'},
   { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/業務生成.md'},
-  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/情報生成.md'},
   { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/状態生成.md'},
-  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/バリエーション生成.md'},
   { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/条件生成.md'},
-  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/要求生成.md'},
-  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/初期要望分析生成.md'}
+  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase1/要求生成.md'}
 ];
-
 const phase2PromptMap = [
   { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase2/業務生成.md'},
-  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase2/情報生成.md'},
-  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase2/状態生成.md' }
+  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase2/バリエーション生成.md'}
 ];
-
 const phase3PromptMap = [
   { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase3/アクター生成.md'},
-  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase3/BUC生成.md'},
-  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase3/情報生成.md'}
+  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase3/情報生成.md'},
+  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase3/条件生成.md' },
+  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase3/状態生成.md'}
 ];
-
 const phase4PromptMap = [
-  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase4/BUC生成.md'},
-  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase4/バリエーション生成.md'},
-  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase4/条件生成.md' },
-  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase4/状態生成.md'}
+  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase4/BUC生成.md'}
 ];
-
 /**
  * RDRAZeroOne　Phase1~Phase4 RDRA RDRASpecのファイル
  */
 const phase1Files = [
-  'アクター.tsv',
+  '要求.tsv',
   '外部システム.tsv',
   'ビジネスポリシー.tsv',
   'ビジネスパラメータ.tsv',
   '業務.tsv',
-  '情報.tsv',
   '状態.tsv',
-  'バリエーション.tsv',
-  '条件.tsv',
-  '初期要望分析.md'
+  '条件.tsv'
 ];
 
 const phase2Files = [
   '業務.tsv',
-  '情報.tsv',
-  '状態.tsv',
+  'バリエーション.tsv'
 ];
 
 const phase3Files = [
   'アクター.tsv',
-  'BUC.tsv',
-  '情報.tsv'
+  '条件.tsv',
+  '情報.tsv',
+  '状態.tsv'
 ];
 
 const phase4Files = [
@@ -150,9 +136,7 @@ const phaseSharedFiles = {
   // 全タスクがPhase1の複数ファイルを参照する
   2: [
     { name: 'RDRAナレッジ', path: 'RDRA_Knowledge/1_RDRA/RDRA.md' },
-    { name: '初期要望分析', path: '0_RDRAZeroOne/phase1/初期要望分析.md' },
     { name: '業務（Phase1）', path: '0_RDRAZeroOne/phase1/業務.tsv' },
-    { name: 'アクター（Phase1）', path: '0_RDRAZeroOne/phase1/アクター.tsv' },
     { name: '状態（Phase1）', path: '0_RDRAZeroOne/phase1/状態.tsv' },
     { name: 'ビジネスポリシー', path: '0_RDRAZeroOne/phase1/ビジネスポリシー.tsv' },
   ],
@@ -161,7 +145,6 @@ const phaseSharedFiles = {
   3: [
     { name: 'RDRAナレッジ', path: 'RDRA_Knowledge/1_RDRA/RDRA.md' },
     { name: '業務（Phase2）', path: '0_RDRAZeroOne/phase2/業務.tsv' },
-    { name: 'アクター（Phase1）', path: '0_RDRAZeroOne/phase1/アクター.tsv' },
     { name: '情報（Phase2）', path: '0_RDRAZeroOne/phase2/情報.tsv' },
   ],
   
@@ -170,7 +153,7 @@ const phaseSharedFiles = {
     { name: 'RDRAナレッジ', path: 'RDRA_Knowledge/1_RDRA/RDRA.md' },
     { name: 'BUC（Phase3）', path: '0_RDRAZeroOne/phase3/BUC.tsv' },
     { name: '情報（Phase3）', path: '0_RDRAZeroOne/phase3/情報.tsv' },
-    { name: '状態（Phase2）', path: '0_RDRAZeroOne/phase2/状態.tsv' },
+    { name: '状態（Phase1）', path: '0_RDRAZeroOne/phase1/状態.tsv' },
   ],
 };
 

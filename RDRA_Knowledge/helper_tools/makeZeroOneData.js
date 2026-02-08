@@ -55,7 +55,7 @@ function emitSection({ title, fileName, outHeader, mapRow }) {
         const cols = splitTsv(line);
         const outCols = mapRow(cols, inHeader);
 
-        // 列数を必ず outHeader に合わせる（足りない分は空文字で埋める）
+        // 列数を必ず outHeader に合わせる（足りない分は空フィールドで埋める）
         while (outCols.length < outHeader.length) outCols.push('');
         if (outCols.length > outHeader.length) outCols.length = outHeader.length;
 
@@ -85,8 +85,7 @@ function integrateAsRDRASheet() {
                 const desc = joinNonEmpty([
                     role ? `役割:${role}` : '',
                     inOut ? `社内外:${inOut}` : '',
-                    stance ? `立場:${stance}` : '',
-                    mainDuty ? `主担当業務:${mainDuty}` : ''
+                    stance ? `立場:${stance}` : ''
                 ]);
 
                 return [actorGroup, actor, desc];
