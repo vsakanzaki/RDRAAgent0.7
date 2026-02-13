@@ -26,7 +26,7 @@ const phaseConfigs = [
 const sourcePriority = ['phase4', 'phase3', 'phase2', 'phase1'];
 
 const TARGET_DIR = '1_RDRA';
-const EXCLUDE_FROM_COPY = new Set(['システム概要.json']); // Phase5で生成されるため
+const EXCLUDE_FROM_COPY = new Set(); // 全ファイルをコピー対象とする
 
 function checkFileExists(filePath) {
   return fs.existsSync(filePath);

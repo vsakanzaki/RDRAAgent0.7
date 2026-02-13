@@ -2058,6 +2058,7 @@ var require_RdraSheet2Graph_res = __commonJS({
             biz: Core__Option.getOr(buc["\u696D\u52D9"], ""),
             buc: Core__Option.getOr(buc["BUC"], ""),
             job: Core__Option.getOr(buc["\u30A2\u30AF\u30C6\u30A3\u30D3\u30C6\u30A3"], ""),
+            next: Core__Option.getOr(buc["\u6B21"], ""),
             uc: uc1 === "" ? uc2 === "" ? "" : uc2 : uc1,
             mdl1: Core__Option.getOr(buc["\u95A2\u9023\u30E2\u30C7\u30EB1"], ""),
             obj1: Core__Option.getOr(buc["\u95A2\u9023\u30AA\u30D6\u30B8\u30A7\u30AF\u30C81"], ""),
@@ -2269,6 +2270,14 @@ var require_RdraSheet2Graph_res = __commonJS({
           },
           objectPairs: []
         };
+        var jobJob = {
+          edge: "arrow",
+          modelPair: {
+            source: "\u30A2\u30AF\u30C6\u30A3\u30D3\u30C6\u30A3",
+            target: "\u30A2\u30AF\u30C6\u30A3\u30D3\u30C6\u30A3"
+          },
+          objectPairs: []
+        };
         var biz = {
           contents: ""
         };
@@ -2281,16 +2290,30 @@ var require_RdraSheet2Graph_res = __commonJS({
         var uc = {
           contents: ""
         };
+        var prevArrowJob = {
+          contents: ""
+        };
         bucs.forEach(function(bucRec) {
           if (bucRec.biz !== "") {
             biz.contents = bucRec.biz;
           }
           if (bucRec.buc !== "") {
+            if (buc.contents !== bucRec.buc) {
+              prevArrowJob.contents = "";
+            }
             buc.contents = bucRec.buc;
           }
           if (bucRec.job !== "") {
+            if (prevArrowJob.contents !== "" && prevArrowJob.contents !== bucRec.job) {
+              addPair(jobJob, prevArrowJob.contents, bucRec.job);
+            }
             job.contents = bucRec.job;
             uc.contents = "";
+            if (bucRec.next === "\u2193") {
+              prevArrowJob.contents = bucRec.job;
+            } else {
+              prevArrowJob.contents = "";
+            }
           }
           if (bucRec.uc !== "") {
             uc.contents = bucRec.uc;
@@ -2367,6 +2390,7 @@ var require_RdraSheet2Graph_res = __commonJS({
         evtExs.objectPairs = edgeBeUnique(evtExs);
         jobSrn.objectPairs = edgeBeUnique(jobSrn);
         jobAct.objectPairs = edgeBeUnique(jobAct);
+        jobJob.objectPairs = edgeBeUnique(jobJob);
         return [
           [
             bizBuc,
@@ -2376,6 +2400,7 @@ var require_RdraSheet2Graph_res = __commonJS({
             jobUC,
             jobSrn,
             jobAct,
+            jobJob,
             ucSrn,
             ucEvt,
             ucInf,

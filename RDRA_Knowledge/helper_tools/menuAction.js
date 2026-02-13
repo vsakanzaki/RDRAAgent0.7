@@ -1,6 +1,8 @@
 const { exec, spawn } = require('child_process');
 const fs = require('fs');
 
+// ファイル削除ユーティリティ
+const { deleteFilesInFolder } = require('./deleteFiles');
 
 // RDRA設定（プロンプトマップ／成果物ファイル定義）は settings に集約
 const {
@@ -18,24 +20,18 @@ const {
     specFiles,
 } = require('./settings/rdraConfig');
 
-// System Prompt生成関数をインポート
-const { generateSystemPrompt, generateSpecSystemPrompt } = require('./tokenOptimization/generateSystemPrompt');
-
-// Phase5：システム概要生成プロンプト
-const phase5SystemOverviewPrompt = 'RDRA_Knowledge/0_RDRAZeroOne/phase5/システム概要生成.md';
-
 /**
  * menu.js から「実行部分」を切り出したアクション実装。
  * - createMenuAction({ rl, promptUser }) により実行ディスパッチ関数を生成する
  */
 function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
-    // メニュー「2」(一括要件定義)の自動連続実行フラグ
+    // メニュー「8」(一括要件定義)の自動連続実行フラグ（メニュー1〜4でも使用）
     let isAllPhaseAutoRunning = false;
 
-    // メニュー「1」：Phase4 実行後に Phase5 を自動実行するためのフラグ
+    // メニュー「7」：Phase4 実行後に Phase5 を自動実行するためのフラグ
     let autoRunPhase5AfterPhase4 = false;
 
-    // メニュー「2」：今回の一括実行で Phase4 を実行した場合、1_RDRA が既に存在していても Phase5 を1回実行する
+    // メニュー「8」：今回の一括実行で Phase4 を実行した場合、1_RDRA が既に存在していても Phase5 を1回実行する
     let forceRunPhase5AfterPhase4InAllPhase = false;
 
     /**
@@ -127,6 +123,21 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
             return;
         }
 
+        // 前Phaseの成果物が揃っているか確認（Phase2以降）
+        if (phaseNumber >= 2) {
+            const prevPhaseNumber = phaseNumber - 1;
+            const prevConfig = getPhaseConfig(prevPhaseNumber);
+            const prevOutputDir = `0_RDRAZeroOne/phase${prevPhaseNumber}`;
+            if (!checkAllFilesExistInFolder(prevConfig.files, prevOutputDir)) {
+                console.error(`エラー: Phase${prevPhaseNumber}の成果物が揃っていません。先にPhase${prevPhaseNumber}を実行してください。`);
+                isAllPhaseAutoRunning = false;
+                autoRunPhase5AfterPhase4 = false;
+                forceRunPhase5AfterPhase4InAllPhase = false;
+                waitForEnter();
+                return;
+            }
+        }
+
 	    console.log(`Phase${phaseNumber}を並列実行します...`);
 	    
 	    // 出力フォルダが存在しない場合は作成
@@ -141,7 +152,7 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
 	        const phaseExist = checkAllFilesExistInFolder(config.files, outputDir);
 	        if (phaseExist) {
 	            console.log(`phase${phaseNumber}は既に定義されています。`);
-	            // メニュー2の自動連続実行中は次の不足フェーズへ進める
+	            // メニュー1〜4,8の自動連続実行中は次の不足フェーズへ進める
 	            if (isAllPhaseAutoRunning) {
 	                // phase4の実行が発生していないので、phase5自動実行フラグは落とす
 	                if (phaseNumber === 4) {
@@ -150,7 +161,7 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
 	                executeMissingPhasesTo5();
 	                return;
 	            }
-	            // メニュー1：Phase4が揃ったならPhase5を更新する（Phase4実行の有無に関わらず）
+	            // メニュー7：Phase4が揃ったならPhase5を更新する（Phase4実行の有無に関わらず）
 	            if (phaseNumber === 4 && autoRunPhase5AfterPhase4) {
 	                autoRunPhase5AfterPhase4 = false;
 	                executePhase5Auto();
@@ -163,30 +174,13 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
 	            return;
 	        }
 
-	        // System Promptを動的生成
-	        let systemPromptPath = null;
-	        try {
-	            console.log(`Phase${phaseNumber}用のSystem Promptを生成中...`);
-	            systemPromptPath = generateSystemPrompt(phaseNumber);
-	        } catch (err) {
-	            console.warn(`System Prompt生成をスキップ: ${err.message}`);
-	        }
-
 	        // parallel-runner.jsに渡す引数を構築
 	        const args = config.promptMap.map(pair => pair.prompt);
-
-	        // System Promptオプションを追加
-	        if (systemPromptPath) {
-	            args.push('--system-prompt', systemPromptPath);
-	        }
 
 	        console.log('実行するプロンプトファイル:');
 	        config.promptMap.forEach(pair => {
 	            console.log(`  ${pair.prompt}`);
 	        });
-	        if (systemPromptPath) {
-	            console.log(`System Prompt: ${systemPromptPath}`);
-	        }
 	        console.log('');
 
 	        const child = spawn('node', [
@@ -201,7 +195,7 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
 	            if (code === 0) {
 	                console.log('');
 	                console.log(`Phase${phaseNumber}の並列実行が完了しました。`);
-	                // メニュー2の自動連続実行中は次の不足フェーズへ
+	                // メニュー1〜4,8の自動連続実行中は次の不足フェーズへ
 	                if (isAllPhaseAutoRunning) {
 	                    // Phase4 を今回実行した場合は、1_RDRA が既に揃っていても Phase5 を更新する
 	                    if (phaseNumber === 4) {
@@ -210,7 +204,7 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
 	                    executeMissingPhasesTo5();
 	                    return;
 	                }
-	                // メニュー1：Phase4を実行した直後はPhase5を自動実行
+	                // メニュー7：Phase4を実行した直後はPhase5を自動実行
 	                if (phaseNumber === 4 && autoRunPhase5AfterPhase4) {
 	                    autoRunPhase5AfterPhase4 = false;
 	                    executePhase5Auto();
@@ -269,10 +263,10 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
     }
 
     /**
-     * Phase5を実行する（1_RDRAへコピー＋システム概要.json作成＋関連データ.txt作成）
+     * Phase5を実行する（1_RDRAへコピー＋関連データ.txt作成）
      */
     function executePhase5Auto() {
-	    console.log('Phase5を実行します（1_RDRAへコピー + システム概要.json作成 + 関連データ.txt作成）...');
+	    console.log('Phase5を実行します（1_RDRAへコピー + 関連データ.txt作成）...');
 
 	    // 1) Phase3/4の生成ファイルを1_RDRAへコピー
 	    const copyProc = spawn('node', ['RDRA_Knowledge/helper_tools/rdraFileCopy.js'], {
@@ -289,58 +283,33 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
 	            return;
 	        }
 
-	        console.log('Phase5(コピー)が完了しました。システム概要.jsonを作成します...');
+	        console.log('Phase5(コピー)が完了しました。関連データ.txtを作成します...');
 
-	        // 2) システム概要.json 生成（Claude Code等にファイル作成させる）
-	        const overviewProc = spawn('node', [
-	            'RDRA_Knowledge/helper_tools/parallelRun/parallel-runner.js',
-	            phase5SystemOverviewPrompt
-	        ], {
+	        // 2) 関連データ.txt 作成（makeGraphData.js が 1_RDRA/関連データ.txt を出力する）
+	        const graphDataProc = spawn('node', ['RDRA_Knowledge/helper_tools/makeGraphData.js'], {
 	            stdio: 'inherit',
 	            shell: true
 	        });
 
-	        overviewProc.on('close', (code2) => {
+	        graphDataProc.on('close', (code2) => {
 	            if (code2 === 0) {
-	                console.log('Phase5(システム概要)が完了しました。関連データ.txtを作成します...');
+	                console.log('Phase5(関連データ)が完了しました。');
+	                if (isAllPhaseAutoRunning) {
+	                    executeMissingPhasesTo5();
+	                    return;
+	                }
 	            } else {
-	                console.error(`Phase5(システム概要)がエラーで終了しました。終了コード: ${code2}`);
+	                console.error(`Phase5(関連データ)がエラーで終了しました。終了コード: ${code2}`);
 	                isAllPhaseAutoRunning = false;
 	            }
-	            
-	            // 3) 関連データ.txt 作成（makeGraphData.js が 1_RDRA/関連データ.txt を出力する）
-	            const graphDataProc = spawn('node', ['RDRA_Knowledge/helper_tools/makeGraphData.js'], {
-	                stdio: 'inherit',
-	                shell: true
-	            });
-	            
-	            graphDataProc.on('close', (code3) => {
-	                if (code3 === 0) {
-	                    console.log('Phase5(関連データ)が完了しました。');
-	                    if (isAllPhaseAutoRunning) {
-	                        executeMissingPhasesTo5();
-	                        return;
-	                    }
-	                } else {
-	                    console.error(`Phase5(関連データ)がエラーで終了しました。終了コード: ${code3}`);
-	                    isAllPhaseAutoRunning = false;
-	                }
                 waitForEnter();
-	            });
-	            
-	            graphDataProc.on('error', (error) => {
-	                console.error(`Phase5(関連データ) エラー: ${error.message}`);
-	                isAllPhaseAutoRunning = false;
-	                forceRunPhase5AfterPhase4InAllPhase = false;
-                waitForEnter();
-	            });
 	        });
 
-	        overviewProc.on('error', (error) => {
-	            console.error(`Phase5(システム概要) エラー: ${error.message}`);
+	        graphDataProc.on('error', (error) => {
+	            console.error(`Phase5(関連データ) エラー: ${error.message}`);
 	            isAllPhaseAutoRunning = false;
 	            forceRunPhase5AfterPhase4InAllPhase = false;
-            waitForEnter();
+                waitForEnter();
 	        });
 	    });
 
@@ -353,17 +322,17 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
     }
 
     /**
-     * メニュー2：Phase1?5を上から確認し、未定義の最初のフェーズから最終まで連続実行する
+     * メニュー1〜4,8：Phase1〜5を上から確認し、未定義の最初のフェーズから最終まで連続実行する
      */
     function executeMissingPhasesTo5() {
-	    // Phase1?4：不足している最初のフェーズを実行
+	    // Phase1〜4：不足している最初のフェーズを実行
 	    if (!checkAllFilesExistInFolder(phase1Files, '0_RDRAZeroOne/phase1')) { executePhaseParallel(1); return; }
 	    if (!checkAllFilesExistInFolder(phase2Files, '0_RDRAZeroOne/phase2')) { executePhaseParallel(2); return; }
 	    if (!checkAllFilesExistInFolder(phase3Files, '0_RDRAZeroOne/phase3')) { executePhaseParallel(3); return; }
 	    if (!checkAllFilesExistInFolder(phase4Files, '0_RDRAZeroOne/phase4')) { executePhaseParallel(4); return; }
 
 	    // Phase5：1_RDRA が揃っていなければ実行（コピー + システム概要）
-	    // ただし、メニュー2で Phase4 を今回実行した場合は、1_RDRA が既に揃っていても Phase5 を更新する
+	    // ただし、メニュー1〜4,8で Phase4 を今回実行した場合は、1_RDRA が既に揃っていても Phase5 を更新する
 	    if (forceRunPhase5AfterPhase4InAllPhase || !checkAllFilesExistInFolder(rdraFiles, '1_RDRA')) {
 	        forceRunPhase5AfterPhase4InAllPhase = false;
 	        executePhase5Auto();
@@ -381,9 +350,9 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
      * フェーズ単位のRDRA定義を実行する（定義されていないフェーズがあれば実行する）
      */
     function executeEachPhase() {
-	    // メニュー1用フラグは毎回リセット
+	    // メニュー7用フラグは毎回リセット
 	    autoRunPhase5AfterPhase4 = false;
-	    // メニュー2用フラグが残っていても影響しないようにリセット
+	    // メニュー8用フラグが残っていても影響しないようにリセット
 	    forceRunPhase5AfterPhase4InAllPhase = false;
 
 	    const phaseExist1 = checkAllFilesExistInFolder(phase1Files, '0_RDRAZeroOne/phase1');
@@ -431,6 +400,26 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
     }
 
     /**
+     * 指定されたPhaseから成果物を削除し、Phase1〜5を再実行する（メニュー1〜4用）
+     * @param {number} startPhase - 削除開始のPhase番号 (1-4)
+     */
+    function executeFromPhase(startPhase) {
+        console.log(`Phase${startPhase}〜Phase4、1_RDRA配下のファイルを削除します...`);
+
+        // startPhaseからphase4までを削除
+        for (let i = startPhase; i <= 4; i++) {
+            deleteFilesInFolder(`0_RDRAZeroOne/phase${i}`);
+        }
+        // 1_RDRA配下を削除
+        deleteFilesInFolder('1_RDRA');
+
+        console.log('削除完了。Phase1からPhase5まで実行します...');
+        isAllPhaseAutoRunning = true;
+        forceRunPhase5AfterPhase4InAllPhase = false;
+        executeMissingPhasesTo5();
+    }
+
+    /**
      * 仕様作成を並列実行する（論理データ/UI/ビジネスルール）
      */
     function executeSpec() {
@@ -454,29 +443,12 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
         }
 
         const runParallel = async (promptMap, specPhaseNumber) => {
-            // System Promptを動的生成
-            let systemPromptPath = null;
-            try {
-                console.log(`specPhase${specPhaseNumber}用のSystem Promptを生成中...`);
-                systemPromptPath = generateSpecSystemPrompt(specPhaseNumber);
-            } catch (err) {
-                console.warn(`System Prompt生成をスキップ: ${err.message}`);
-            }
-            
             const args = promptMap.map(pair => pair.prompt);
-            
-            // System Promptオプションを追加
-            if (systemPromptPath) {
-                args.push('--system-prompt', systemPromptPath);
-            }
-            
+
             console.log('実行するプロンプトファイル:');
             promptMap.forEach(pair => {
                 console.log(`  ${pair.prompt}`);
             });
-            if (systemPromptPath) {
-                console.log(`System Prompt: ${systemPromptPath}`);
-            }
             console.log('');
 
             try {
@@ -629,7 +601,13 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
         }
 
         // 既にサーバーが起動しているかチェック
-        if (global.bucActorUIServer && !global.bucActorUIServer.killed) {
+        const existingServer = global.bucActorUIServer;
+        const isServerRunning =
+            existingServer &&
+            existingServer.exitCode === null &&
+            !existingServer.killed;
+
+        if (isServerRunning) {
             console.log('サーバーは既に起動しています。ブラウザで画面を開きます...');
             const browserCmd = getBrowserCommand('http://localhost:3002/');
             if (browserCmd) {
@@ -642,6 +620,11 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
             console.log('画面照会（BUC/アクター）を表示しました。');
             promptUser();
             return;
+        }
+
+        // 終了済みプロセス参照が残っている場合は破棄して再起動する
+        if (existingServer && !isServerRunning) {
+            global.bucActorUIServer = null;
         }
 
         console.log('HTTPサーバーを起動してブラウザで画面を開きます...');
@@ -728,9 +711,21 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
     function executeOption(option) {
         switch (option) {
             case '1':
-                executeEachPhase();
+                executeFromPhase(1);
                 break;
             case '2':
+                executeFromPhase(2);
+                break;
+            case '3':
+                executeFromPhase(3);
+                break;
+            case '4':
+                executeFromPhase(4);
+                break;
+            case '7':
+                executeEachPhase();
+                break;
+            case '8':
                 executeAllPhase();
                 break;
             case '11':

@@ -82,13 +82,9 @@ function buildArgsFromTemplate(providerConfig, prompt, runtimeOptions) {
         ? providerConfig.vars
         : {};
 
-    // 実行時の補助変数
-    // systemPrompt を明示的に取り出し、優先順位を明確化
     const vars = {
         ...providerVars,
         prompt,
-        // runtimeOptions から systemPrompt を優先的に取得
-        systemPrompt: runtimeOptions?.systemPrompt || providerVars.systemPrompt || '',
         ...(runtimeOptions || {}),
     };
 
@@ -157,8 +153,10 @@ async function runAIWithPrefix(prompt, options = {}) {
     const prefixStr = prefix ? `[${prefix}] ` : '';
 
     return new Promise((resolve, reject) => {
+        let effectivePrompt = prompt;
+
         const useStdin = provider.useStdin === true;
-        const promptForArgs = useStdin ? '' : prompt;
+        const promptForArgs = useStdin ? '' : effectivePrompt;
         const args = buildArgsFromTemplate(provider, promptForArgs, options);
 
         process.stdout.write(`${prefixStr}---\n`);
@@ -257,7 +255,7 @@ async function runAIWithPrefix(prompt, options = {}) {
 
         // stdin経由でプロンプトを渡す場合
         if (useStdin) {
-            child.stdin.write(prompt);
+            child.stdin.write(effectivePrompt);
             child.stdin.end();
         }
     });
