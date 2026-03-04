@@ -5,7 +5,7 @@
 ## 事前知識
 - 「RDRA_Knowledge/1_RDRA/RDRA.md」を読込み、RDRA構造を理解する
 - 「RDRA_Knowledge/1_RDRA/RDRAGraph.md」を読込み、関連データの構造を理解する
-- 「1_RDRA/関連データ.txt」を読込み、定義したRDRAの内容を理解する
+- 「1_RDRA/if/関連データ.txt」を読込み、定義したRDRAの内容を理解する
 
 ### 関連データから以下の定義を理解する
 - 業務の階層構造：業務、BUC、アクティビティは階層構造を持つ

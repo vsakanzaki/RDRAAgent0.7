@@ -2,13 +2,13 @@
 'use strict';
 
 /**
- * phase3の「条件.tsv」「状態.tsv」、phase2の「バリエーション.tsv」にコンテキスト列を追加し、
- * phase4フォルダーへ出力する。
+ * phase3の「UC条件.tsv」、phase2の「バリエーション.tsv」にコンテキスト列を追加し、
+ * phase2の「BUC.tsv」から状態遷移を抽出して、phase4フォルダーへ出力する。
  *
- * - 条件.tsv: 条件(バリエーション集合) ⊆ 情報.tsv(バリエーション集合) となる最初の情報行のコンテキストを採用
- * - 状態.tsv: 状態(状態モデル集合) ⊆ 情報.tsv(状態モデル集合) となる最初の情報行のコンテキストを採用
+ * - UC条件.tsv: 条件(バリエーション集合) ⊆ 情報.tsv(バリエーション集合) となる最初の情報行のコンテキストを採用
  * - バリエーション.tsv: バリエーション名 ∈ 情報.tsv(バリエーション集合) となる最初の情報行のコンテキストを採用
- * - 一致なし: それぞれ "条件コンテキスト" / "状態コンテキスト" / "バリエーションコンテキスト"
+ * - 状態.tsv: phase2/BUC.tsvの状態モデル ∈ 情報.tsv(状態モデル集合) となる最初の情報行のコンテキストを採用
+ * - 一致なし: それぞれ "条件コンテキスト" / "バリエーションコンテキスト" / "状態コンテキスト"
  */
 
 const fs = require('fs');
@@ -117,7 +117,7 @@ function buildInfoIndex(infoTsv) {
 }
 
 function convertConditions({ infoIndex, inTsv }) {
-  const variationIdx = colIndex(inTsv.header, 'バリエーション', 'phase3/条件.tsv');
+  const variationIdx = colIndex(inTsv.header, 'バリエーション', 'phase4/条件関連.tsv');
 
   const outHeader = ['コンテキスト', ...inTsv.header];
   const outRows = inTsv.rows.map((r) => {
@@ -132,18 +132,34 @@ function convertConditions({ infoIndex, inTsv }) {
   return { header: outHeader, rows: outRows };
 }
 
-function convertStates({ infoIndex, inTsv }) {
-  const stateModelIdx = colIndex(inTsv.header, '状態モデル', 'phase3/状態.tsv');
+function buildStateTsv({ infoIndex, bucTsv }) {
+  const bucLabel = 'phase2/BUC.tsv';
+  const ucIdx = colIndex(bucTsv.header, 'UC', bucLabel);
+  const stateModelIdx = colIndex(bucTsv.header, '状態モデル', bucLabel);
+  const fromIdx = colIndex(bucTsv.header, 'From状態', bucLabel);
+  const toIdx = colIndex(bucTsv.header, 'To状態', bucLabel);
 
-  const outHeader = ['コンテキスト', ...inTsv.header];
-  const outRows = inTsv.rows.map((r) => {
-    const modelSet = parseList(r[stateModelIdx]);
-    const match = modelSet.size
-      ? firstMatch(infoIndex, (info) => info.context && info.stateModelSet.size && isSubset(modelSet, info.stateModelSet))
-      : null;
+  const outHeader = ['コンテキスト', '状態モデル', '状態', '遷移UC', '遷移先状態', '状態モデル・状態の説明'];
+  const outRows = [];
+
+  for (const r of bucTsv.rows) {
+    const stateModel = normalizeToken(r[stateModelIdx]);
+    if (!stateModel) continue;
+
+    const match = firstMatch(infoIndex, (info) =>
+      info.context && info.stateModelSet.size && info.stateModelSet.has(stateModel)
+    );
     const context = match ? match.context : '状態コンテキスト';
-    return [context, ...r];
-  });
+
+    outRows.push([
+      context,
+      stateModel,
+      normalizeToken(r[fromIdx]),
+      normalizeToken(r[ucIdx]),
+      normalizeToken(r[toIdx]),
+      '',
+    ]);
+  }
 
   return { header: outHeader, rows: outRows };
 }
@@ -173,42 +189,43 @@ function main() {
   const phase4Dir = path.resolve(root, '0_RDRAZeroOne', 'phase4');
 
   const infoPath = path.resolve(phase3Dir, '情報.tsv');
-  const condInPath = path.resolve(phase3Dir, '条件.tsv');
-  const stateInPath = path.resolve(phase3Dir, '状態.tsv');
+  const condInPath = path.resolve(phase4Dir, '条件関連.tsv');
   const varInPath = path.resolve(phase2Dir, 'バリエーション.tsv');
 
+  const bucInPath = path.resolve(phase2Dir, 'BUC.tsv');
+
   const condOutPath = path.resolve(phase4Dir, '条件.tsv');
-  const stateOutPath = path.resolve(phase4Dir, '状態.tsv');
   const varOutPath = path.resolve(phase4Dir, 'バリエーション.tsv');
+  const stateOutPath = path.resolve(phase4Dir, '状態.tsv');
 
   const infoTsv = parseTsv(readText(infoPath));
   const infoIndex = buildInfoIndex(infoTsv);
 
   const condTsv = parseTsv(readText(condInPath));
-  const stateTsv = parseTsv(readText(stateInPath));
   const variationTsv = parseTsv(readText(varInPath));
+  const bucTsv = parseTsv(readText(bucInPath));
 
   const condOut = convertConditions({ infoIndex, inTsv: condTsv });
-  const stateOut = convertStates({ infoIndex, inTsv: stateTsv });
   const varOut = convertVariations({ infoIndex, inTsv: variationTsv });
+  const stateOut = buildStateTsv({ infoIndex, bucTsv });
 
   ensureDir(phase4Dir);
 
   fs.writeFileSync(condOutPath, toTsv(condOut.header, condOut.rows), { encoding: 'utf8' });
-  fs.writeFileSync(stateOutPath, toTsv(stateOut.header, stateOut.rows), { encoding: 'utf8' });
   fs.writeFileSync(varOutPath, toTsv(varOut.header, varOut.rows), { encoding: 'utf8' });
+  fs.writeFileSync(stateOutPath, toTsv(stateOut.header, stateOut.rows), { encoding: 'utf8' });
 
-  console.log('[makePhase3to4] done');
+  console.log('[attachContext] done');
   console.log(`- ${path.relative(root, condOutPath)}`);
-  console.log(`- ${path.relative(root, stateOutPath)}`);
   console.log(`- ${path.relative(root, varOutPath)}`);
+  console.log(`- ${path.relative(root, stateOutPath)}`);
 }
 
 if (require.main === module) {
   try {
     main();
   } catch (err) {
-    console.error('[makePhase3to4] error:', err && err.stack ? err.stack : err);
+    console.error('[attachContext] error:', err && err.stack ? err.stack : err);
     process.exitCode = 1;
   }
 }

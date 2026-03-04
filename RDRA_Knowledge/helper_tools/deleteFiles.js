@@ -10,13 +10,12 @@ const targetFolders = [
     '0_RDRAZeroOne/phase3',
     '0_RDRAZeroOne/phase4',
     '1_RDRA',
-    '1_RDRA/Validation',
     '2_RDRASpec',
-    '2_RDRASpec/Validation',
+    '2_RDRASpec/phase1',
 ];
 
 // 削除対象の特定ファイル（オプション）
-const targetFiles = ['1_RDRA/関連データ.txt'];
+const targetFiles = ['1_RDRA/if/関連データ.txt', '1_RDRA/if/ZeroOne.txt'];
 
 /**
  * 指定されたファイルを削除する関数

@@ -14,10 +14,10 @@ rl.setPrompt('> ');
  */
 function showMenu() {
     console.log('■ZeroOne');
-    console.log('1.フェーズ１から４まで実行し1_RDRDにコピーする');
-    console.log('2.フェーズ２から４まで実行し1_RDRDにコピーする');
-    console.log('3.フェーズ３から４まで実行し1_RDRDにコピーする');
-    console.log('4.フェーズ４から４まで実行し1_RDRDにコピーする');
+    console.log('1.フェーズ１から４まで実行し1_RDRAにコピーする');
+    console.log('2.フェーズ２から４まで実行し1_RDRAにコピーする');
+    console.log('3.フェーズ３から４まで実行し1_RDRAにコピーする');
+    console.log('4.フェーズ４から４まで実行し1_RDRAにコピーする');
     console.log('7.フェーズ単位実行：成果物が無い最初のPhaseを実行する');
     console.log('8.一括要件定義：成果物が無いPhaseからRDRA定義を一括実行する');
     console.log('■RDRA');

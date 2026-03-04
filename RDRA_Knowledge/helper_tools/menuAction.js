@@ -195,19 +195,47 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
 	            if (code === 0) {
 	                console.log('');
 	                console.log(`Phase${phaseNumber}の並列実行が完了しました。`);
-	                // メニュー1〜4,8の自動連続実行中は次の不足フェーズへ
-	                if (isAllPhaseAutoRunning) {
-	                    // Phase4 を今回実行した場合は、1_RDRA が既に揃っていても Phase5 を更新する
-	                    if (phaseNumber === 4) {
-	                        forceRunPhase5AfterPhase4InAllPhase = true;
-	                    }
-	                    executeMissingPhasesTo5();
+
+	                // Phase4 の後処理：LLM が生成した条件関連.tsv 等を入力に、条件/バリエーション/状態へコンテキスト列を付与
+	                if (phaseNumber === 4) {
+	                    console.log('Phase4の後処理を実行します（条件/状態/バリエーションのコンテキスト付与）...');
+	                    const post = spawn('node', ['RDRA_Knowledge/helper_tools/attachContext.js'], {
+	                        stdio: 'inherit',
+	                        shell: true
+	                    });
+
+	                    post.on('close', (postCode) => {
+	                        if (postCode === 0) {
+	                            console.log('Phase4の後処理が完了しました。');
+	                        } else {
+	                            console.error(`Phase4の後処理がエラーで終了しました。終了コード: ${postCode}`);
+	                        }
+	                        if (isAllPhaseAutoRunning) {
+	                            forceRunPhase5AfterPhase4InAllPhase = true;
+	                            executeMissingPhasesTo5();
+	                            return;
+	                        }
+	                        if (autoRunPhase5AfterPhase4) {
+	                            autoRunPhase5AfterPhase4 = false;
+	                            executePhase5Auto();
+	                            return;
+	                        }
+	                        waitForEnter();
+	                    });
+
+	                    post.on('error', (error) => {
+	                        console.error(`Phase4の後処理エラー: ${error.message}`);
+	                        isAllPhaseAutoRunning = false;
+	                        autoRunPhase5AfterPhase4 = false;
+	                        forceRunPhase5AfterPhase4InAllPhase = false;
+	                        waitForEnter();
+	                    });
 	                    return;
 	                }
-	                // メニュー7：Phase4を実行した直後はPhase5を自動実行
-	                if (phaseNumber === 4 && autoRunPhase5AfterPhase4) {
-	                    autoRunPhase5AfterPhase4 = false;
-	                    executePhase5Auto();
+
+	                // メニュー1〜4,8の自動連続実行中は次の不足フェーズへ
+	                if (isAllPhaseAutoRunning) {
+	                    executeMissingPhasesTo5();
 	                    return;
 	                }
 	            } else {
@@ -227,37 +255,6 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
 	            waitForEnter();
 	        });
 	    };
-
-	    // Phase4の前処理：phase3/条件・状態、phase2/バリエーション → phase4へコンテキスト列を付与して出力
-	    if (phaseNumber === 4) {
-	        console.log('Phase4の前処理を実行します（条件/状態/バリエーションのコンテキスト付与）...');
-	        const pre = spawn('node', ['RDRA_Knowledge/helper_tools/makePhase3to4.js'], {
-	            stdio: 'inherit',
-	            shell: true
-	        });
-
-	        pre.on('close', (code) => {
-	            if (code === 0) {
-	                console.log('Phase4の前処理が完了しました。');
-	                runPhase();
-	            } else {
-	                console.error(`Phase4の前処理がエラーで終了しました。終了コード: ${code}`);
-	                isAllPhaseAutoRunning = false;
-	                autoRunPhase5AfterPhase4 = false;
-	                forceRunPhase5AfterPhase4InAllPhase = false;
-	                waitForEnter();
-	            }
-	        });
-
-	        pre.on('error', (error) => {
-	            console.error(`Phase4の前処理エラー: ${error.message}`);
-	            isAllPhaseAutoRunning = false;
-	            autoRunPhase5AfterPhase4 = false;
-	            forceRunPhase5AfterPhase4InAllPhase = false;
-	            waitForEnter();
-	        });
-	        return;
-	    }
 
 	    runPhase();
     }
@@ -285,7 +282,7 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
 
 	        console.log('Phase5(コピー)が完了しました。関連データ.txtを作成します...');
 
-	        // 2) 関連データ.txt 作成（makeGraphData.js が 1_RDRA/関連データ.txt を出力する）
+	        // 2) 関連データ.txt 作成（makeGraphData.js が 1_RDRA/if/関連データ.txt を出力する）
 	        const graphDataProc = spawn('node', ['RDRA_Knowledge/helper_tools/makeGraphData.js'], {
 	            stdio: 'inherit',
 	            shell: true
@@ -507,7 +504,7 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
             console.log('関連データの作成が完了しました。');
             console.log('RDRAGraphを表示しています...');
 
-            const clipboardCmd = getClipboardCommand('1_RDRA/関連データ.txt');
+            const clipboardCmd = getClipboardCommand('1_RDRA/if/関連データ.txt');
             const browserCmd = getBrowserCommand('https://vsa.co.jp/rdratool/graph/v0.94/index.html?clipboard');
 
             if (!clipboardCmd || !browserCmd) {
@@ -748,10 +745,10 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
                 break;
             case '21':
                 // 仕様生成の前提として「関連データ.txt」の存在をチェックする
-                if (fs.existsSync('1_RDRA/関連データ.txt')) {
+                if (fs.existsSync('1_RDRA/if/関連データ.txt')) {
                     executeSpec();
                 } else {
-                    console.log('1_RDRA/関連データ.txt が存在しません。先にメニュー11で関連データを作成してください。');
+                    console.log('1_RDRA/if/関連データ.txt が存在しません。先にメニュー11で関連データを作成してください。');
                     waitForEnter();
                 }
                 break;

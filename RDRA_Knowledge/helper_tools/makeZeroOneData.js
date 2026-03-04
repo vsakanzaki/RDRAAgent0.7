@@ -2,7 +2,9 @@ const fs = require('fs');
 const path = require('path');
 
 const rdraDir = path.resolve(__dirname, '..', '..', '1_RDRA');
-const outputFile = path.join(rdraDir, 'ZeroOne.txt');
+const outputDir = path.join(rdraDir, 'if');
+fs.mkdirSync(outputDir, { recursive: true });
+const outputFile = path.join(outputDir, 'ZeroOne.txt');
 
 function readSystemName() {
     const systemOverviewPath = path.join(rdraDir, 'システム概要.json');

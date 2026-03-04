@@ -154,8 +154,12 @@ async function executeParallel(filePairs, options = {}) {
             results.push(result);
         }
     } else {
+        const STAGGER_DELAY_MS = 500;
         results = await Promise.all(
-            filePairs.map(filePair => executePrompt(filePair, options))
+            filePairs.map((filePair, index) =>
+                new Promise(resolve => setTimeout(resolve, index * STAGGER_DELAY_MS))
+                    .then(() => executePrompt(filePair, options))
+            )
         );
     }
     

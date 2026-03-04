@@ -62,8 +62,8 @@ function main() {
     
     // デフォルトファイルパスの定義（日本語ファイル名の文字化け対策）
     const defaultFiles = {
-        'graph': '1_RDRA/関連データ.txt',
-        'zeroone': '1_RDRA/ZeroOne.txt'
+        'graph': '1_RDRA/if/関連データ.txt',
+        'zeroone': '1_RDRA/if/ZeroOne.txt'
     };
     
     let filePath;
@@ -71,7 +71,7 @@ function main() {
     if (args.length === 0) {
         // 引数なしの場合はグラフデータをデフォルトに
         filePath = defaultFiles['graph'];
-        console.log('デフォルトファイルを使用: 1_RDRA/関連データ.txt');
+        console.log('デフォルトファイルを使用: 1_RDRA/if/関連データ.txt');
     } else if (defaultFiles[args[0].toLowerCase()]) {
         // キーワード指定の場合
         filePath = defaultFiles[args[0].toLowerCase()];
