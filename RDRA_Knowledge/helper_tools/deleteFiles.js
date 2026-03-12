@@ -12,6 +12,7 @@ const targetFolders = [
     '1_RDRA',
     '2_RDRASpec',
     '2_RDRASpec/phase1',
+    '2_RDRASpec/phase2',
 ];
 
 // 削除対象の特定ファイル（オプション）
