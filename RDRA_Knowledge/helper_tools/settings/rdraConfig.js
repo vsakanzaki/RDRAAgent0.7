@@ -13,20 +13,21 @@ const phase1PromptMap = [
 const phase2PromptMap = [
   { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase2/ph2状態生成.md'},
   { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase2/ph2アクティビティ生成.md'},
-  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase2/ph2状態モデル生成.md'},
+  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase2/ph2条件生成.md'},
 ];
 const phase3PromptMap = [
   { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase3/ph3BUC生成.md'},
   { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase3/ph3バリエーション生成.md'},
 ];
 const phase4PromptMap = [
-  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase4/ph4アクター生成.md'},
-  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase4/ph4外部システム生成.md'},
-  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase4/ph4条件生成.md'},
   { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase4/ph4情報生成.md'},
+  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase4/ph4状態生成.md'},
   { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase4/ph4UCアクター.md'},
   { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase4/ph4UCタイマー.md'},
   { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase4/ph4UC外部システム.md'},
+  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase4/ph4アクター生成.md'},
+  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase4/ph4外部システム生成.md'},
+  { prompt: 'RDRA_Knowledge/0_RDRAZeroOne/phase4/ph4条件生成.md'},
 ];
 /**
  * RDRAZeroOne　Phase1~Phase4 RDRA RDRASpecのファイル
@@ -58,6 +59,7 @@ const phase4Files = [
   'ph4外部システム.tsv',
   'ph4条件.tsv',
   'ph4情報.tsv',
+  'ph4状態.tsv',
 ];
 
 const rdraFiles = [

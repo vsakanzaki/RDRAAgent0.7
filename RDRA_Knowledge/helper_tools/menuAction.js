@@ -99,6 +99,54 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
               };
 
     /**
+     * 単一の Node スクリプトを spawn して実行する
+     * @param {string} scriptPath - 実行するスクリプトのパス
+     * @param {string|null} successMessage - 成功時に表示するメッセージ（null なら省略）
+     * @param {Function} callbackOnSuccess - 成功時に呼ぶコールバック
+     */
+    function runNodeScript(scriptPath, successMessage, callbackOnSuccess) {
+        const proc = spawn('node', [scriptPath], {
+            stdio: 'inherit',
+            shell: true
+        });
+
+        proc.on('close', (code) => {
+            if (code !== 0) {
+                console.error(`${scriptPath} がエラーで終了しました。終了コード: ${code}`);
+                isAllPhaseAutoRunning = false;
+                autoRunPhase5AfterPhase4 = false;
+                forceRunPhase5AfterPhase4InAllPhase = false;
+                waitForEnter();
+                return;
+            }
+            if (successMessage) console.log(successMessage);
+            callbackOnSuccess();
+        });
+
+        proc.on('error', (error) => {
+            console.error(`${scriptPath} 実行エラー: ${error.message}`);
+            isAllPhaseAutoRunning = false;
+            autoRunPhase5AfterPhase4 = false;
+            forceRunPhase5AfterPhase4InAllPhase = false;
+            waitForEnter();
+        });
+    }
+
+    /**
+     * Phase4 後処理チェーン: makeBUC → attachContext → rdraFileCopy を順に実行する
+     * Phase4 完了直後と executePhase5Auto() の両方から呼ばれる共通処理。
+     * @param {Function} onComplete - 全ステップ成功後に呼ぶコールバック
+     */
+    function runPhase4PostProcess(onComplete) {
+        console.log('1_RDRA を再構築します（makeBUC → attachContext → rdraFileCopy）...');
+        runNodeScript('RDRA_Knowledge/helper_tools/makeBUC.js', 'BUC作成が完了しました。', () => {
+            runNodeScript('RDRA_Knowledge/helper_tools/attachContext.js', 'コンテキスト付与が完了しました。', () => {
+                runNodeScript('RDRA_Knowledge/helper_tools/rdraFileCopy.js', '1_RDRAへの反映が完了しました。', onComplete);
+            });
+        });
+    }
+
+    /**
      * Phase番号に対応するファイル配列とプロンプトマップを取得
      */
     function getPhaseConfig(phaseNumber) {
@@ -196,20 +244,10 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
 	                console.log('');
 	                console.log(`Phase${phaseNumber}の並列実行が完了しました。`);
 
-	                // Phase4 の後処理：LLM が生成した条件関連.tsv 等を入力に、条件/バリエーション/状態へコンテキスト列を付与
+	                // Phase4 の後処理：makeBUC → attachContext → rdraFileCopy で 1_RDRA を再構築
 	                if (phaseNumber === 4) {
-	                    console.log('Phase4の後処理を実行します（条件/状態/バリエーションのコンテキスト付与）...');
-	                    const post = spawn('node', ['RDRA_Knowledge/helper_tools/attachContext.js'], {
-	                        stdio: 'inherit',
-	                        shell: true
-	                    });
-
-	                    post.on('close', (postCode) => {
-	                        if (postCode === 0) {
-	                            console.log('Phase4の後処理が完了しました。');
-	                        } else {
-	                            console.error(`Phase4の後処理がエラーで終了しました。終了コード: ${postCode}`);
-	                        }
+	                    runPhase4PostProcess(() => {
+	                        console.log('Phase4の後処理が完了しました。');
 	                        if (isAllPhaseAutoRunning) {
 	                            forceRunPhase5AfterPhase4InAllPhase = true;
 	                            executeMissingPhasesTo5();
@@ -220,14 +258,6 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
 	                            executePhase5Auto();
 	                            return;
 	                        }
-	                        waitForEnter();
-	                    });
-
-	                    post.on('error', (error) => {
-	                        console.error(`Phase4の後処理エラー: ${error.message}`);
-	                        isAllPhaseAutoRunning = false;
-	                        autoRunPhase5AfterPhase4 = false;
-	                        forceRunPhase5AfterPhase4InAllPhase = false;
 	                        waitForEnter();
 	                    });
 	                    return;
@@ -260,61 +290,23 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
     }
 
     /**
-     * Phase5を実行する（1_RDRAへコピー＋関連データ.txt作成）
+     * Phase5を実行する（1_RDRA再構築＋関連データ.txt作成）
+     * runPhase4PostProcess() で makeBUC → attachContext → rdraFileCopy を実行後、
+     * makeGraphData.js で関連データ.txt を生成する。
+     * menu7/menu8 で phase4 を再実行しない経路でも 1_RDRA を再構築できる。
      */
     function executePhase5Auto() {
-	    console.log('Phase5を実行します（1_RDRAへコピー + 関連データ.txt作成）...');
+	    console.log('Phase5を実行します（1_RDRA再構築 + 関連データ.txt作成）...');
 
-	    // 1) Phase3/4の生成ファイルを1_RDRAへコピー
-	    const copyProc = spawn('node', ['RDRA_Knowledge/helper_tools/rdraFileCopy.js'], {
-	        stdio: 'inherit',
-	        shell: true
-	    });
-
-	    copyProc.on('close', (code) => {
-	        if (code !== 0) {
-	            console.error(`Phase5(コピー)がエラーで終了しました。終了コード: ${code}`);
-	            isAllPhaseAutoRunning = false;
-	            forceRunPhase5AfterPhase4InAllPhase = false;
-                waitForEnter();
-	            return;
-	        }
-
-	        console.log('Phase5(コピー)が完了しました。関連データ.txtを作成します...');
-
-	        // 2) 関連データ.txt 作成（makeGraphData.js が 1_RDRA/if/関連データ.txt を出力する）
-	        const graphDataProc = spawn('node', ['RDRA_Knowledge/helper_tools/makeGraphData.js'], {
-	            stdio: 'inherit',
-	            shell: true
-	        });
-
-	        graphDataProc.on('close', (code2) => {
-	            if (code2 === 0) {
-	                console.log('Phase5(関連データ)が完了しました。');
-	                if (isAllPhaseAutoRunning) {
-	                    executeMissingPhasesTo5();
-	                    return;
-	                }
-	            } else {
-	                console.error(`Phase5(関連データ)がエラーで終了しました。終了コード: ${code2}`);
-	                isAllPhaseAutoRunning = false;
+	    runPhase4PostProcess(() => {
+	        console.log('1_RDRAの再構築が完了しました。関連データ.txtを作成します...');
+	        runNodeScript('RDRA_Knowledge/helper_tools/makeGraphData.js', 'Phase5(関連データ)が完了しました。', () => {
+	            if (isAllPhaseAutoRunning) {
+	                executeMissingPhasesTo5();
+	                return;
 	            }
-                waitForEnter();
+	            waitForEnter();
 	        });
-
-	        graphDataProc.on('error', (error) => {
-	            console.error(`Phase5(関連データ) エラー: ${error.message}`);
-	            isAllPhaseAutoRunning = false;
-	            forceRunPhase5AfterPhase4InAllPhase = false;
-                waitForEnter();
-	        });
-	    });
-
-	    copyProc.on('error', (error) => {
-	        console.error(`Phase5(コピー) エラー: ${error.message}`);
-	        isAllPhaseAutoRunning = false;
-	        forceRunPhase5AfterPhase4InAllPhase = false;
-        waitForEnter();
 	    });
     }
 
@@ -328,7 +320,7 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
 	    if (!checkAllFilesExistInFolder(phase3Files, '0_RDRAZeroOne/phase3')) { executePhaseParallel(3); return; }
 	    if (!checkAllFilesExistInFolder(phase4Files, '0_RDRAZeroOne/phase4')) { executePhaseParallel(4); return; }
 
-	    // Phase5：1_RDRA が揃っていなければ実行（コピー + システム概要）
+	    // Phase5：1_RDRA を再構築し関連データ.txt を作成する
 	    // ただし、メニュー1〜4,8で Phase4 を今回実行した場合は、1_RDRA が既に揃っていても Phase5 を更新する
 	    if (forceRunPhase5AfterPhase4InAllPhase || !checkAllFilesExistInFolder(rdraFiles, '1_RDRA')) {
 	        forceRunPhase5AfterPhase4InAllPhase = false;
@@ -744,11 +736,11 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
                 }
                 break;
             case '21':
-                // 仕様生成の前提として「関連データ.txt」の存在をチェックする
-                if (fs.existsSync('1_RDRA/if/関連データ.txt')) {
+                // 仕様生成の前提として 1_RDRA の全ファイルと「関連データ.txt」の存在をチェックする
+                if (checkAllFilesExistInFolder(rdraFiles, '1_RDRA') && fs.existsSync('1_RDRA/if/関連データ.txt')) {
                     executeSpec();
                 } else {
-                    console.log('1_RDRA/if/関連データ.txt が存在しません。先にメニュー11で関連データを作成してください。');
+                    console.log('1_RDRA または 1_RDRA/if/関連データ.txt が不足しています。先にRDRA定義を生成し、メニュー11で関連データを作成してください。');
                     waitForEnter();
                 }
                 break;

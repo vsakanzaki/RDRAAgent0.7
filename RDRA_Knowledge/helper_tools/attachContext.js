@@ -95,10 +95,10 @@ function firstMatch(list, predicate) {
 }
 
 function buildInfoIndex(infoTsv) {
-  const ctxIdx = colIndex(infoTsv.header, 'コンテキスト', 'phase3/情報.tsv');
-  const infoIdx = colIndex(infoTsv.header, '情報', 'phase3/情報.tsv');
-  const stateModelIdx = colIndex(infoTsv.header, '状態モデル', 'phase3/情報.tsv');
-  const variationIdx = colIndex(infoTsv.header, 'バリエーション', 'phase3/情報.tsv');
+  const ctxIdx = colIndex(infoTsv.header, 'コンテキスト', 'phase4/ph4情報.tsv');
+  const infoIdx = colIndex(infoTsv.header, '情報', 'phase4/ph4情報.tsv');
+  const stateModelIdx = colIndex(infoTsv.header, '状態モデル', 'phase4/ph4情報.tsv');
+  const variationIdx = colIndex(infoTsv.header, 'バリエーション', 'phase4/ph4情報.tsv');
 
   return infoTsv.rows.map((r) => {
     const context = normalizeToken(r[ctxIdx]);
@@ -117,7 +117,7 @@ function buildInfoIndex(infoTsv) {
 }
 
 function convertConditions({ infoIndex, inTsv }) {
-  const variationIdx = colIndex(inTsv.header, 'バリエーション', 'phase4/条件関連.tsv');
+  const variationIdx = colIndex(inTsv.header, 'バリエーション', 'phase4/ph4条件.tsv');
 
   const outHeader = ['コンテキスト', ...inTsv.header];
   const outRows = inTsv.rows.map((r) => {
@@ -133,7 +133,7 @@ function convertConditions({ infoIndex, inTsv }) {
 }
 
 function buildStateTsv({ infoIndex, bucTsv }) {
-  const bucLabel = 'phase2/BUC.tsv';
+  const bucLabel = 'phase3/ph3BUC.tsv';
   const ucIdx = colIndex(bucTsv.header, 'UC', bucLabel);
   const stateModelIdx = colIndex(bucTsv.header, '状態モデル', bucLabel);
   const fromIdx = colIndex(bucTsv.header, 'From状態', bucLabel);
@@ -165,7 +165,7 @@ function buildStateTsv({ infoIndex, bucTsv }) {
 }
 
 function convertVariations({ infoIndex, inTsv }) {
-  const variationNameIdx = colIndex(inTsv.header, 'バリエーション', 'phase2/バリエーション.tsv');
+  const variationNameIdx = colIndex(inTsv.header, 'バリエーション', 'phase3/ph3バリエーション.tsv');
 
   const outHeader = ['コンテキスト', ...inTsv.header];
   const outRows = inTsv.rows.map((r) => {
@@ -185,18 +185,17 @@ function main() {
   // このスクリプトは RDRA_Knowledge/helper_tools 配下にあるため、2階層上がプロジェクトルート。
   const root = path.resolve(__dirname, '..', '..');
   const phase3Dir = path.resolve(root, '0_RDRAZeroOne', 'phase3');
-  const phase2Dir = path.resolve(root, '0_RDRAZeroOne', 'phase2');
   const phase4Dir = path.resolve(root, '0_RDRAZeroOne', 'phase4');
+  const rdraDir   = path.resolve(root, '1_RDRA');
 
-  const infoPath = path.resolve(phase3Dir, '情報.tsv');
-  const condInPath = path.resolve(phase4Dir, '条件関連.tsv');
-  const varInPath = path.resolve(phase2Dir, 'バリエーション.tsv');
+  const infoPath   = path.resolve(phase4Dir, 'ph4情報.tsv');
+  const condInPath = path.resolve(phase4Dir, 'ph4条件.tsv');
+  const varInPath  = path.resolve(phase3Dir, 'ph3バリエーション.tsv');
+  const bucInPath  = path.resolve(phase3Dir, 'ph3BUC.tsv');
 
-  const bucInPath = path.resolve(phase2Dir, 'BUC.tsv');
-
-  const condOutPath = path.resolve(phase4Dir, '条件.tsv');
-  const varOutPath = path.resolve(phase4Dir, 'バリエーション.tsv');
-  const stateOutPath = path.resolve(phase4Dir, '状態.tsv');
+  const condOutPath  = path.resolve(rdraDir, '条件.tsv');
+  const varOutPath   = path.resolve(rdraDir, 'バリエーション.tsv');
+  const stateOutPath = path.resolve(rdraDir, '状態.tsv');
 
   const infoTsv = parseTsv(readText(infoPath));
   const infoIndex = buildInfoIndex(infoTsv);
@@ -209,7 +208,7 @@ function main() {
   const varOut = convertVariations({ infoIndex, inTsv: variationTsv });
   const stateOut = buildStateTsv({ infoIndex, bucTsv });
 
-  ensureDir(phase4Dir);
+  ensureDir(rdraDir);
 
   fs.writeFileSync(condOutPath, toTsv(condOut.header, condOut.rows), { encoding: 'utf8' });
   fs.writeFileSync(varOutPath, toTsv(varOut.header, varOut.rows), { encoding: 'utf8' });

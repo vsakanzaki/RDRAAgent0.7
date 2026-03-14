@@ -26,19 +26,29 @@ const phaseConfigs = [
 const sourcePriority = ['phase4', 'phase3', 'phase2', 'phase1'];
 
 const TARGET_DIR = '1_RDRA';
-const EXCLUDE_FROM_COPY = new Set(); // 全ファイルをコピー対象とする
+const EXCLUDE_FROM_COPY = new Set(['状態.tsv', '条件.tsv', 'バリエーション.tsv', 'BUC.tsv']);
+
+// rdraFiles のファイル名（コピー先名） -> phaseFiles のファイル名（コピー元名）のマッピング
+const SOURCE_FILE_MAP = {
+  'アクター.tsv':     'ph4アクター.tsv',
+  '外部システム.tsv': 'ph4外部システム.tsv',
+  '情報.tsv':         'ph4情報.tsv',
+};
 
 function checkFileExists(filePath) {
   return fs.existsSync(filePath);
 }
 
-function copyFile(source, target) {
+function copyFile(source, target, targetName) {
+  const srcName = path.basename(source);
+  const dstName = targetName ?? path.basename(target);
+  const label = srcName !== dstName ? `${srcName} -> ${dstName}` : srcName;
   try {
     fs.copyFileSync(source, target);
-    console.log(`✓ コピー完了: ${path.basename(source)}`);
+    console.log(`✓ コピー完了: ${label}`);
     return true;
   } catch (error) {
-    console.error(`✗ コピー失敗: ${path.basename(source)} - ${error.message}`);
+    console.error(`✗ コピー失敗: ${label} - ${error.message}`);
     return false;
   }
 }
@@ -50,24 +60,20 @@ function ensureTargetDirectory(targetDir) {
   }
 }
 
-function validatePhaseOutputs() {
+function validatePhaseOutputs(plan) {
   console.log('=== ファイル存在チェック ===');
 
   let allFilesExist = true;
   const missingFiles = [];
 
-  for (const cfg of phaseConfigs) {
-    console.log(`\n${cfg.phase}フォルダーのチェック:`);
-
-    for (const fileName of cfg.files) {
-      const filePath = path.join(cfg.sourceDir, fileName);
-      if (checkFileExists(filePath)) {
-        console.log(`  ✓ ${fileName} - 存在`);
-      } else {
-        console.log(`  ✗ ${fileName} - 存在しない`);
-        allFilesExist = false;
-        missingFiles.push(`${cfg.sourceDir}/${fileName}`);
-      }
+  for (const item of plan) {
+    const filePath = path.join(item.sourceDir, item.sourceFileName);
+    if (checkFileExists(filePath)) {
+      console.log(`  ✓ ${item.sourceFileName} (${item.sourcePhase}) - 存在`);
+    } else {
+      console.log(`  ✗ ${item.sourceFileName} (${item.sourcePhase}) - 存在しない`);
+      allFilesExist = false;
+      missingFiles.push(`${item.sourceDir}/${item.sourceFileName}`);
     }
   }
 
@@ -86,14 +92,16 @@ function buildCopyPlan() {
   const filesToCopy = rdraFiles.filter(f => !EXCLUDE_FROM_COPY.has(f));
 
   const plan = [];
-  for (const fileName of filesToCopy) {
-    const sourcePhase = sourcePriority.find(phase => phaseMap.get(phase)?.files?.includes(fileName));
+  for (const targetFileName of filesToCopy) {
+    const sourceFileName = SOURCE_FILE_MAP[targetFileName] ?? targetFileName;
+    const sourcePhase = sourcePriority.find(phase => phaseMap.get(phase)?.files?.includes(sourceFileName));
     if (!sourcePhase) {
-      throw new Error(`コピー元フェーズが特定できません: ${fileName}（rdraFiles と phase*Files の整合性を確認してください）`);
+      throw new Error(`コピー元フェーズが特定できません: ${sourceFileName}（rdraFiles と phase*Files の整合性を確認してください）`);
     }
     const cfg = phaseMap.get(sourcePhase);
     plan.push({
-      fileName,
+      sourceFileName,
+      targetFileName,
       sourceDir: cfg.sourceDir,
       sourcePhase,
       targetDir: TARGET_DIR,
@@ -115,11 +123,12 @@ function main() {
 
   console.log('=== コピー計画（優先: phase4 > phase3 > phase2 > phase1） ===');
   plan.forEach(p => {
-    console.log(`- ${p.fileName}: ${p.sourcePhase} -> ${p.targetDir}`);
+    const rename = p.sourceFileName !== p.targetFileName ? ` -> ${p.targetFileName}` : '';
+    console.log(`- ${p.sourceFileName}${rename}: ${p.sourcePhase} -> ${p.targetDir}`);
   });
 
   // ファイル存在チェック
-  if (!validatePhaseOutputs()) {
+  if (!validatePhaseOutputs(plan)) {
     process.exit(1);
   }
 
@@ -130,16 +139,16 @@ function main() {
   let totalFiles = 0;
 
   for (const item of plan) {
-    const sourcePath = path.join(item.sourceDir, item.fileName);
-    const targetPath = path.join(item.targetDir, item.fileName);
+    const sourcePath = path.join(item.sourceDir, item.sourceFileName);
+    const targetPath = path.join(item.targetDir, item.targetFileName);
 
     totalFiles++;
 
     if (checkFileExists(targetPath)) {
-      console.log(`  上書き対象: ${item.fileName}`);
+      console.log(`  上書き対象: ${item.targetFileName}`);
     }
 
-    if (copyFile(sourcePath, targetPath)) {
+    if (copyFile(sourcePath, targetPath, item.targetFileName)) {
       successCount++;
     }
   }
@@ -149,11 +158,11 @@ function main() {
 
   console.log('\n=== 最終確認 ===');
   for (const item of plan) {
-    const targetPath = path.join(TARGET_DIR, item.fileName);
+    const targetPath = path.join(TARGET_DIR, item.targetFileName);
     if (checkFileExists(targetPath)) {
-      console.log(`✓ ${item.fileName} - 配置確認`);
+      console.log(`✓ ${item.targetFileName} - 配置確認`);
     } else {
-      console.log(`✗ ${item.fileName} - 配置未確認`);
+      console.log(`✗ ${item.targetFileName} - 配置未確認`);
     }
   }
 }

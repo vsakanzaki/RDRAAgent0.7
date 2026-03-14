@@ -1,7 +1,7 @@
 {
   "version": 1,
   "default": {
-    "provider": "claude"
+    "provider": "cursor"
   },
   "providers": {
     "claude": {
@@ -40,7 +40,7 @@
         "CI": "1"
       },
       "vars": {
-        "model": "gemini-3-flash-preview",
+        "model": "gemini-3.1-flash-lite-preview",
         "yolo": true
       },
       "args": [],
