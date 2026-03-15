@@ -2,12 +2,12 @@
 'use strict';
 
 /**
- * phase3の「UC条件.tsv」、phase2の「バリエーション.tsv」にコンテキスト列を追加し、
- * phase2の「BUC.tsv」から状態遷移を抽出して、phase4フォルダーへ出力する。
+ * phase4の「ph4条件.tsv」、phase3の「ph3バリエーション.tsv」にコンテキスト列を追加し、
+ * phase4の「ph4状態.tsv」にコンテキスト列を付与して、1_RDRAフォルダーへ出力する。
  *
- * - UC条件.tsv: 条件(バリエーション集合) ⊆ 情報.tsv(バリエーション集合) となる最初の情報行のコンテキストを採用
+ * - 条件.tsv:       条件(バリエーション集合) ⊆ 情報.tsv(バリエーション集合) となる最初の情報行のコンテキストを採用
  * - バリエーション.tsv: バリエーション名 ∈ 情報.tsv(バリエーション集合) となる最初の情報行のコンテキストを採用
- * - 状態.tsv: phase2/BUC.tsvの状態モデル ∈ 情報.tsv(状態モデル集合) となる最初の情報行のコンテキストを採用
+ * - 状態.tsv:       ph4状態.tsvの状態モデル ∈ 情報.tsv(状態モデル集合) となる最初の情報行のコンテキストを採用
  * - 一致なし: それぞれ "条件コンテキスト" / "バリエーションコンテキスト" / "状態コンテキスト"
  */
 
@@ -132,17 +132,18 @@ function convertConditions({ infoIndex, inTsv }) {
   return { header: outHeader, rows: outRows };
 }
 
-function buildStateTsv({ infoIndex, bucTsv }) {
-  const bucLabel = 'phase3/ph3BUC.tsv';
-  const ucIdx = colIndex(bucTsv.header, 'UC', bucLabel);
-  const stateModelIdx = colIndex(bucTsv.header, '状態モデル', bucLabel);
-  const fromIdx = colIndex(bucTsv.header, 'From状態', bucLabel);
-  const toIdx = colIndex(bucTsv.header, 'To状態', bucLabel);
+function buildStateTsv({ infoIndex, stateTsv }) {
+  const stateLabel = 'phase4/ph4状態.tsv';
+  const stateModelIdx = colIndex(stateTsv.header, '状態モデル', stateLabel);
+  const stateIdx      = colIndex(stateTsv.header, '状態',       stateLabel);
+  const ucIdx         = colIndex(stateTsv.header, '遷移UC',     stateLabel);
+  const toIdx         = colIndex(stateTsv.header, '遷移先状態', stateLabel);
+  const descIdx       = colIndex(stateTsv.header, '説明',       stateLabel);
 
   const outHeader = ['コンテキスト', '状態モデル', '状態', '遷移UC', '遷移先状態', '状態モデル・状態の説明'];
   const outRows = [];
 
-  for (const r of bucTsv.rows) {
+  for (const r of stateTsv.rows) {
     const stateModel = normalizeToken(r[stateModelIdx]);
     if (!stateModel) continue;
 
@@ -154,10 +155,10 @@ function buildStateTsv({ infoIndex, bucTsv }) {
     outRows.push([
       context,
       stateModel,
-      normalizeToken(r[fromIdx]),
+      normalizeToken(r[stateIdx]),
       normalizeToken(r[ucIdx]),
       normalizeToken(r[toIdx]),
-      '',
+      normalizeToken(r[descIdx]),
     ]);
   }
 
@@ -190,8 +191,8 @@ function main() {
 
   const infoPath   = path.resolve(phase4Dir, 'ph4情報.tsv');
   const condInPath = path.resolve(phase4Dir, 'ph4条件.tsv');
-  const varInPath  = path.resolve(phase3Dir, 'ph3バリエーション.tsv');
-  const bucInPath  = path.resolve(phase3Dir, 'ph3BUC.tsv');
+  const varInPath   = path.resolve(phase3Dir, 'ph3バリエーション.tsv');
+  const stateInPath = path.resolve(phase4Dir, 'ph4状態.tsv');
 
   const condOutPath  = path.resolve(rdraDir, '条件.tsv');
   const varOutPath   = path.resolve(rdraDir, 'バリエーション.tsv');
@@ -202,11 +203,11 @@ function main() {
 
   const condTsv = parseTsv(readText(condInPath));
   const variationTsv = parseTsv(readText(varInPath));
-  const bucTsv = parseTsv(readText(bucInPath));
+  const stateTsv = parseTsv(readText(stateInPath));
 
   const condOut = convertConditions({ infoIndex, inTsv: condTsv });
   const varOut = convertVariations({ infoIndex, inTsv: variationTsv });
-  const stateOut = buildStateTsv({ infoIndex, bucTsv });
+  const stateOut = buildStateTsv({ infoIndex, stateTsv });
 
   ensureDir(rdraDir);
 

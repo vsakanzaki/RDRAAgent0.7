@@ -401,7 +401,7 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
         }
         // 1_RDRA配下を削除
         deleteFilesInFolder('1_RDRA');
-
+        deleteFilesInFolder('1_RDRA/if');
         console.log('削除完了。Phase1からPhase5まで実行します...');
         isAllPhaseAutoRunning = true;
         forceRunPhase5AfterPhase4InAllPhase = false;

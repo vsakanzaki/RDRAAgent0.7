@@ -10,6 +10,7 @@ const targetFolders = [
     '0_RDRAZeroOne/phase3',
     '0_RDRAZeroOne/phase4',
     '1_RDRA',
+    '1_RDRA/if',
     '2_RDRASpec',
     '2_RDRASpec/phase1',
     '2_RDRASpec/phase2',

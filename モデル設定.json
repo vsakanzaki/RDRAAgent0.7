@@ -1,7 +1,7 @@
 {
   "version": 1,
   "default": {
-    "provider": "cursor"
+    "provider": "claude"
   },
   "providers": {
     "claude": {
