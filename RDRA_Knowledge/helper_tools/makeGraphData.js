@@ -1985,86 +1985,86 @@ var require_Core_Ordering_res = __commonJS({
   }
 });
 
-// src/rdraGraph/RdraSheet2Graph.res.js
-var require_RdraSheet2Graph_res = __commonJS({
-  "src/rdraGraph/RdraSheet2Graph.res.js"(exports2) {
+// src/rdraGraph/makeGraphData.res.js
+var require_makeGraphData_res = __commonJS({
+  "src/rdraGraph/makeGraphData.res.js"(exports2) {
     "use strict";
     var Caml = require_caml();
     var Belt_Array = require_belt_Array();
     var Core__Array = require_Core_Array_res();
     var Core__Option = require_Core_Option_res();
     var Core__Ordering = require_Core_Ordering_res();
-    var linkInfs = (obj) => obj["\u95A2\u9023\u60C5\u5831"];
-    var linkStts = (obj) => obj["\u72B6\u614B\u30E2\u30C7\u30EB"];
-    var linkVris = (obj) => obj["\u30D0\u30EA\u30A8\u30FC\u30B7\u30E7\u30F3"];
+    var linkInfs = (obj) => obj["関連情報"];
+    var linkStts = (obj) => obj["状態モデル"];
+    var linkVris = (obj) => obj["バリエーション"];
     function makeRdraData(data) {
       return {
         acts: data.acts.map(function(act) {
           return {
-            grp: Core__Option.getOr(act["\u30A2\u30AF\u30BF\u30FC\u7FA4"], ""),
-            act: Core__Option.getOr(act["\u30A2\u30AF\u30BF\u30FC"], ""),
-            exp: Core__Option.getOr(act["\u8AAC\u660E"], "")
+            grp: Core__Option.getOr(act["アクター群"], ""),
+            act: Core__Option.getOr(act["アクター"], ""),
+            exp: Core__Option.getOr(act["説明"], "")
           };
         }),
         exss: data.exss.map(function(exs) {
           return {
-            grp: Core__Option.getOr(exs["\u5916\u90E8\u30B7\u30B9\u30C6\u30E0\u7FA4"], ""),
-            exs: Core__Option.getOr(exs["\u5916\u90E8\u30B7\u30B9\u30C6\u30E0"], ""),
-            exp: Core__Option.getOr(exs["\u8AAC\u660E"], "")
+            grp: Core__Option.getOr(exs["外部システム群"], ""),
+            exs: Core__Option.getOr(exs["外部システム"], ""),
+            exp: Core__Option.getOr(exs["説明"], "")
           };
         }),
         infs: data.infs.map(function(inf) {
           return {
-            ctx: Core__Option.getOr(inf["\u30B3\u30F3\u30C6\u30AD\u30B9\u30C8"], ""),
-            inf: Core__Option.getOr(inf["\u60C5\u5831"], ""),
-            atr: Core__Option.getOr(inf["\u5C5E\u6027"], ""),
+            ctx: Core__Option.getOr(inf["コンテキスト"], ""),
+            inf: Core__Option.getOr(inf["情報"], ""),
+            atr: Core__Option.getOr(inf["属性"], ""),
             lnkInf: linkInfs(inf),
             lnkStt: linkStts(inf),
             lnkVri: linkVris(inf),
-            exp: Core__Option.getOr(inf["\u8AAC\u660E"], "")
+            exp: Core__Option.getOr(inf["説明"], "")
           };
         }),
         stts: data.stts.map(function(stt) {
           return {
-            ctx: Core__Option.getOr(stt["\u30B3\u30F3\u30C6\u30AD\u30B9\u30C8"], ""),
-            sttMdl: Core__Option.getOr(stt["\u72B6\u614B\u30E2\u30C7\u30EB"], ""),
-            fromStt: Core__Option.getOr(stt["\u72B6\u614B"], ""),
-            uc: Core__Option.getOr(stt["\u9077\u79FBUC"], ""),
-            toStt: Core__Option.getOr(stt["\u9077\u79FB\u5148\u72B6\u614B"], ""),
-            exp: Core__Option.getOr(stt["\u8AAC\u660E"], "")
+            ctx: Core__Option.getOr(stt["コンテキスト"], ""),
+            sttMdl: Core__Option.getOr(stt["状態モデル"], ""),
+            fromStt: Core__Option.getOr(stt["状態"], ""),
+            uc: Core__Option.getOr(stt["遷移UC"], ""),
+            toStt: Core__Option.getOr(stt["遷移先状態"], ""),
+            exp: Core__Option.getOr(stt["説明"], "")
           };
         }),
         cnds: data.cnds.map(function(cnd) {
           return {
-            ctx: Core__Option.getOr(cnd["\u30B3\u30F3\u30C6\u30AD\u30B9\u30C8"], "\u30B3\u30F3\u30C6\u30AD\u30B9\u30C8"),
-            cnd: Core__Option.getOr(cnd["\u6761\u4EF6"], ""),
-            exp: Core__Option.getOr(cnd["\u6761\u4EF6\u306E\u8AAC\u660E"], ""),
-            vri: Core__Option.getOr(cnd["\u30D0\u30EA\u30A8\u30FC\u30B7\u30E7\u30F3"], ""),
-            sttMdl: Core__Option.getOr(cnd["\u72B6\u614B\u30E2\u30C7\u30EB"], "")
+            ctx: Core__Option.getOr(cnd["コンテキスト"], "コンテキスト"),
+            cnd: Core__Option.getOr(cnd["条件"], ""),
+            exp: Core__Option.getOr(cnd["条件の説明"], ""),
+            vri: Core__Option.getOr(cnd["バリエーション"], ""),
+            sttMdl: Core__Option.getOr(cnd["状態モデル"], "")
           };
         }),
         vris: data.vris.map(function(vri) {
           return {
-            ctx: Core__Option.getOr(vri["\u30B3\u30F3\u30C6\u30AD\u30B9\u30C8"], "\u30B3\u30F3\u30C6\u30AD\u30B9\u30C8"),
-            vri: Core__Option.getOr(vri["\u30D0\u30EA\u30A8\u30FC\u30B7\u30E7\u30F3"], ""),
-            val: Core__Option.getOr(vri["\u5024"], ""),
-            exp: Core__Option.getOr(vri["\u8AAC\u660E"], "")
+            ctx: Core__Option.getOr(vri["コンテキスト"], "コンテキスト"),
+            vri: Core__Option.getOr(vri["バリエーション"], ""),
+            val: Core__Option.getOr(vri["値"], ""),
+            exp: Core__Option.getOr(vri["説明"], "")
           };
         }),
         bucs: data.bucs.map(function(buc) {
           var uc1 = Core__Option.getOr(buc["UC"], "");
-          var uc2 = Core__Option.getOr(buc["\u30E6\u30FC\u30B9\u30B1\u30FC\u30B9"], "");
+          var uc2 = Core__Option.getOr(buc["ユースケース"], "");
           return {
-            biz: Core__Option.getOr(buc["\u696D\u52D9"], ""),
+            biz: Core__Option.getOr(buc["業務"], ""),
             buc: Core__Option.getOr(buc["BUC"], ""),
-            job: Core__Option.getOr(buc["\u30A2\u30AF\u30C6\u30A3\u30D3\u30C6\u30A3"], ""),
-            next: Core__Option.getOr(buc["\u6B21"], ""),
+            job: Core__Option.getOr(buc["アクティビティ"], ""),
             uc: uc1 === "" ? uc2 === "" ? "" : uc2 : uc1,
-            mdl1: Core__Option.getOr(buc["\u95A2\u9023\u30E2\u30C7\u30EB1"], ""),
-            obj1: Core__Option.getOr(buc["\u95A2\u9023\u30AA\u30D6\u30B8\u30A7\u30AF\u30C81"], ""),
-            mdl2: Core__Option.getOr(buc["\u95A2\u9023\u30E2\u30C7\u30EB2"], ""),
-            obj2: Core__Option.getOr(buc["\u95A2\u9023\u30AA\u30D6\u30B8\u30A7\u30AF\u30C82"], ""),
-            exp: Core__Option.getOr(buc["\u8AAC\u660E"], "")
+            mdl1: Core__Option.getOr(buc["関連モデル1"], ""),
+            obj1: Core__Option.getOr(buc["関連オブジェクト1"], ""),
+            mdl2: Core__Option.getOr(buc["関連モデル2"], ""),
+            obj2: Core__Option.getOr(buc["関連オブジェクト2"], ""),
+            exp: Core__Option.getOr(buc["説明"], ""),
+            srnReq: Core__Option.getOr(buc["画面要求"], "")
           };
         })
       };
@@ -2103,7 +2103,7 @@ var require_RdraSheet2Graph_res = __commonJS({
       if (Array.isArray(object)) {
         return object;
       } else if (typeof object === "string") {
-        return object.includes(",") ? object.split(",") : object.includes("\u3001") ? object.split("\u3001") : [object];
+        return object.includes(",") ? object.split(",") : object.includes("、") ? object.split("、") : [object];
       } else {
         return [];
       }
@@ -2121,7 +2121,7 @@ var require_RdraSheet2Graph_res = __commonJS({
         var bizBuc = {
           edge: "child",
           modelPair: {
-            source: "\u696D\u52D9",
+            source: "業務",
             target: "BUC"
           },
           objectPairs: []
@@ -2130,14 +2130,14 @@ var require_RdraSheet2Graph_res = __commonJS({
           edge: "child",
           modelPair: {
             source: "BUC",
-            target: "\u30A2\u30AF\u30C6\u30A3\u30D3\u30C6\u30A3"
+            target: "アクティビティ"
           },
           objectPairs: []
         };
         var jobUC = {
           edge: "edge",
           modelPair: {
-            source: "\u30A2\u30AF\u30C6\u30A3\u30D3\u30C6\u30A3",
+            source: "アクティビティ",
             target: "UC"
           },
           objectPairs: []
@@ -2145,40 +2145,40 @@ var require_RdraSheet2Graph_res = __commonJS({
         var jobSrn = {
           edge: "edge",
           modelPair: {
-            source: "\u30A2\u30AF\u30C6\u30A3\u30D3\u30C6\u30A3",
-            target: "\u753B\u9762"
+            source: "アクティビティ",
+            target: "画面"
           },
           objectPairs: []
         };
         var jobAct = {
           edge: "edge",
           modelPair: {
-            source: "\u30A2\u30AF\u30C6\u30A3\u30D3\u30C6\u30A3",
-            target: "\u30A2\u30AF\u30BF\u30FC"
+            source: "アクティビティ",
+            target: "アクター"
           },
           objectPairs: []
         };
         var jobInf = {
           edge: "edge",
           modelPair: {
-            source: "\u30A2\u30AF\u30C6\u30A3\u30D3\u30C6\u30A3",
-            target: "\u60C5\u5831"
+            source: "アクティビティ",
+            target: "情報"
           },
           objectPairs: []
         };
         var jobTmr = {
           edge: "edge",
           modelPair: {
-            source: "\u30A2\u30AF\u30C6\u30A3\u30D3\u30C6\u30A3",
-            target: "\u30BF\u30A4\u30DE\u30FC"
+            source: "アクティビティ",
+            target: "タイマー"
           },
           objectPairs: []
         };
         var jobExp = {
           edge: "edge",
           modelPair: {
-            source: "\u30A2\u30AF\u30C6\u30A3\u30D3\u30C6\u30A3",
-            target: "\u8AAC\u660E"
+            source: "アクティビティ",
+            target: "説明"
           },
           objectPairs: []
         };
@@ -2186,7 +2186,7 @@ var require_RdraSheet2Graph_res = __commonJS({
           edge: "edge",
           modelPair: {
             source: "UC",
-            target: "\u753B\u9762"
+            target: "画面"
           },
           objectPairs: []
         };
@@ -2194,7 +2194,7 @@ var require_RdraSheet2Graph_res = __commonJS({
           edge: "edge",
           modelPair: {
             source: "UC",
-            target: "\u30A4\u30D9\u30F3\u30C8"
+            target: "イベント"
           },
           objectPairs: []
         };
@@ -2202,7 +2202,7 @@ var require_RdraSheet2Graph_res = __commonJS({
           edge: "edge",
           modelPair: {
             source: "UC",
-            target: "\u60C5\u5831"
+            target: "情報"
           },
           objectPairs: []
         };
@@ -2210,7 +2210,7 @@ var require_RdraSheet2Graph_res = __commonJS({
           edge: "edge",
           modelPair: {
             source: "UC",
-            target: "\u6761\u4EF6"
+            target: "条件"
           },
           objectPairs: []
         };
@@ -2218,7 +2218,7 @@ var require_RdraSheet2Graph_res = __commonJS({
           edge: "edge",
           modelPair: {
             source: "UC",
-            target: "\u30BF\u30A4\u30DE\u30FC"
+            target: "タイマー"
           },
           objectPairs: []
         };
@@ -2226,55 +2226,55 @@ var require_RdraSheet2Graph_res = __commonJS({
           edge: "comment",
           modelPair: {
             source: "UC",
-            target: "\u8AAC\u660E"
+            target: "説明"
           },
           objectPairs: []
         };
         var srnAct = {
           edge: "edge",
           modelPair: {
-            source: "\u753B\u9762",
-            target: "\u30A2\u30AF\u30BF\u30FC"
+            source: "画面",
+            target: "アクター"
           },
           objectPairs: []
         };
         var srnExs = {
           edge: "edge",
           modelPair: {
-            source: "\u753B\u9762",
-            target: "\u5916\u90E8\u30B7\u30B9\u30C6\u30E0"
+            source: "画面",
+            target: "外部システム"
+          },
+          objectPairs: []
+        };
+        var srnSrnReq = {
+          edge: "edge",
+          modelPair: {
+            source: "画面",
+            target: "画面要求"
           },
           objectPairs: []
         };
         var evtExs = {
           edge: "edge",
           modelPair: {
-            source: "\u30A4\u30D9\u30F3\u30C8",
-            target: "\u5916\u90E8\u30B7\u30B9\u30C6\u30E0"
+            source: "イベント",
+            target: "外部システム"
           },
           objectPairs: []
         };
         var evtAct = {
           edge: "edge",
           modelPair: {
-            source: "\u30A4\u30D9\u30F3\u30C8",
-            target: "\u30A2\u30AF\u30BF\u30FC"
+            source: "イベント",
+            target: "アクター"
           },
           objectPairs: []
         };
         var infAct = {
           edge: "edge",
           modelPair: {
-            source: "\u30A2\u30AF\u30BF\u30FC",
-            target: "\u60C5\u5831"
-          },
-          objectPairs: []
-        };
-        var jobJob = {
-          edge: "arrow",
-          modelPair: {
-            source: "\u30A2\u30AF\u30C6\u30A3\u30D3\u30C6\u30A3",
-            target: "\u30A2\u30AF\u30C6\u30A3\u30D3\u30C6\u30A3"
+            source: "アクター",
+            target: "情報"
           },
           objectPairs: []
         };
@@ -2290,34 +2290,21 @@ var require_RdraSheet2Graph_res = __commonJS({
         var uc = {
           contents: ""
         };
-        var prevArrowJob = {
-          contents: ""
-        };
         bucs.forEach(function(bucRec) {
           if (bucRec.biz !== "") {
             biz.contents = bucRec.biz;
           }
           if (bucRec.buc !== "") {
-            if (buc.contents !== bucRec.buc) {
-              prevArrowJob.contents = "";
-            }
             buc.contents = bucRec.buc;
           }
           if (bucRec.job !== "") {
-            if (prevArrowJob.contents !== "" && prevArrowJob.contents !== bucRec.job) {
-              addPair(jobJob, prevArrowJob.contents, bucRec.job);
-            }
             job.contents = bucRec.job;
             uc.contents = "";
-            if (bucRec.next === "\u2193") {
-              prevArrowJob.contents = bucRec.job;
-            } else {
-              prevArrowJob.contents = "";
-            }
           }
           if (bucRec.uc !== "") {
             uc.contents = bucRec.uc;
           }
+          console.log("Current refs:", bucRec);
           if (biz.contents !== "" && bucRec.buc !== "") {
             addPair(bizBuc, biz.contents, buc.contents);
           }
@@ -2328,16 +2315,16 @@ var require_RdraSheet2Graph_res = __commonJS({
             addPair(jobUC, job.contents, bucRec.uc);
           }
           if (job.contents !== "" && uc.contents === "") {
-            if (bucRec.mdl1 === "\u753B\u9762" && bucRec.obj1 !== "") {
+            if (bucRec.mdl1 === "画面" && bucRec.obj1 !== "") {
               addPair(jobSrn, job.contents, bucRec.obj1);
             }
-            if (bucRec.mdl2 === "\u30A2\u30AF\u30BF\u30FC" && bucRec.obj2 !== "") {
+            if (bucRec.mdl2 === "アクター" && bucRec.obj2 !== "") {
               addPair(jobAct, job.contents, bucRec.obj2);
             }
-            if (bucRec.mdl1 === "\u60C5\u5831" && bucRec.obj1 !== "") {
+            if (bucRec.mdl1 === "情報" && bucRec.obj1 !== "") {
               addPair(jobInf, job.contents, bucRec.obj1);
             }
-            if (bucRec.mdl1 === "\u30BF\u30A4\u30DE\u30FC" && bucRec.obj1 !== "") {
+            if (bucRec.mdl1 === "タイマー" && bucRec.obj1 !== "") {
               addPair(jobTmr, job.contents, bucRec.obj1);
             }
             if (bucRec.exp !== "") {
@@ -2345,38 +2332,42 @@ var require_RdraSheet2Graph_res = __commonJS({
             }
           }
           if (uc.contents !== "") {
-            if (bucRec.mdl1 === "\u753B\u9762" && bucRec.obj1 !== "") {
+            console.log("UC processing:", uc.contents, bucRec.mdl1, bucRec.obj1, bucRec.mdl2);
+            if (bucRec.mdl1 === "画面" && bucRec.obj1 !== "") {
               addPair(ucSrn, uc.contents, bucRec.obj1);
             }
-            if (bucRec.mdl1 === "\u30A4\u30D9\u30F3\u30C8" && bucRec.obj1 !== "") {
+            if (bucRec.mdl1 === "イベント" && bucRec.obj1 !== "") {
               addPair(ucEvt, uc.contents, bucRec.obj1);
             }
-            if (bucRec.mdl1 === "\u60C5\u5831" && bucRec.obj1 !== "") {
+            if (bucRec.mdl1 === "情報" && bucRec.obj1 !== "") {
               addPair(ucInf, uc.contents, bucRec.obj1);
             }
-            if (bucRec.mdl1 === "\u6761\u4EF6" && bucRec.obj1 !== "") {
+            if (bucRec.mdl1 === "条件" && bucRec.obj1 !== "") {
               addPair(ucCnd, uc.contents, bucRec.obj1);
             }
-            if (bucRec.mdl1 === "\u30BF\u30A4\u30DE\u30FC" && bucRec.obj1 !== "") {
+            if (bucRec.mdl1 === "タイマー" && bucRec.obj1 !== "") {
               addPair(ucTmr, uc.contents, bucRec.obj1);
             }
             if (bucRec.exp !== "") {
               addPair(ucExp, uc.contents, bucRec.exp);
             }
           }
-          if (bucRec.mdl1 === "\u753B\u9762" && bucRec.mdl2 === "\u30A2\u30AF\u30BF\u30FC" && bucRec.obj1 !== "" && bucRec.obj2 !== "") {
+          if (bucRec.mdl1 === "画面" && bucRec.mdl2 === "アクター" && bucRec.obj1 !== "" && bucRec.obj2 !== "") {
             addPair(srnAct, bucRec.obj1, bucRec.obj2);
           }
-          if (bucRec.mdl1 === "\u753B\u9762" && bucRec.mdl2 === "\u5916\u90E8\u30B7\u30B9\u30C6\u30E0" && bucRec.obj1 !== "" && bucRec.obj2 !== "") {
+          if (bucRec.mdl1 === "画面" && bucRec.mdl2 === "外部システム" && bucRec.obj1 !== "" && bucRec.obj2 !== "") {
             addPair(srnExs, bucRec.obj1, bucRec.obj2);
           }
-          if (bucRec.mdl1 === "\u30A4\u30D9\u30F3\u30C8" && bucRec.mdl2 === "\u5916\u90E8\u30B7\u30B9\u30C6\u30E0" && bucRec.obj1 !== "" && bucRec.obj2 !== "") {
+          if (bucRec.mdl1 === "画面" && bucRec.obj1 !== "" && bucRec.srnReq !== "") {
+            addPair(srnSrnReq, bucRec.obj1, bucRec.srnReq);
+          }
+          if (bucRec.mdl1 === "イベント" && bucRec.mdl2 === "外部システム" && bucRec.obj1 !== "" && bucRec.obj2 !== "") {
             addPair(evtExs, bucRec.obj1, bucRec.obj2);
           }
-          if (bucRec.mdl1 === "\u30A4\u30D9\u30F3\u30C8" && bucRec.mdl2 === "\u30A2\u30AF\u30BF\u30FC" && bucRec.obj1 !== "" && bucRec.obj2 !== "") {
+          if (bucRec.mdl1 === "イベント" && bucRec.mdl2 === "アクター" && bucRec.obj1 !== "" && bucRec.obj2 !== "") {
             addPair(evtAct, bucRec.obj1, bucRec.obj2);
           }
-          if (bucRec.mdl1 === "\u60C5\u5831" && bucRec.mdl2 === "\u30A2\u30AF\u30BF\u30FC" && bucRec.obj1 !== "" && bucRec.obj2 !== "") {
+          if (bucRec.mdl1 === "情報" && bucRec.mdl2 === "アクター" && bucRec.obj1 !== "" && bucRec.obj2 !== "") {
             return addPair(infAct, bucRec.obj1, bucRec.obj2);
           }
         });
@@ -2387,10 +2378,12 @@ var require_RdraSheet2Graph_res = __commonJS({
         ucTmr.objectPairs = edgeBeUnique(ucTmr);
         srnAct.objectPairs = edgeBeUnique(srnAct);
         srnExs.objectPairs = edgeBeUnique(srnExs);
+        srnSrnReq.objectPairs = edgeBeUnique(srnSrnReq);
         evtExs.objectPairs = edgeBeUnique(evtExs);
         jobSrn.objectPairs = edgeBeUnique(jobSrn);
         jobAct.objectPairs = edgeBeUnique(jobAct);
-        jobJob.objectPairs = edgeBeUnique(jobJob);
+        console.log("BUC", ucSrn.modelPair, ucSrn.objectPairs, ucInf.modelPair, ucInf.objectPairs);
+        console.log("UC contents:", uc.contents, "ucInf pairs count:", ucInf.objectPairs.length, "");
         return [
           [
             bizBuc,
@@ -2400,7 +2393,6 @@ var require_RdraSheet2Graph_res = __commonJS({
             jobUC,
             jobSrn,
             jobAct,
-            jobJob,
             ucSrn,
             ucEvt,
             ucInf,
@@ -2409,7 +2401,8 @@ var require_RdraSheet2Graph_res = __commonJS({
             ucExp,
             srnAct,
             evtExs,
-            srnExs
+            srnExs,
+            srnSrnReq
           ]
         ];
       };
@@ -2417,32 +2410,32 @@ var require_RdraSheet2Graph_res = __commonJS({
         var ctxCnd = {
           edge: "child",
           modelPair: {
-            source: "\u30B3\u30F3\u30C6\u30AD\u30B9\u30C8",
-            target: "\u6761\u4EF6"
+            source: "コンテキスト",
+            target: "条件"
           },
           objectPairs: []
         };
         var cndExp = {
           edge: "comment",
           modelPair: {
-            source: "\u6761\u4EF6",
-            target: "\u8AAC\u660E"
+            source: "条件",
+            target: "説明"
           },
           objectPairs: []
         };
         var cndVri = {
           edge: "edge",
           modelPair: {
-            source: "\u6761\u4EF6",
-            target: "\u30D0\u30EA\u30A8\u30FC\u30B7\u30E7\u30F3"
+            source: "条件",
+            target: "バリエーション"
           },
           objectPairs: []
         };
         var cndStt = {
           edge: "edge",
           modelPair: {
-            source: "\u6761\u4EF6",
-            target: "\u72B6\u614B\u30E2\u30C7\u30EB"
+            source: "条件",
+            target: "状態モデル"
           },
           objectPairs: []
         };
@@ -2504,24 +2497,24 @@ var require_RdraSheet2Graph_res = __commonJS({
         var ctxVri = {
           edge: "child",
           modelPair: {
-            source: "\u30B3\u30F3\u30C6\u30AD\u30B9\u30C8",
-            target: "\u30D0\u30EA\u30A8\u30FC\u30B7\u30E7\u30F3"
+            source: "コンテキスト",
+            target: "バリエーション"
           },
           objectPairs: []
         };
         var vriVal = {
           edge: "attribute",
           modelPair: {
-            source: "\u30D0\u30EA\u30A8\u30FC\u30B7\u30E7\u30F3",
-            target: "\u5024"
+            source: "バリエーション",
+            target: "値"
           },
           objectPairs: []
         };
         var vriExp = {
           edge: "comment",
           modelPair: {
-            source: "\u30D0\u30EA\u30A8\u30FC\u30B7\u30E7\u30F3",
-            target: "\u8AAC\u660E"
+            source: "バリエーション",
+            target: "説明"
           },
           objectPairs: []
         };
@@ -2554,16 +2547,16 @@ var require_RdraSheet2Graph_res = __commonJS({
         var grpAct = {
           edge: "child",
           modelPair: {
-            source: "\u30A2\u30AF\u30BF\u30FC\u7FA4",
-            target: "\u30A2\u30AF\u30BF\u30FC"
+            source: "アクター群",
+            target: "アクター"
           },
           objectPairs: []
         };
         var actExp = {
           edge: "comment",
           modelPair: {
-            source: "\u30A2\u30AF\u30BF\u30FC",
-            target: "\u8AAC\u660E"
+            source: "アクター",
+            target: "説明"
           },
           objectPairs: []
         };
@@ -2590,16 +2583,16 @@ var require_RdraSheet2Graph_res = __commonJS({
         var grpExs = {
           edge: "child",
           modelPair: {
-            source: "\u5916\u90E8\u30B7\u30B9\u30C6\u30E0\u7FA4",
-            target: "\u5916\u90E8\u30B7\u30B9\u30C6\u30E0"
+            source: "外部システム群",
+            target: "外部システム"
           },
           objectPairs: []
         };
         var exsExp = {
           edge: "comment",
           modelPair: {
-            source: "\u5916\u90E8\u30B7\u30B9\u30C6\u30E0",
-            target: "\u8AAC\u660E"
+            source: "外部システム",
+            target: "説明"
           },
           objectPairs: []
         };
@@ -2626,48 +2619,48 @@ var require_RdraSheet2Graph_res = __commonJS({
         var ctxInf = {
           edge: "child",
           modelPair: {
-            source: "\u30B3\u30F3\u30C6\u30AD\u30B9\u30C8",
-            target: "\u60C5\u5831"
+            source: "コンテキスト",
+            target: "情報"
           },
           objectPairs: []
         };
         var infAtr = {
           edge: "attribute",
           modelPair: {
-            source: "\u60C5\u5831",
-            target: "\u5C5E\u6027"
+            source: "情報",
+            target: "属性"
           },
           objectPairs: []
         };
         var infLnkInf = {
           edge: "edge",
           modelPair: {
-            source: "\u60C5\u5831",
-            target: "\u60C5\u5831"
+            source: "情報",
+            target: "情報"
           },
           objectPairs: []
         };
         var infLnkStt = {
           edge: "edge",
           modelPair: {
-            source: "\u60C5\u5831",
-            target: "\u72B6\u614B\u30E2\u30C7\u30EB"
+            source: "情報",
+            target: "状態モデル"
           },
           objectPairs: []
         };
         var infLnkVri = {
           edge: "edge",
           modelPair: {
-            source: "\u60C5\u5831",
-            target: "\u30D0\u30EA\u30A8\u30FC\u30B7\u30E7\u30F3"
+            source: "情報",
+            target: "バリエーション"
           },
           objectPairs: []
         };
         var infExp = {
           edge: "comment",
           modelPair: {
-            source: "\u60C5\u5831",
-            target: "\u8AAC\u660E"
+            source: "情報",
+            target: "説明"
           },
           objectPairs: []
         };
@@ -2702,7 +2695,7 @@ var require_RdraSheet2Graph_res = __commonJS({
           if (match2 === "") {
             return;
           }
-          if (!match$12 || match$12.length === 0) {
+          if (match$12.length === 0) {
             return;
           }
           var sttGary = ifString2Arrayy(match$12);
@@ -2735,7 +2728,7 @@ var require_RdraSheet2Graph_res = __commonJS({
           if (match2 === "") {
             return;
           }
-          if (!match$12 || match$12.length === 0) {
+          if (match$12.length === 0) {
             return;
           }
           var vriAry = ifString2Arrayy(match$12);
@@ -2761,23 +2754,23 @@ var require_RdraSheet2Graph_res = __commonJS({
         var ctxSttMdl = {
           edge: "child",
           modelPair: {
-            source: "\u30B3\u30F3\u30C6\u30AD\u30B9\u30C8",
-            target: "\u72B6\u614B\u30E2\u30C7\u30EB"
+            source: "コンテキスト",
+            target: "状態モデル"
           },
           objectPairs: []
         };
         var sttMdlStt = {
           edge: "child",
           modelPair: {
-            source: "\u72B6\u614B\u30E2\u30C7\u30EB",
-            target: "\u72B6\u614B"
+            source: "状態モデル",
+            target: "状態"
           },
           objectPairs: []
         };
         var sttUc = {
           edge: "arrow",
           modelPair: {
-            source: "\u72B6\u614B",
+            source: "状態",
             target: "UC"
           },
           objectPairs: []
@@ -2786,30 +2779,30 @@ var require_RdraSheet2Graph_res = __commonJS({
           edge: "arrow",
           modelPair: {
             source: "UC",
-            target: "\u72B6\u614B"
+            target: "状態"
           },
           objectPairs: []
         };
         var sttStt = {
           edge: "arrow",
           modelPair: {
-            source: "\u72B6\u614B",
-            target: "\u72B6\u614B"
+            source: "状態",
+            target: "状態"
           },
           objectPairs: []
         };
         var sttExp = {
           edge: "stereotype",
           modelPair: {
-            source: "\u72B6\u614B",
-            target: "\u8AAC\u660E"
+            source: "状態",
+            target: "説明"
           },
           objectPairs: []
         };
         var sttStp = {
           edge: "stereotype",
           modelPair: {
-            source: "\u72B6\u614B",
+            source: "状態",
             target: "Stereotype"
           },
           objectPairs: []
@@ -2817,8 +2810,8 @@ var require_RdraSheet2Graph_res = __commonJS({
         var sttMdlExp = {
           edge: "child",
           modelPair: {
-            source: "\u72B6\u614B\u30E2\u30C7\u30EB",
-            target: "\u72B6\u614B"
+            source: "状態モデル",
+            target: "状態"
           },
           objectPairs: []
         };
@@ -2964,13 +2957,13 @@ var require_RdraSheet2Graph_res = __commonJS({
 // src/rdraFile2Rec.js
 var fs = require("fs");
 var path = require("path");
-var { makeConnection, conectin2String } = require_RdraSheet2Graph_res();
+var { makeConnection, conectin2String } = require_makeGraphData_res();
 function parseTSVFile(filePath) {
   try {
     const content = fs.readFileSync(filePath, "utf8");
     const lines = content.split("\n").filter((line) => line.trim() !== "");
     if (lines.length < 2) {
-      console.warn(`\u30D5\u30A1\u30A4\u30EB ${filePath} \u306B\u306F\u30D8\u30C3\u30C0\u30FC\u3068\u30C7\u30FC\u30BF\u304C\u3042\u308A\u307E\u305B\u3093`);
+      console.warn(`ファイル ${filePath} にはヘッダーとデータがありません`);
       return [];
     }
     const headers = lines[0].split("	");
@@ -2983,32 +2976,32 @@ function parseTSVFile(filePath) {
       });
       data.push(row);
     }
-    console.log(`  - \u8AAD\u307F\u8FBC\u307F\u5B8C\u4E86: ${data.length}\u4EF6\u306E\u30C7\u30FC\u30BF`);
+    console.log(`  - 読み込み完了: ${data.length}件のデータ`);
     return data;
   } catch (error) {
-    console.error(`\u30D5\u30A1\u30A4\u30EB ${filePath} \u306E\u8AAD\u307F\u8FBC\u307F\u30A8\u30E9\u30FC:`, error.message);
+    console.error(`ファイル ${filePath} の読み込みエラー:`, error.message);
     return [];
   }
 }
 function createRdraSheetDefT(rdraPath = "1_RDRA") {
   const rdraDir = path.join(process.cwd(), rdraPath);
-  console.log(`RDRA\u30C7\u30A3\u30EC\u30AF\u30C8\u30EA: ${rdraDir}`);
-  let systemName = "XXXXX\u30B7\u30B9\u30C6\u30E0";
+  console.log(`RDRAディレクトリ: ${rdraDir}`);
+  let systemName = "XXXXXシステム";
   try {
-    const systemOverviewPath = path.join(rdraDir, "\u30B7\u30B9\u30C6\u30E0\u6982\u8981.json");
+    const systemOverviewPath = path.join(rdraDir, "システム概要.json");
     const systemOverviewContent = fs.readFileSync(systemOverviewPath, "utf8");
     const systemOverview = JSON.parse(systemOverviewContent);
     systemName = systemOverview.system_name || systemName;
     console.log(systemName);
   } catch (error) {
-    console.warn(`\u30B7\u30B9\u30C6\u30E0\u6982\u8981.json\u306E\u8AAD\u307F\u8FBC\u307F\u306B\u5931\u6557\u3057\u307E\u3057\u305F: ${error.message}`);
+    console.warn(`システム概要.jsonの読み込みに失敗しました: ${error.message}`);
   }
-  const acts = parseTSVFile(path.join(rdraDir, "\u30A2\u30AF\u30BF\u30FC.tsv"));
-  const exss = parseTSVFile(path.join(rdraDir, "\u5916\u90E8\u30B7\u30B9\u30C6\u30E0.tsv"));
-  const vris = parseTSVFile(path.join(rdraDir, "\u30D0\u30EA\u30A8\u30FC\u30B7\u30E7\u30F3.tsv"));
-  const cnds = parseTSVFile(path.join(rdraDir, "\u6761\u4EF6.tsv"));
-  const infs = parseTSVFile(path.join(rdraDir, "\u60C5\u5831.tsv"));
-  const stts = parseTSVFile(path.join(rdraDir, "\u72B6\u614B.tsv"));
+  const acts = parseTSVFile(path.join(rdraDir, "アクター.tsv"));
+  const exss = parseTSVFile(path.join(rdraDir, "外部システム.tsv"));
+  const vris = parseTSVFile(path.join(rdraDir, "バリエーション.tsv"));
+  const cnds = parseTSVFile(path.join(rdraDir, "条件.tsv"));
+  const infs = parseTSVFile(path.join(rdraDir, "情報.tsv"));
+  const stts = parseTSVFile(path.join(rdraDir, "状態.tsv"));
   const bucs = parseTSVFile(path.join(rdraDir, "BUC.tsv"));
   const rdraSheetDef = {
     systemName,
@@ -3024,43 +3017,43 @@ function createRdraSheetDefT(rdraPath = "1_RDRA") {
 }
 function main(rdraPath = "1_RDRA") {
   try {
-    console.log(`\u4F7F\u7528\u3059\u308BRDRA\u30D1\u30B9: ${rdraPath}`);
+    console.log(`使用するRDRAパス: ${rdraPath}`);
     const rdraData = createRdraSheetDefT(rdraPath);
-    const outputDir = path.join(process.cwd(), "1_RDRA", "if");
+    const outputDir = path.join(process.cwd(), rdraPath, "if");
+    const outputPath = path.join(outputDir, "関連データ.txt");
     fs.mkdirSync(outputDir, { recursive: true });
-    const outputPath = path.join(outputDir, "\u95A2\u9023\u30C7\u30FC\u30BF.txt");
     try {
       const connections = makeConnection(rdraData);
       const linkData = conectin2String(rdraData.systemName, connections);
-      console.log(`- \u4F5C\u6210\u3055\u308C\u305F\u63A5\u7D9A\u6570: ${connections.length}`);
+      console.log(`- 作成された接続数: ${connections.length}`);
       try {
         fs.writeFileSync(outputPath, linkData, "utf8");
-        console.log("\u2713 \u30D5\u30A1\u30A4\u30EB\u51FA\u529B\u5B8C\u4E86");
+        console.log("✓ ファイル出力完了");
       } catch (writeError) {
-        console.error("\u30D5\u30A1\u30A4\u30EB\u51FA\u529B\u30A8\u30E9\u30FC:", writeError.message);
+        console.error("ファイル出力エラー:", writeError.message);
       }
       console.log(linkData);
     } catch (error) {
-      console.error("makeConnection\u3067\u30A8\u30E9\u30FC\u304C\u767A\u751F\u3057\u307E\u3057\u305F:", error);
-      console.error("\u30A8\u30E9\u30FC\u30B9\u30BF\u30C3\u30AF:", error.stack);
+      console.error("makeConnectionでエラーが発生しました:", error);
+      console.error("エラースタック:", error.stack);
     }
-    console.log("\nRDRA\u30C7\u30FC\u30BF\u306E\u51E6\u7406\u304C\u5B8C\u4E86\u3057\u307E\u3057\u305F\u3002");
+    console.log("\nRDRAデータの処理が完了しました。");
   } catch (error) {
-    console.error("\u30A8\u30E9\u30FC\u304C\u767A\u751F\u3057\u307E\u3057\u305F:", error);
-    console.error("\u30A8\u30E9\u30FC\u30B9\u30BF\u30C3\u30AF:", error.stack);
+    console.error("エラーが発生しました:", error);
+    console.error("エラースタック:", error.stack);
   }
 }
-console.log("=== \u30B9\u30AF\u30EA\u30D7\u30C8\u958B\u59CB ===");
+console.log("=== スクリプト開始 ===");
 console.log("require.main:", require.main);
 console.log("module:", module);
 console.log("process.argv:", process.argv);
 if (require.main === module) {
-  console.log("\u30B9\u30AF\u30EA\u30D7\u30C8\u304C\u76F4\u63A5\u5B9F\u884C\u3055\u308C\u307E\u3057\u305F");
+  console.log("スクリプトが直接実行されました");
   const rdraPath = process.argv[2] || "1_RDRA";
-  console.log("\u4F7F\u7528\u3059\u308BRDRA\u30D1\u30B9:", rdraPath);
+  console.log("使用するRDRAパス:", rdraPath);
   main(rdraPath);
 } else {
-  console.log("\u30B9\u30AF\u30EA\u30D7\u30C8\u304C\u30E2\u30B8\u30E5\u30FC\u30EB\u3068\u3057\u3066\u8AAD\u307F\u8FBC\u307E\u308C\u307E\u3057\u305F");
+  console.log("スクリプトがモジュールとして読み込まれました");
 }
-console.log("=== \u30B9\u30AF\u30EA\u30D7\u30C8\u7D42\u4E86 ===");
+console.log("=== スクリプト終了 ===");
 module.exports = { createRdraSheetDefT, parseTSVFile, main };

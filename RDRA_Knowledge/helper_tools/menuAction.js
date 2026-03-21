@@ -79,8 +79,12 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
      */
     function checkAllFilesExistInFolder(fileNames, folderPath) {
         try {
+            // 正規化関数（NFC に統一）
+            const normalize = s => s.normalize('NFC');
+            // フォルダ側を正規化
             const filesInDir = fs.readdirSync(folderPath);
-            return fileNames.every(file => filesInDir.includes(file));
+            const filesInDirNormalized = filesInDir.map(normalize);
+            return fileNames.every(file => filesInDirNormalized.includes(file));
         } catch (err) {
             console.error(`ディレクトリの読み込みエラー: ${err}`);
             return false;

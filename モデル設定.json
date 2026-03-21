@@ -1,7 +1,7 @@
 {
   "version": 1,
   "default": {
-    "provider": "claude"
+    "provider": "cline"
   },
   "providers": {
     "claude": {
@@ -65,7 +65,7 @@
         "FORCE_COLOR": "0"
       },
       "vars": {
-        "model": "gemini-3-flash"
+        "model": "GLM-4.7"
       },
       "args": [
         "-p",
@@ -93,6 +93,26 @@
       "args": [
         "exec",
         "--full-auto"
+      ],
+      "argsIf": {
+        "model": [
+          "--model",
+          "{model}"
+        ]
+      }
+    },
+    "cline": {
+      "command": "cline",
+      "useStdin": true,
+      "env": {
+        "NO_COLOR": "1",
+        "CI": "1"
+      },
+      "vars": {
+        "model": "GLM-5"
+      },
+      "args": [
+        "-y"
       ],
       "argsIf": {
         "model": [

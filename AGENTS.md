@@ -1,4 +1,4 @@
-see @RDRA_Knowledge/1_RDRA/RDRA.md
+see @RDRA_Knowledge/.rdracore/RDRA.md
 see @初期要望.txt
 
 # RDRAAgent Project Context
@@ -51,7 +51,7 @@ RDRAAgent は、体系的なソフトウェア要件定義のために **RDRA（
 ### 「RDRA_Knowledge/0_RDRAZeroOne」フォルダー
 - Phase1〜4: 初期要望から４フェーズでRDRA定義を生成するプロンプトを保持
 
-### 「RDRA_Knowledge/1_RDRA」フォルダー
+### 「RDRA_Knowledge/.rdracore」フォルダー
 要件定義手法の「RDRA」の考え方をまとめたファイルを含む
 - RDRA.md: RDRAの考え方をまとめたファイル
 - RDRASheet.md: RDRA定義をSpreadsheetで行う各シートのフォーマットの説明

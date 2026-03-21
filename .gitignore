@@ -13,7 +13,7 @@ node_modules/
 _no_use/
 _graph_script/
 _script_Prompt/
-
+.cursor/skills
 #Aiが出力するバグファイル
 null
 

@@ -8,7 +8,7 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const DEFAULT_TIMEOUT_MS = 120000;
+const DEFAULT_TIMEOUT_MS = 360000;
 
 // ========================================
 // 設定ファイル（モデル設定.json）読み込み

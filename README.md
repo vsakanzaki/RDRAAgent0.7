@@ -50,8 +50,8 @@ RDRAAgent_v0.6.6/
 ### モデル別の特徴
 - codex：Codex Cliを利用
 - claude：Claude Cliを利用　AGENTS.mdが使えないのでCLAUD.mdからAGENTS.mdを参照
-- cursor：Agent Cliを利用　モデル設定.mdの設定内で利用するモデルを設定する
-- gemini：Gemini Cliを利用
+- cursor：Agent Cliを利用　モデル設定.jsonの設定内で利用するモデルを設定する
+- gemini：Gemini Cliを利用　
 - どのモデルを使う場合でも事前にCliが動く状態にしておいてください
 
 ## 実行時の問題
@@ -91,6 +91,7 @@ node menu
 - **段階的な要件定義**: 4つのフェーズで段階的にRDRA定義を作成
 - **AI連携**: 設定したLLM（大規模言語モデル）を活用して自動生成
 - **可視化機能**: RDRAGraphによる要件の関連性の可視化
+- **RDRASheet連携**: 生成内容をRDRASheetに取り込む
 - **画面プロトタイプ**: ブラウザで画面定義を確認
 
 ## メニュー構成
@@ -101,7 +102,7 @@ node menu
 - 指定したフェーズ（1〜4）から開始して、不足フェーズを自動実行
 - 途中のフェーズから実行するときは「2~4」を選択
   - 7,8との違いは、各フェーズに成果物があっても指定のフェーズから実行
-- フェーズ4完了後に `1_RDRA/` への統合（Phase5）まで進める
+- フェーズ4完了後に `1_RDRA/` への統合まで進める
 
 **7. フェーズ単位実行**
 - 成果物が無い最初のPhaseを1つ実行
@@ -275,7 +276,7 @@ node menu
 - `RDRA_Knowledge/0_RDRAZeroOne/` - ZeroOneフェーズの説明
   - Phase:1-4 - フェーズ毎の成果物生成Prompt
 
-- `RDRA_Knowledge/1_RDRA/` - RDRA定義の説明
+- `RDRA_Knowledge/.rdracore/` - RDRA定義の説明
   - `RDRA.md` - RDRAの基本概念
   - `RDRAGraph.md` - RDRAGraphの説明（関連データ.txtの構造説明）
   - `RDRASheet.md` - RDRASheetの説明
@@ -302,31 +303,29 @@ node menu
 
 #### Phase1で生成されるファイル
 - `システム概要.json` - システム概要
-- `要求.tsv` - 要求の一覧
-- `ビジネスポリシー.tsv` - ビジネスポリシー
-- `ビジネスパラメータ.tsv` - ビジネスパラメータ
-- `業務.tsv` - 業務フロー
-- `状態.tsv` - 状態遷移モデル
+- `ph1要求.tsv` - 要求の一覧
+- `ph1ビジネスポリシー.tsv` - ビジネスポリシー
+- `ph1ビジネスパラメータ.tsv` - ビジネスパラメータ
+- `ph1業務.tsv` - 業務フロー
 
 #### Phase2で生成されるファイル
-- `BUC.tsv` - BUC候補
-- `アクター.tsv` - アクター定義
-- `バリエーション.tsv` - バリエーション定義
-- `外部システム.tsv` - 外部システム定義
+- `ph2状態.tsv` - 状態遷移モデル
+- `ph2アクティビティ.tsv` - アクティビティ定義
+- `ph2条件.tsv` - 条件定義
 
 #### Phase3で生成されるファイル
-- `UCアクター.tsv` - UCとアクターの関連
-- `UCタイマー.tsv` - UCとタイマーの関連
-- `UC外部システム.tsv` - UCと外部システムの関連
-- `UC条件.tsv` - UCと条件の関連
-- `情報.tsv` - 情報の関連付け
+- `ph3BUC.tsv` - BUC候補
+- `ph3バリエーション.tsv` - バリエーション定義
 
 #### Phase4で生成されるファイル
-- `BUC.tsv` - BUCの関係モデル化
-- `条件関連.tsv` - 条件の関連データ
-- `条件.tsv` - 条件の最終形式
-- `バリエーション.tsv` - バリエーションの最終形式
-- `状態.tsv` - 状態の最終形式
+- `ph4UCタイマー.tsv` - UCとタイマーの関連
+- `ph4UCアクター.tsv` - UCとアクターの関連
+- `ph4UC外部システム.tsv` - UCと外部システムの関連
+- `ph4アクター.tsv` - アクター定義
+- `ph4外部システム.tsv` - 外部システム定義
+- `ph4条件.tsv` - 条件の最終形式
+- `ph4情報.tsv` - 情報の関連付け
+- `ph4状態.tsv` - 状態の最終形式
 
 #### 1_RDRAフォルダーで生成されるファイル
 - `システム概要.json` - システム全体の概要（Phase1から統合）
@@ -338,6 +337,7 @@ node menu
 - `バリエーション.tsv` - バリエーション（Phase4から統合）
 - `BUC.tsv` - ビジネスユースケース（Phase4から統合）
 - `if/関連データ.txt` - RDRAGraph用の関連データ（makeGraphData.jsで生成）
+- `if/ZeroOne.txt` - RDRASheet用のZeroOne（makeZeroOneData.jsで生成）
 
 ## LLM連携（Windows / Mac）
 
@@ -380,7 +380,7 @@ node menu
 - **条件** - ビジネスルールや制約
 - **バリエーション** - 業務のバリエーションパラメータ
 
-詳細は `RDRA_Knowledge/1_RDRA/RDRA.md` を参照してください。
+詳細は `RDRA_Knowledge/.rdracore/RDRA.md` を参照してください。
 
 ### Phase別の作業内容
 
@@ -420,7 +420,7 @@ A: Samplesフォルダー内のサンプルの初期要望.txtを、プロジェ
 ### 関連リンク
 - **RDRAツール公式サイト**: https://vsa.co.jp/rdratool/
 - **RDRAGraph**: https://vsa.co.jp/rdratool/graph/
-- **RDRA手法について**: `RDRA_Knowledge/1_RDRA/RDRA.md` を参照
+- **RDRA手法について**: `RDRA_Knowledge/.rdracore/RDRA.md` を参照
 
 ---
 
@@ -429,7 +429,7 @@ A: Samplesフォルダー内のサンプルの初期要望.txtを、プロジェ
 **現在のバージョン**: RDRAAgent v0.6.6
 
 ### 変更履歴
-- v0.6.6: 現行バージョン
+- v0.6.7: 現行バージョン
   - 4フェーズのRDRA定義プロセス実装
   - BUCアクター別画面表示機能
 
