@@ -91,6 +91,29 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
         }
     }
 
+    /**
+     * 出力フォルダーが存在しない場合は作成する
+     */
+    function ensureOutputFolders() {
+        const dirs = [
+            '0_RDRAZeroOne/phase1',
+            '0_RDRAZeroOne/phase2',
+            '0_RDRAZeroOne/phase3',
+            '0_RDRAZeroOne/phase4',
+            '1_RDRA',
+            '1_RDRA/if',
+            '2_RDRASpec',
+            '2_RDRASpec/phase1',
+            '2_RDRASpec/phase2',
+        ];
+        dirs.forEach(dir => {
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+                console.log(`フォルダーを作成しました: ${dir}`);
+            }
+        });
+    }
+
     // menu.js 側の入力ループ（rl.on('line')）と競合しないよう、Enter待ちは外部から注入する。
     // 互換のため未指定なら従来の rl.question 方式にフォールバックする。
     const waitForEnter =
@@ -343,6 +366,7 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
      * フェーズ単位のRDRA定義を実行する（定義されていないフェーズがあれば実行する）
      */
     function executeEachPhase() {
+	    ensureOutputFolders();
 	    // メニュー7用フラグは毎回リセット
 	    autoRunPhase5AfterPhase4 = false;
 	    // メニュー8用フラグが残っていても影響しないようにリセット
@@ -387,6 +411,7 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
      * 全フェーズのRDRA定義を実行する（定義されていないフェーズがあれば実行する）
      */
     function executeAllPhase() {
+	    ensureOutputFolders();
 	    console.log('全フェーズのRDRA定義を行います...');
 	    isAllPhaseAutoRunning = true;
 	    executeMissingPhasesTo5();
@@ -397,6 +422,7 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
      * @param {number} startPhase - 削除開始のPhase番号 (1-4)
      */
     function executeFromPhase(startPhase) {
+        ensureOutputFolders();
         console.log(`Phase${startPhase}〜Phase4、1_RDRA配下のファイルを削除します...`);
 
         // startPhaseからphase4までを削除

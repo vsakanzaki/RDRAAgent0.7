@@ -1,6 +1,11 @@
 # Node modules
 node_modules/
 
+# 作業用フォルダー（生成されるファイル）
+0_RDRAZeroOne/
+1_RDRA/
+2_RDRASpec/
+
 # エディター固有
 .vscode/
 
