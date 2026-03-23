@@ -142,26 +142,13 @@ async function executeParallel(filePairs, options = {}) {
 
     const startTime = Date.now();
     
-    const provider = getResolvedDefaultProvider();
-    let results;
-
-    // codex は複数プロセス同時起動時に認証トークン更新が競合しやすいため、直列実行にフォールバック
-    if (provider === 'codex' && filePairs.length > 1) {
-        console.log('provider=codex のため直列実行に切り替えます（認証競合回避）');
-        results = [];
-        for (const filePair of filePairs) {
-            const result = await executePrompt(filePair, options);
-            results.push(result);
-        }
-    } else {
-        const STAGGER_DELAY_MS = 500;
-        results = await Promise.all(
-            filePairs.map((filePair, index) =>
-                new Promise(resolve => setTimeout(resolve, index * STAGGER_DELAY_MS))
-                    .then(() => executePrompt(filePair, options))
-            )
-        );
-    }
+    const STAGGER_DELAY_MS = 500;
+    const results = await Promise.all(
+        filePairs.map((filePair, index) =>
+            new Promise(resolve => setTimeout(resolve, index * STAGGER_DELAY_MS))
+                .then(() => executePrompt(filePair, options))
+        )
+    );
     
     const totalElapsed = ((Date.now() - startTime) / 1000).toFixed(1);
     console.log(`\n🏁 並行実行完了 (合計: ${totalElapsed}秒)`);

@@ -118,6 +118,7 @@ function buildInfoIndex(infoTsv) {
 
 function convertConditions({ infoIndex, inTsv }) {
   const variationIdx = colIndex(inTsv.header, 'バリエーション', 'phase4/ph4条件.tsv');
+  const stateModelIdx = inTsv.header.indexOf('状態モデル');
 
   const outHeader = ['コンテキスト', ...inTsv.header];
   const outRows = inTsv.rows.map((r) => {
@@ -126,7 +127,15 @@ function convertConditions({ infoIndex, inTsv }) {
       ? firstMatch(infoIndex, (info) => info.context && info.variationSet.size && isSubset(varSet, info.variationSet))
       : null;
     const context = match ? match.context : '条件コンテキスト';
-    return [context, ...r];
+
+    // 出力用に行コピーを作成し、バリエーション列と状態モデル列の半角カンマを読点に置換する
+    const outRow = r.slice();
+    outRow[variationIdx] = outRow[variationIdx].replace(/,/g, '、');
+    if (stateModelIdx !== -1) {
+      outRow[stateModelIdx] = outRow[stateModelIdx].replace(/,/g, '、');
+    }
+
+    return [context, ...outRow];
   });
 
   return { header: outHeader, rows: outRows };

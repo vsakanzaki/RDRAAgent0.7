@@ -43,15 +43,16 @@ RDRAAgent_v0.7/
 ### **モデルの切替**
 - 各モデルのCLIが事前に動作する状態にしておく
 - モデル設定.jsonを見直す
-- 4つのモデルを予め設定済み（gemini,claude,cursor,codex）
+- 4つのモデルを予め設定済み（gemini,claude,cursor,codex,cline）
 - モデル設定.jsonのproviderに設定
-  - "provider": "claude"　⇐　"gemini","claude","cursor","codex"
+  - "provider": "claude"　⇐　"gemini","claude","cursor","codex","cline"
 
 ### モデル別の特徴
 - codex：Codex Cliを利用
 - claude：Claude Cliを利用　AGENTS.mdが使えないのでCLAUD.mdからAGENTS.mdを参照
 - cursor：Agent Cliを利用　モデル設定.jsonの設定内で利用するモデルを設定する
 - gemini：Gemini Cliを利用　
+- cline：Cline Cliを利用　様々なLLMのAPIを利用したい場合に使用
 - どのモデルを使う場合でも事前にCliが動く状態にしておいてください
 
 ## 実行時の問題

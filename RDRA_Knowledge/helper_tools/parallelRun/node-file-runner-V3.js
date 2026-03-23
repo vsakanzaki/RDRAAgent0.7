@@ -157,7 +157,7 @@ async function runAIWithPrefix(prompt, options = {}) {
 
         const useStdin = provider.useStdin === true;
         const promptForArgs = useStdin ? '' : effectivePrompt;
-        const args = buildArgsFromTemplate(provider, promptForArgs, options);
+        let args = buildArgsFromTemplate(provider, promptForArgs, options);
 
         process.stdout.write(`${prefixStr}---\n`);
 
@@ -166,14 +166,39 @@ async function runAIWithPrefix(prompt, options = {}) {
             throw new Error(`モデル設定の形式エラー: providers.${providerName}.command が不正です`);
         }
 
-        const child = spawn(command, args, {
+        let spawnCommand = command;
+        let spawnArgs = args;
+        let spawnOptions = {
             stdio: ['pipe', 'pipe', 'pipe'],
             shell: true, // Windows互換のため
             env: {
                 ...process.env,
                 ...(provider.env && typeof provider.env === 'object' ? provider.env : {}),
             },
-        });
+        };
+
+        // Windows の cline は shell:true で複数行プロンプトを位置引数に渡すと
+        // 先頭行だけに切り詰められるため、PowerShell 経由で 1 つの文字列として渡す。
+        if (process.platform === 'win32' && command.toLowerCase() === 'cline' && !useStdin) {
+            const argsWithoutPrompt = buildArgsFromTemplate(provider, '', options);
+            const promptB64 = Buffer.from(effectivePrompt, 'utf8').toString('base64');
+            const argsB64 = Buffer.from(JSON.stringify(argsWithoutPrompt), 'utf8').toString('base64');
+            const psScript =
+                `$prompt = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('${promptB64}')); ` +
+                `$argsJson = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('${argsB64}')); ` +
+                `$clineArgs = @(); ` +
+                `if ($argsJson -and $argsJson -ne '[]') { $clineArgs = @((ConvertFrom-Json $argsJson)) }; ` +
+                `& cline @clineArgs $prompt`;
+
+            spawnCommand = 'powershell';
+            spawnArgs = ['-NoProfile', '-Command', psScript];
+            spawnOptions = {
+                ...spawnOptions,
+                shell: false,
+            };
+        }
+
+        const child = spawn(spawnCommand, spawnArgs, spawnOptions);
 
         let stdout = '';
         let stderr = '';

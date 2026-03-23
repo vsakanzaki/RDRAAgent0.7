@@ -103,13 +103,13 @@
     },
     "cline": {
       "command": "cline",
-      "useStdin": true,
+      "useStdin": false,
       "env": {
         "NO_COLOR": "1",
         "CI": "1"
       },
       "vars": {
-        "model": "GLM-5"
+        "model": "glm-4.7"
       },
       "args": [
         "-y"
@@ -118,6 +118,9 @@
         "model": [
           "--model",
           "{model}"
+        ],
+        "prompt": [
+          "{prompt}"
         ]
       }
     }
