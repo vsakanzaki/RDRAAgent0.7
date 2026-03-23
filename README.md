@@ -43,7 +43,7 @@ RDRAAgent_v0.7/
 ### **モデルの切替**
 - 各モデルのCLIが事前に動作する状態にしておく
 - モデル設定.jsonを見直す
-- 4つのモデルを予め設定済み（gemini,claude,cursor,codex,cline）
+- 5つのモデルを予め設定済み（gemini,claude,cursor,codex,cline）
 - モデル設定.jsonのproviderに設定
   - "provider": "claude"　⇐　"gemini","claude","cursor","codex","cline"
 
