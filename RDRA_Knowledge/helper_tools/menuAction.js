@@ -20,6 +20,8 @@ const {
     specFiles,
 } = require('./settings/rdraConfig');
 
+let grahUrl = 'https://vsa.co.jp/rdratool/graph/v0.96/index.html?clipboard'
+
 /**
  * menu.js から「実行部分」を切り出したアクション実装。
  * - createMenuAction({ rl, promptUser }) により実行ディスパッチ関数を生成する
@@ -527,7 +529,7 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
             console.log('RDRAGraphを表示しています...');
 
             const clipboardCmd = getClipboardCommand('1_RDRA/if/関連データ.txt');
-            const browserCmd = getBrowserCommand('https://vsa.co.jp/rdratool/graph/v0.94/index.html?clipboard');
+            const browserCmd = getBrowserCommand(grahUrl);
 
             if (!clipboardCmd || !browserCmd) {
                 console.error('このOSではクリップボード操作またはブラウザ起動がサポートされていません。');
