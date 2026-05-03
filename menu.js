@@ -14,22 +14,24 @@ rl.setPrompt('> ');
  */
 function showMenu() {
     console.log('■ZeroOne');
-    console.log('1.フェーズ１から４まで実行し1_RDRAにコピーする');
-    console.log('2.フェーズ２から４まで実行し1_RDRAにコピーする');
-    console.log('3.フェーズ３から４まで実行し1_RDRAにコピーする');
-    console.log('4.フェーズ４から４まで実行し1_RDRAにコピーする');
-    console.log('7.フェーズ単位実行：成果物が無い最初のPhaseを実行する');
-    console.log('8.一括要件定義：成果物が無いPhaseからRDRA定義を一括実行する');
+    console.log('1.全削除してPhase1〜Phase5を生成する');
+    console.log('2.フェーズ単位実行：未完了の最小Phaseを1回だけ実行する');
+    console.log('3.一括要件定義：依存DAGで未生成ノードを実行する');
     console.log('■RDRA');
     console.log('11.RDRAGraphを表示：関連データを作成しRDRAGraphを表示');
     console.log('12.Spreadsheetに展開：RDRA定義をクリップボードにコピー');
-    console.log('■RDRASpec：仕様');
+    console.log('■RDRASpec：非アーキテクチャ仕様');
     console.log('21.仕様の作成：論理データ構造/画面/ビジネスルール');
     console.log('22.BUC・アクター別画面を表示する');
+    console.log('■RDRASdd：機能仕様');
+    console.log('31.Domain仕様書を作成する');
+    console.log('32.Application仕様書を作成する');
+    console.log('33.UI仕様書を作成する');
+    console.log('34.機能仕様のCallgraphを表示する');
     console.log('■全般');
     console.log('0.メニュー終了');
     console.log('');
-    console.log('99.生成した成果物の削除：0_RDRAZeroOne/1_RDRA/2_RDRASpec');
+    console.log('99.生成した成果物の削除：0_RDRAZeroOne/1_RDRA/2_RDRASpec/3_RDRASdd');
     console.log('');
     console.log('実行したい番号を入力してください');
 }

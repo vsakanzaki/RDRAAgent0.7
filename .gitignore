@@ -1,11 +1,6 @@
 # Node modules
 node_modules/
 
-# 作業用フォルダー（生成されるファイル）
-0_RDRAZeroOne/
-1_RDRA/
-2_RDRASpec/
-
 # エディター固有
 .vscode/
 
@@ -13,8 +8,8 @@ node_modules/
 _no_use/
 _graph_script/
 _script_Prompt/
-.cursor/skills
 説明.txt
+
 #Aiが出力するバグファイル
 null
 

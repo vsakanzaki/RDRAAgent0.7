@@ -397,6 +397,9 @@
   <script>
     let uiData = null;
     let screensIndex = new Map();
+    const HEARTBEAT_INTERVAL_MS = 2000;
+    let heartbeatTimer = null;
+    let shutdownRequested = false;
 
     const state = {
       mode: 'buc', // 'buc' | 'actor'
@@ -411,6 +414,34 @@
       selectedScreenName: null,
       selectedScreenDataIndex: 0,
     };
+
+    async function requestServerShutdown() {
+      if (shutdownRequested) return;
+      shutdownRequested = true;
+      try {
+        await fetch('/shutdown', { method: 'POST', keepalive: true, cache: 'no-store' });
+      } catch (e) {
+        // 無視（停止要求が通らないケース）
+      }
+    }
+
+    async function sendHeartbeat() {
+      if (shutdownRequested) return;
+      try {
+        await fetch('/heartbeat', { method: 'POST', keepalive: true, cache: 'no-store' });
+      } catch (e) {
+        // 無視（通信断やサーバー停止中）
+      }
+    }
+
+    function startHeartbeat() {
+      if (heartbeatTimer) return;
+      // 初回を即時送信して、起動直後の監視猶予を安定化
+      sendHeartbeat();
+      heartbeatTimer = setInterval(() => {
+        sendHeartbeat();
+      }, HEARTBEAT_INTERVAL_MS);
+    }
 
     function escapeHtml(s) {
       return String(s ?? '')
@@ -1017,11 +1048,7 @@
 
     async function closeAndStopServer() {
       if (!confirm('サーバーを停止して画面を閉じますか？')) return;
-      try {
-        await fetch('/shutdown');
-      } catch (e) {
-        // 無視（停止要求が通らないケース）
-      }
+      await requestServerShutdown();
       setTimeout(() => {
         window.close();
         document.body.innerHTML =
@@ -1039,6 +1066,7 @@
         clearBody('左のTreeからアクターを選択してください');
         // 初期表示はBUCパネル＋先頭アクター選択（要件）
         autoSelectFirstBucActor();
+        startHeartbeat();
       } catch (e) {
         console.error(e);
         document.getElementById('treeRoot').innerHTML = '';

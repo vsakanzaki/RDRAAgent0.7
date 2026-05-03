@@ -1,0 +1,626 @@
+{
+  "uiBucs": [
+    {
+      "id": "uibuc:BillingFlow",
+      "label": "BillingFlow",
+      "screens": [
+        "screen:CareCostBillingScreen"
+      ]
+    },
+    {
+      "id": "uibuc:CareCostCalculationFlow",
+      "label": "CareCostCalculationFlow",
+      "screens": [
+        "screen:CareCostCalculationScreen",
+        "screen:ExecutionRecordConfirmationScreen"
+      ]
+    },
+    {
+      "id": "uibuc:CareeMemberRegistrationAndManagementFlow",
+      "label": "CareeMemberRegistrationAndManagementFlow",
+      "screens": [
+        "screen:CareMemberInformationManagementScreen",
+        "screen:CareMemberReceptionScreen",
+        "screen:CareMemberRegistrationScreen",
+        "screen:ServiceTerminationScreen",
+        "screen:ServiceUtilizationPauseScreen",
+        "screen:ServiceUtilizationResumeScreen",
+        "screen:ServiceUtilizationStartScreen"
+      ]
+    },
+    {
+      "id": "uibuc:CollectionManagementFlow",
+      "label": "CollectionManagementFlow",
+      "screens": [
+        "screen:PaymentDefaultResponseScreen",
+        "screen:PaymentStatusConfirmationScreen",
+        "screen:RevenueManagementScreen"
+      ]
+    },
+    {
+      "id": "uibuc:ExecutionRecordCreationFlow",
+      "label": "ExecutionRecordCreationFlow",
+      "screens": [
+        "screen:ExecutionRecordCreationScreen",
+        "screen:ExecutionRecordRegistrationScreen"
+      ]
+    },
+    {
+      "id": "uibuc:HomeVisitServiceExecutionFlow",
+      "label": "HomeVisitServiceExecutionFlow",
+      "screens": [
+        "screen:HomeCareServiceExecutionScreen",
+        "screen:MovementStatusReportScreen",
+        "screen:StaffConfirmationScreen"
+      ]
+    },
+    {
+      "id": "uibuc:ScheduleAdjustmentFlow",
+      "label": "ScheduleAdjustmentFlow",
+      "screens": [
+        "screen:ScheduleAdjustmentResponseConsultationScreen",
+        "screen:ScheduleAdjustmentScreen",
+        "screen:ScheduleChangeRequestReceptionScreen"
+      ]
+    },
+    {
+      "id": "uibuc:SchedulePlanningFlow",
+      "label": "SchedulePlanningFlow",
+      "screens": [
+        "screen:ScheduleConfirmationScreen",
+        "screen:SchedulePlanningScreen",
+        "screen:ScheduleRequestConfirmationScreen"
+      ]
+    },
+    {
+      "id": "uibuc:StaffRegistrationAndManagementFlow",
+      "label": "StaffRegistrationAndManagementFlow",
+      "screens": [
+        "screen:StaffInformationManagementScreen",
+        "screen:StaffInformationReferenceScreen",
+        "screen:StaffRegistrationScreen"
+      ]
+    },
+    {
+      "id": "uibuc:StaffSkillManagementFlow",
+      "label": "StaffSkillManagementFlow",
+      "screens": [
+        "screen:SkillCertificationScreen",
+        "screen:SkillConfirmationScreen",
+        "screen:SkillInputScreen"
+      ]
+    },
+    {
+      "id": "uibuc:StaffWorkingStyleSettingFlow",
+      "label": "StaffWorkingStyleSettingFlow",
+      "screens": [
+        "screen:WorkingStyleApprovalScreen",
+        "screen:WorkingStyleExecutionManagementScreen",
+        "screen:WorkingStyleReviewScreen",
+        "screen:WorkingStyleSettingScreen"
+      ]
+    }
+  ],
+  "screens": [
+    {
+      "id": "screen:CareCostBillingScreen",
+      "label": "CareCostBillingScreen",
+      "labelJa": "介護費用請求画面",
+      "buc": "uibuc:BillingFlow",
+      "filePath": "3_RDRASdd/ui/BillingFlow/CareCostBillingScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "POST",
+          "path": "/api/v1/invoices/execute"
+        }
+      ]
+    },
+    {
+      "id": "screen:CareCostCalculationScreen",
+      "label": "CareCostCalculationScreen",
+      "labelJa": "介護費用計算画面",
+      "buc": "uibuc:CareCostCalculationFlow",
+      "filePath": "3_RDRASdd/ui/CareCostCalculationFlow/CareCostCalculationScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "POST",
+          "path": "/api/v1/care-costs/calculate"
+        }
+      ]
+    },
+    {
+      "id": "screen:ExecutionRecordConfirmationScreen",
+      "label": "ExecutionRecordConfirmationScreen",
+      "labelJa": "実施記録確認画面",
+      "buc": "uibuc:CareCostCalculationFlow",
+      "filePath": "3_RDRASdd/ui/CareCostCalculationFlow/ExecutionRecordConfirmationScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "GET",
+          "path": "/api/v1/execution-records?memberName={name}&month={month}&page={page}"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/execution-records/:recordId"
+        }
+      ]
+    },
+    {
+      "id": "screen:CareMemberInformationManagementScreen",
+      "label": "CareMemberInformationManagementScreen",
+      "labelJa": "介護会員情報管理画面",
+      "buc": "uibuc:CareeMemberRegistrationAndManagementFlow",
+      "filePath": "3_RDRASdd/ui/CareeMemberRegistrationAndManagementFlow/CareMemberInformationManagementScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "GET",
+          "path": "/api/v1/caremembers?memberStatus={status}&facilityType={type}&page={page}&limit={limit}"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/caremembers/:careeMemberId"
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/v1/caremembers/:careeMemberId"
+        }
+      ]
+    },
+    {
+      "id": "screen:CareMemberReceptionScreen",
+      "label": "CareMemberReceptionScreen",
+      "labelJa": "介護会員受付画面",
+      "buc": "uibuc:CareeMemberRegistrationAndManagementFlow",
+      "filePath": "3_RDRASdd/ui/CareeMemberRegistrationAndManagementFlow/CareMemberReceptionScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "POST",
+          "path": "/api/v1/caremembers/accept"
+        }
+      ]
+    },
+    {
+      "id": "screen:CareMemberRegistrationScreen",
+      "label": "CareMemberRegistrationScreen",
+      "labelJa": "介護会員登録画面",
+      "buc": "uibuc:CareeMemberRegistrationAndManagementFlow",
+      "filePath": "3_RDRASdd/ui/CareeMemberRegistrationAndManagementFlow/CareMemberRegistrationScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "POST",
+          "path": "/api/v1/caremembers/register"
+        }
+      ]
+    },
+    {
+      "id": "screen:ServiceTerminationScreen",
+      "label": "ServiceTerminationScreen",
+      "labelJa": "サービス終了画面",
+      "buc": "uibuc:CareeMemberRegistrationAndManagementFlow",
+      "filePath": "3_RDRASdd/ui/CareeMemberRegistrationAndManagementFlow/ServiceTerminationScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "POST",
+          "path": "/api/v1/caremembers/:careeMemberId/service/terminate"
+        }
+      ]
+    },
+    {
+      "id": "screen:ServiceUtilizationPauseScreen",
+      "label": "ServiceUtilizationPauseScreen",
+      "labelJa": "サービス利用休止画面",
+      "buc": "uibuc:CareeMemberRegistrationAndManagementFlow",
+      "filePath": "3_RDRASdd/ui/CareeMemberRegistrationAndManagementFlow/ServiceUtilizationPauseScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "POST",
+          "path": "/api/v1/caremembers/:careeMemberId/service/pause"
+        }
+      ]
+    },
+    {
+      "id": "screen:ServiceUtilizationResumeScreen",
+      "label": "ServiceUtilizationResumeScreen",
+      "labelJa": "サービス利用再開画面",
+      "buc": "uibuc:CareeMemberRegistrationAndManagementFlow",
+      "filePath": "3_RDRASdd/ui/CareeMemberRegistrationAndManagementFlow/ServiceUtilizationResumeScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "POST",
+          "path": "/api/v1/caremembers/:careeMemberId/service/resume"
+        }
+      ]
+    },
+    {
+      "id": "screen:ServiceUtilizationStartScreen",
+      "label": "ServiceUtilizationStartScreen",
+      "labelJa": "サービス利用開始画面",
+      "buc": "uibuc:CareeMemberRegistrationAndManagementFlow",
+      "filePath": "3_RDRASdd/ui/CareeMemberRegistrationAndManagementFlow/ServiceUtilizationStartScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "GET",
+          "path": "/api/v1/caremembers/:careeMemberId"
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/caremembers/:careeMemberId/service/start"
+        }
+      ]
+    },
+    {
+      "id": "screen:PaymentDefaultResponseScreen",
+      "label": "PaymentDefaultResponseScreen",
+      "labelJa": "支払い滞納対応画面",
+      "buc": "uibuc:CollectionManagementFlow",
+      "filePath": "3_RDRASdd/ui/CollectionManagementFlow/PaymentDefaultResponseScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "GET",
+          "path": "/api/v1/defaults?status={status}&days={daysOverdue}"
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/defaults/:invoiceId/response"
+        }
+      ]
+    },
+    {
+      "id": "screen:PaymentStatusConfirmationScreen",
+      "label": "PaymentStatusConfirmationScreen",
+      "labelJa": "支払い状況確認画面",
+      "buc": "uibuc:CollectionManagementFlow",
+      "filePath": "3_RDRASdd/ui/CollectionManagementFlow/PaymentStatusConfirmationScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "GET",
+          "path": "/api/v1/collections?month={month}&status={status}&page={page}"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/collections/:invoiceId"
+        }
+      ]
+    },
+    {
+      "id": "screen:RevenueManagementScreen",
+      "label": "RevenueManagementScreen",
+      "labelJa": "売上管理画面",
+      "buc": "uibuc:CollectionManagementFlow",
+      "filePath": "3_RDRASdd/ui/CollectionManagementFlow/RevenueManagementScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "GET",
+          "path": "/api/v1/revenue?month={month}&businessLocation={location}"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/revenue/detail/:month"
+        }
+      ]
+    },
+    {
+      "id": "screen:ExecutionRecordCreationScreen",
+      "label": "ExecutionRecordCreationScreen",
+      "labelJa": "実施記録作成画面",
+      "buc": "uibuc:ExecutionRecordCreationFlow",
+      "filePath": "3_RDRASdd/ui/ExecutionRecordCreationFlow/ExecutionRecordCreationScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "POST",
+          "path": "/api/v1/execution-records/create"
+        }
+      ]
+    },
+    {
+      "id": "screen:ExecutionRecordRegistrationScreen",
+      "label": "ExecutionRecordRegistrationScreen",
+      "labelJa": "実施記録登録画面",
+      "buc": "uibuc:ExecutionRecordCreationFlow",
+      "filePath": "3_RDRASdd/ui/ExecutionRecordCreationFlow/ExecutionRecordRegistrationScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "POST",
+          "path": "/api/v1/execution-records/:recordId/register"
+        }
+      ]
+    },
+    {
+      "id": "screen:HomeCareServiceExecutionScreen",
+      "label": "HomeCareServiceExecutionScreen",
+      "labelJa": "訪問介護実施画面",
+      "buc": "uibuc:HomeVisitServiceExecutionFlow",
+      "filePath": "3_RDRASdd/ui/HomeVisitServiceExecutionFlow/HomeCareServiceExecutionScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "PUT",
+          "path": "/api/v1/schedules/:scheduleId/service-execution"
+        }
+      ]
+    },
+    {
+      "id": "screen:MovementStatusReportScreen",
+      "label": "MovementStatusReportScreen",
+      "labelJa": "移動状況報告画面",
+      "buc": "uibuc:HomeVisitServiceExecutionFlow",
+      "filePath": "3_RDRASdd/ui/HomeVisitServiceExecutionFlow/MovementStatusReportScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "PUT",
+          "path": "/api/v1/schedules/:scheduleId/movement-report"
+        }
+      ]
+    },
+    {
+      "id": "screen:StaffConfirmationScreen",
+      "label": "StaffConfirmationScreen",
+      "labelJa": "スタッフ確定画面",
+      "buc": "uibuc:HomeVisitServiceExecutionFlow",
+      "filePath": "3_RDRASdd/ui/HomeVisitServiceExecutionFlow/StaffConfirmationScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "POST",
+          "path": "/api/v1/schedules/:scheduleId/staff-confirm"
+        }
+      ]
+    },
+    {
+      "id": "screen:ScheduleAdjustmentResponseConsultationScreen",
+      "label": "ScheduleAdjustmentResponseConsultationScreen",
+      "labelJa": "スケジュール調整対応協議画面",
+      "buc": "uibuc:ScheduleAdjustmentFlow",
+      "filePath": "3_RDRASdd/ui/ScheduleAdjustmentFlow/ScheduleAdjustmentResponseConsultationScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "POST",
+          "path": "/api/v1/schedules/:scheduleId/consultation"
+        }
+      ]
+    },
+    {
+      "id": "screen:ScheduleAdjustmentScreen",
+      "label": "ScheduleAdjustmentScreen",
+      "labelJa": "スケジュール調整画面",
+      "buc": "uibuc:ScheduleAdjustmentFlow",
+      "filePath": "3_RDRASdd/ui/ScheduleAdjustmentFlow/ScheduleAdjustmentScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/schedules/:scheduleId/adjust"
+        }
+      ]
+    },
+    {
+      "id": "screen:ScheduleChangeRequestReceptionScreen",
+      "label": "ScheduleChangeRequestReceptionScreen",
+      "labelJa": "スケジュール変更要望受付画面",
+      "buc": "uibuc:ScheduleAdjustmentFlow",
+      "filePath": "3_RDRASdd/ui/ScheduleAdjustmentFlow/ScheduleChangeRequestReceptionScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "POST",
+          "path": "/api/v1/schedules/:scheduleId/change-request"
+        }
+      ]
+    },
+    {
+      "id": "screen:ScheduleConfirmationScreen",
+      "label": "ScheduleConfirmationScreen",
+      "labelJa": "スケジュール確定画面",
+      "buc": "uibuc:SchedulePlanningFlow",
+      "filePath": "3_RDRASdd/ui/SchedulePlanningFlow/ScheduleConfirmationScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "POST",
+          "path": "/api/v1/schedules/:scheduleId/confirm"
+        }
+      ]
+    },
+    {
+      "id": "screen:SchedulePlanningScreen",
+      "label": "SchedulePlanningScreen",
+      "labelJa": "スケジュール計画画面",
+      "buc": "uibuc:SchedulePlanningFlow",
+      "filePath": "3_RDRASdd/ui/SchedulePlanningFlow/SchedulePlanningScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "POST",
+          "path": "/api/v1/schedules/plan"
+        }
+      ]
+    },
+    {
+      "id": "screen:ScheduleRequestConfirmationScreen",
+      "label": "ScheduleRequestConfirmationScreen",
+      "labelJa": "スケジュール要望確認画面",
+      "buc": "uibuc:SchedulePlanningFlow",
+      "filePath": "3_RDRASdd/ui/SchedulePlanningFlow/ScheduleRequestConfirmationScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "GET",
+          "path": "/api/v1/schedules?memberStatus={status}&page={page}&limit={limit}"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/schedules/:scheduleId"
+        }
+      ]
+    },
+    {
+      "id": "screen:StaffInformationManagementScreen",
+      "label": "StaffInformationManagementScreen",
+      "labelJa": "スタッフ情報管理画面",
+      "buc": "uibuc:StaffRegistrationAndManagementFlow",
+      "filePath": "3_RDRASdd/ui/StaffRegistrationAndManagementFlow/StaffInformationManagementScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "GET",
+          "path": "/api/v1/staff?businessLocationId={id}&name={name}&page={page}&limit={limit}"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/staff/:staffId"
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/v1/staff/:staffId"
+        }
+      ]
+    },
+    {
+      "id": "screen:StaffInformationReferenceScreen",
+      "label": "StaffInformationReferenceScreen",
+      "labelJa": "スタッフ情報参照画面",
+      "buc": "uibuc:StaffRegistrationAndManagementFlow",
+      "filePath": "3_RDRASdd/ui/StaffRegistrationAndManagementFlow/StaffInformationReferenceScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "GET",
+          "path": "/api/v1/staff/:staffId"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/staff?businessLocationId={id}&name={name}&page={page}&limit={limit}"
+        }
+      ]
+    },
+    {
+      "id": "screen:StaffRegistrationScreen",
+      "label": "StaffRegistrationScreen",
+      "labelJa": "スタッフ登録画面",
+      "buc": "uibuc:StaffRegistrationAndManagementFlow",
+      "filePath": "3_RDRASdd/ui/StaffRegistrationAndManagementFlow/StaffRegistrationScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "POST",
+          "path": "/api/v1/staff/register"
+        }
+      ]
+    },
+    {
+      "id": "screen:SkillCertificationScreen",
+      "label": "SkillCertificationScreen",
+      "labelJa": "スキル認定画面",
+      "buc": "uibuc:StaffSkillManagementFlow",
+      "filePath": "3_RDRASdd/ui/StaffSkillManagementFlow/SkillCertificationScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/staff-skills/:skillId/approve"
+        }
+      ]
+    },
+    {
+      "id": "screen:SkillConfirmationScreen",
+      "label": "SkillConfirmationScreen",
+      "labelJa": "スキル確認画面",
+      "buc": "uibuc:StaffSkillManagementFlow",
+      "filePath": "3_RDRASdd/ui/StaffSkillManagementFlow/SkillConfirmationScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/staff-skills/:skillId/verify"
+        }
+      ]
+    },
+    {
+      "id": "screen:SkillInputScreen",
+      "label": "SkillInputScreen",
+      "labelJa": "スキル入力画面",
+      "buc": "uibuc:StaffSkillManagementFlow",
+      "filePath": "3_RDRASdd/ui/StaffSkillManagementFlow/SkillInputScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "POST",
+          "path": "/api/v1/staff-skills/register"
+        }
+      ]
+    },
+    {
+      "id": "screen:WorkingStyleApprovalScreen",
+      "label": "WorkingStyleApprovalScreen",
+      "labelJa": "働き方承認画面",
+      "buc": "uibuc:StaffWorkingStyleSettingFlow",
+      "filePath": "3_RDRASdd/ui/StaffWorkingStyleSettingFlow/WorkingStyleApprovalScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/staff-working-style/:styleId/approve"
+        }
+      ]
+    },
+    {
+      "id": "screen:WorkingStyleExecutionManagementScreen",
+      "label": "WorkingStyleExecutionManagementScreen",
+      "labelJa": "働き方実行管理画面",
+      "buc": "uibuc:StaffWorkingStyleSettingFlow",
+      "filePath": "3_RDRASdd/ui/StaffWorkingStyleSettingFlow/WorkingStyleExecutionManagementScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/staff-working-style/:styleId/execute"
+        }
+      ]
+    },
+    {
+      "id": "screen:WorkingStyleReviewScreen",
+      "label": "WorkingStyleReviewScreen",
+      "labelJa": "働き方審査画面",
+      "buc": "uibuc:StaffWorkingStyleSettingFlow",
+      "filePath": "3_RDRASdd/ui/StaffWorkingStyleSettingFlow/WorkingStyleReviewScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/staff-working-style/:styleId/review"
+        }
+      ]
+    },
+    {
+      "id": "screen:WorkingStyleSettingScreen",
+      "label": "WorkingStyleSettingScreen",
+      "labelJa": "働き方設定画面",
+      "buc": "uibuc:StaffWorkingStyleSettingFlow",
+      "filePath": "3_RDRASdd/ui/StaffWorkingStyleSettingFlow/WorkingStyleSettingScreen.md",
+      "ucs": [],
+      "apis": [
+        {
+          "method": "POST",
+          "path": "/api/v1/staff-working-style/register"
+        }
+      ]
+    }
+  ]
+}

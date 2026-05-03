@@ -28,7 +28,6 @@ RDRAAgent_v0.7/
 ├── RDRA_Knowledge/       # ナレッジベース
 ├── .claude/              # Claude Code設定
 ├── .cursor/              # Cursor設定
-├── .gemini/              # Gemini設定
 ├── Samples/              # サンプルプロジェクト
 └── 初期要望.txt
 ```
@@ -43,15 +42,13 @@ RDRAAgent_v0.7/
 ### **モデルの切替**
 - 各モデルのCLIが事前に動作する状態にしておく
 - モデル設定.jsonを見直す
-- 5つのモデルを予め設定済み（gemini,claude,cursor,codex,cline）
+- 5つのモデルを予め設定済み（claude,cursor,cline）
 - モデル設定.jsonのproviderに設定
-  - "provider": "claude"　⇐　"gemini","claude","cursor","codex","cline"
+  - "provider": "claude"　⇐　"claude","cursor","cline"
 
 ### モデル別の特徴
-- codex：Codex Cliを利用
 - claude：Claude Cliを利用　AGENTS.mdが使えないのでCLAUD.mdからAGENTS.mdを参照
 - cursor：Agent Cliを利用　モデル設定.jsonの設定内で利用するモデルを設定する
-- gemini：Gemini Cliを利用　
 - cline：Cline Cliを利用　様々なLLMのAPIを利用したい場合に使用
 - どのモデルを使う場合でも事前にCliが動く状態にしておいてください
 
@@ -141,6 +138,9 @@ node menu
   - `2_RDRASpec/phase1/BUC画面.json` - BUC別画面定義
   - `2_RDRASpec/phase1/アクター画面.json` - アクター別画面定義
   - `2_RDRASpec/画面照会.json` - 統合画面定義
+  - `3_RDRASdd/domain` - ドメインについて記述された仕様書を保持
+  - `3_RDRASdd/application` - BUC単位のUCについて記述された仕様書を保持
+  - `3_RDRASdd/ui` - UIについて記述された仕様書を保持
 
 **22. 画面照会（BUC/アクター）を表示する**
 - 仕様の画面定義をブラウザで表示
@@ -158,6 +158,7 @@ node menu
   - `0_RDRAZeroOne/`
   - `1_RDRA/`
   - `2_RDRASpec/`
+  - `3_RDRASdd/`
 
 ## ワークフロー
 
@@ -168,7 +169,7 @@ node menu
    - `Samples/` フォルダーのサンプルを参考にする
 
 2. **要件定義（ZeroOne）**
-   - メニュー「7」（段階実行）または「8」（一括実行）を使用
+   - メニュー「2」（段階実行）または「3」（一括実行）を使用
    - 必要に応じて「1〜4」で開始フェーズを指定して実行
 
 3. **RDRA可視化**
@@ -193,7 +194,7 @@ copy Samples\図書館システム\初期要望.txt 初期要望.txt
 # 2. メニューシステムを起動
 node menu
 
-# 3. メニューで「１」or「8」を選択（一括要件定義）
+# 3. メニューで「1」（全削除後一括）or「3」を選択（一括要件定義・DAG）
 # → 4つのPhaseが順次実行される
 
 # 4. メニューで「11」を選択（RDRAGraph表示）
@@ -221,28 +222,23 @@ notepad 初期要望.txt
 # 2. メニューシステムを起動
 node menu
 
-# 3. メニューで「7」を選択（フェーズ単位の要件定義）
+# 3. フェーズ毎の実行：
+# → メニューで「2」を選択（フェーズ単位の要件定義）
 # → Phase1が実行される
-
 # 4. Phase1の結果を確認
 # → 0_RDRAZeroOne/phase1/ フォルダー内のTSVファイルを確認
-
-# 5. 再度メニューで「7」を選択
+# 5. 再度メニューで「2」を選択
 # → Phase2が実行される
-
 # （Phase3、Phase4も同様に実行）
-
-# 6. （任意）必要に応じてメニュー「11」で関連データを再作成
+# 6.（任意）必要に応じてメニュー「11」で関連データを再作成
 ```
 
 ### 例3: 画面照会（BUC/アクター）の表示
 
 ```bash
 # 1. 仕様作成後（メニュー21実行済み）
-
 # 2. メニューで「22」を選択（画面照会表示）
 # → ブラウザで画面照会（BUC/アクター）が表示される（ポート3002）
-
 # 3. ブラウザでアクターを切り替えて画面を確認
 ```
 
@@ -262,6 +258,7 @@ node menu
 - `0_RDRAZeroOne/phase1~4/` - フェーズ別のTSVファイル
 - `1_RDRA/` - RDRA定義ファイル（統合版、TSV/JSON形式）
 - `2_RDRASpec/` - 仕様ファイル（JSON/Markdown形式）
+- `3_RDRASdd/` - 機能仕様ファイル（JSON/Markdown形式）
 
 ### ヘルパーツール
 - `RDRA_Knowledge/helper_tools/` - 各種支援スクリプト
@@ -270,29 +267,33 @@ node menu
   - `copyToClipboard.js` - データをクリップボードにコピー
   - `deleteFiles.js` - 成果物削除
   - `web_tool/bucActorUI.js` - 画面照会（BUC/アクター）表示サーバー
+  - `web_tool/callgraph_sever.js` - 機能仕様の依存関係を表示サーバー
   - `parallelRun/parallel-runner.js` - プロンプト並列（または条件により直列）実行
 - 上記のツールはmenu.jsから使われる
 
 ### ナレッジベース
-- `RDRA_Knowledge/0_RDRAZeroOne/` - ZeroOneフェーズの説明
+- `RDRA_Knowledge/_0_RDRAZeroOne/` - ZeroOneフェーズの説明
   - Phase:1-4 - フェーズ毎の成果物生成Prompt
 
 - `RDRA_Knowledge/.rdracore/` - RDRA定義の説明
   - `RDRA.md` - RDRAの基本概念
   - `RDRAGraph.md` - RDRAGraphの説明（関連データ.txtの構造説明）
   - `RDRASheet.md` - RDRASheetの説明
-- `RDRA_Knowledge/2_RDRASpec/` - 仕様作成の説明
+- `RDRA_Knowledge/_2_RDRASpec/` - 仕様作成の説明
   - `phase1/21_論理データ生成.md` - 論理データモデル作成方法
   - `phase1/22_ビジネスルール生成.md` - ビジネスルール作成方法
   - `phase1/23_画面一覧生成.md` - 画面一覧作成方法
   - `phase1/24_BUC画面生成.md` - BUC画面作成方法
   - `phase1/25_アクター画面生成.md` - アクター画面作成方法
   - `phase2/26_画面照会生成.md` - 画面照会作成方法
+- `RDRA_Knowledge/_3_RDRASpec/` - 機能仕様作成の説明
+  - `31_Create_Domain.md` - domainレイヤーの機能仕様書を作成する方法
+  - `32_Create_Application.md` - domainレイヤーの機能仕様書を作成する方法
+  - `33_Create_UI.md` - domainレイヤーの機能仕様書を作成する方法
 
 ### 設定ファイル
 - `.claude/settings.local.json` - Claude Codeのアクセス権限設定
 - `.cursor/.cursorignore` - Cursorの除外設定
-- `.gemini/settings.json` - Geminiの設定
 
 ## ファイルフォーマット
 
@@ -344,7 +345,7 @@ node menu
 
 メニューの一部機能（1〜4, 7, 8, 21）はLLM（大規模言語モデル）を使用します：
 - 実行プロバイダーは `モデル設定.json` から読み込みます
-- プロンプトは `RDRA_Knowledge/0_RDRAZeroOne/phase*/` と `RDRA_Knowledge/2_RDRASpec/phase*/` 配下を使用します
+- プロンプトは `RDRA_Knowledge/_0_RDRAZeroOne/phase*/` と `RDRA_Knowledge/_2_RDRASpec/phase*/` 配下を使用します
 - 実行は `RDRA_Knowledge/helper_tools/parallelRun/parallel-runner.js` 経由で行います
 
 ## トラブルシューティング
@@ -427,12 +428,12 @@ A: Samplesフォルダー内のサンプルの初期要望.txtを、プロジェ
 
 ## バージョン情報
 
-**現在のバージョン**: RDRAAgent v0.7
+**現在のバージョン**: RDRAAgent v0.8
 
 ### 変更履歴
-- v0.7: 現行バージョン
-  - 4フェーズのRDRA定義プロセス実装
-  - BUCアクター別画面表示機能
-
+- v0.8: 現行バージョン
+  - skillを実装し定義されたRDRA（要件定義）についての問合せに答える
+  - 機能仕様の生成（3_RDRASdd）
+    - domain,application,UI
 ## ライセンス
 MIT License

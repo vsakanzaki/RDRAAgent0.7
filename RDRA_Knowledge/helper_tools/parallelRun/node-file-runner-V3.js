@@ -292,6 +292,7 @@ module.exports = {
     getAvailableProviders,
     getModelConfigPath,
     getResolvedDefaultProvider,
+    findProjectRootByInitialRequest,
 };
 
 

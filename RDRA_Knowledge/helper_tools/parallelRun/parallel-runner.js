@@ -6,7 +6,12 @@
  *   node parallel-runner.js {prompt/run1.md,output/run1.tsv} {prompt/run2.md,output/run2.tsv}   # output 側は無視されます（互換用）
  */
 
-const { runAIWithPrefix, getResolvedDefaultProvider } = require('./node-file-runner-V3');
+const {
+    runAIWithPrefix,
+    getResolvedDefaultProvider,
+    findProjectRootByInitialRequest,
+} = require('./node-file-runner-V3');
+const { buildContextHeader } = require('../settings/rdraConfig');
 const fs = require('fs');
 const path = require('path');
 
@@ -95,14 +100,15 @@ async function executePrompt(filePair, options = {}) {
     const baseName = path.basename(inputPath, path.extname(inputPath));
 
     try {
-        const prompt = readPrompt(inputPath);
-        
+        const rawPrompt = readPrompt(inputPath);
+        const prompt = (options.contextHeader || '') + rawPrompt;
+
         // プレフィックスを設定（ファイル名をベースに）
         const execOptions = {
             ...options,
             prefix: baseName,
         };
-        
+
         // プレフィックス付きリアルタイム出力モードで実行
         await runAIWithPrefix(prompt, execOptions);
         
@@ -160,15 +166,23 @@ async function executeParallel(filePairs, options = {}) {
 // ========================================
 async function main() {
     const config = parseArgs(process.argv);
-    
+
     // ファイルが指定されていない場合
     if (config.filePairs.length === 0) {
         console.error('エラー: 実行するファイルが指定されていません（--help を参照）');
         process.exit(1);
     }
-    
+
+    const projectRoot = findProjectRootByInitialRequest(process.cwd());
+    process.chdir(projectRoot);
+    const contextHeader = buildContextHeader(projectRoot);
+    config.options.contextHeader = contextHeader;
+
     // 設定表示
-    console.log(`files: ${config.filePairs.length}, provider(from config): ${getResolvedDefaultProvider()}, timeout: ${config.options.timeout}ms`);
+    console.log(`projectRoot: ${projectRoot}`);
+    console.log(
+        `files: ${config.filePairs.length}, provider(from config): ${getResolvedDefaultProvider()}, timeout: ${config.options.timeout}ms`
+    );
     
     const totalStartTime = Date.now();
     

@@ -1,0 +1,1061 @@
+{
+  "appBucs": [
+    {
+      "id": "appbuc:CareeMemberRegistrationAndManagementFlow",
+      "label": "CareeMemberRegistrationAndManagementFlow",
+      "labelJa": "介護会員登録・管理フロー",
+      "filePath": "3_RDRASdd/application/CareeMemberRegistrationAndManagementFlow.md",
+      "ucs": [
+        "uc:CareeMemberRegistrationAndManagementFlow:介護会員情報を受け付ける",
+        "uc:CareeMemberRegistrationAndManagementFlow:介護会員情報を登録する",
+        "uc:CareeMemberRegistrationAndManagementFlow:介護会員情報を更新する",
+        "uc:CareeMemberRegistrationAndManagementFlow:サービス利用を開始する",
+        "uc:CareeMemberRegistrationAndManagementFlow:サービス利用を休止する",
+        "uc:CareeMemberRegistrationAndManagementFlow:サービス利用を再開する",
+        "uc:CareeMemberRegistrationAndManagementFlow:サービス終了を処理する"
+      ]
+    },
+    {
+      "id": "appbuc:StaffRegistrationAndManagementFlow",
+      "label": "StaffRegistrationAndManagementFlow",
+      "labelJa": "スタッフ登録・管理フロー",
+      "filePath": "3_RDRASdd/application/StaffRegistrationAndManagementFlow.md",
+      "ucs": [
+        "uc:StaffRegistrationAndManagementFlow:スタッフ基本情報を提供する",
+        "uc:StaffRegistrationAndManagementFlow:スタッフ基本情報を登録する",
+        "uc:StaffRegistrationAndManagementFlow:スタッフ基本情報を管理する"
+      ]
+    },
+    {
+      "id": "appbuc:StaffSkillManagementFlow",
+      "label": "StaffSkillManagementFlow",
+      "labelJa": "スタッフスキル管理フロー",
+      "filePath": "3_RDRASdd/application/StaffSkillManagementFlow.md",
+      "ucs": [
+        "uc:StaffSkillManagementFlow:スタッフスキル情報を入力する",
+        "uc:StaffSkillManagementFlow:スタッフスキル情報を確認する",
+        "uc:StaffSkillManagementFlow:スタッフスキル情報を認定する"
+      ]
+    },
+    {
+      "id": "appbuc:StaffWorkingStyleSettingFlow",
+      "label": "StaffWorkingStyleSettingFlow",
+      "labelJa": "スタッフ働き方設定フロー",
+      "filePath": "3_RDRASdd/application/StaffWorkingStyleSettingFlow.md",
+      "ucs": [
+        "uc:StaffWorkingStyleSettingFlow:スタッフ働き方希望を設定する",
+        "uc:StaffWorkingStyleSettingFlow:スタッフ働き方を審査する",
+        "uc:StaffWorkingStyleSettingFlow:スタッフ働き方を承認する",
+        "uc:StaffWorkingStyleSettingFlow:スタッフ働き方を実行する"
+      ]
+    },
+    {
+      "id": "appbuc:SchedulePlanningFlow",
+      "label": "SchedulePlanningFlow",
+      "labelJa": "スケジュール計画フロー",
+      "filePath": "3_RDRASdd/application/SchedulePlanningFlow.md",
+      "ucs": [
+        "uc:SchedulePlanningFlow:スケジュール要望を確認する",
+        "uc:SchedulePlanningFlow:スケジュールを計画する",
+        "uc:SchedulePlanningFlow:スケジュールを確定する"
+      ]
+    },
+    {
+      "id": "appbuc:ScheduleAdjustmentFlow",
+      "label": "ScheduleAdjustmentFlow",
+      "labelJa": "スケジュール調整フロー",
+      "filePath": "3_RDRASdd/application/ScheduleAdjustmentFlow.md",
+      "ucs": [
+        "uc:ScheduleAdjustmentFlow:スケジュール変更要望を受け付ける",
+        "uc:ScheduleAdjustmentFlow:スケジュールを調整する",
+        "uc:ScheduleAdjustmentFlow:スケジュール調整困難時の対応を行う"
+      ]
+    },
+    {
+      "id": "appbuc:HomeVisitServiceExecutionFlow",
+      "label": "HomeVisitServiceExecutionFlow",
+      "labelJa": "訪問介護実施フロー",
+      "filePath": "3_RDRASdd/application/HomeVisitServiceExecutionFlow.md",
+      "ucs": [
+        "uc:HomeVisitServiceExecutionFlow:スタッフを確定する",
+        "uc:HomeVisitServiceExecutionFlow:スタッフが移動する",
+        "uc:HomeVisitServiceExecutionFlow:訪問介護サービスを実施する"
+      ]
+    },
+    {
+      "id": "appbuc:ExecutionRecordCreationFlow",
+      "label": "ExecutionRecordCreationFlow",
+      "labelJa": "実施記録作成フロー",
+      "filePath": "3_RDRASdd/application/ExecutionRecordCreationFlow.md",
+      "ucs": [
+        "uc:ExecutionRecordCreationFlow:実施記録を作成する",
+        "uc:ExecutionRecordCreationFlow:実施記録をシステムに登録する",
+        "uc:ExecutionRecordCreationFlow:実施記録を確認する"
+      ]
+    },
+    {
+      "id": "appbuc:CareCostCalculationFlow",
+      "label": "CareCostCalculationFlow",
+      "labelJa": "介護費用計算フロー",
+      "filePath": "3_RDRASdd/application/CareCostCalculationFlow.md",
+      "ucs": [
+        "uc:CareCostCalculationFlow:実施記録を確認する",
+        "uc:CareCostCalculationFlow:介護費用を計算する"
+      ]
+    },
+    {
+      "id": "appbuc:BillingFlow",
+      "label": "BillingFlow",
+      "labelJa": "請求フロー",
+      "filePath": "3_RDRASdd/application/BillingFlow.md",
+      "ucs": [
+        "uc:BillingFlow:介護費用を請求する"
+      ]
+    },
+    {
+      "id": "appbuc:CollectionManagementFlow",
+      "label": "CollectionManagementFlow",
+      "labelJa": "回収管理フロー",
+      "filePath": "3_RDRASdd/application/CollectionManagementFlow.md",
+      "ucs": [
+        "uc:CollectionManagementFlow:支払い状況を確認する",
+        "uc:CollectionManagementFlow:売上を把握・管理する",
+        "uc:CollectionManagementFlow:支払い滞納に対応する"
+      ]
+    }
+  ],
+  "ucs": [
+    {
+      "id": "uc:CareeMemberRegistrationAndManagementFlow:介護会員情報を受け付ける",
+      "label": "ReceiveCareeMemberInformation",
+      "labelJa": "介護会員情報を受け付ける",
+      "buc": "appbuc:CareeMemberRegistrationAndManagementFlow",
+      "filePath": "3_RDRASdd/application/CareeMemberRegistrationAndManagementFlow.md",
+      "services": [
+        "service:CareeMemberManagement:RegisterCareeMemberInfo"
+      ],
+      "serviceHints": [
+        {
+          "context": "CareeMemberManagement",
+          "nameJa": "新規会員情報を登録"
+        }
+      ],
+      "serviceNamesJa": [
+        "新規会員情報を登録"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v1/caremembers/accept",
+          "label": "△ POST /api/v1/caremembers/accept"
+        }
+      ]
+    },
+    {
+      "id": "uc:CareeMemberRegistrationAndManagementFlow:介護会員情報を登録する",
+      "label": "RegisterCareeMemberInfo",
+      "labelJa": "介護会員情報を登録する",
+      "buc": "appbuc:CareeMemberRegistrationAndManagementFlow",
+      "filePath": "3_RDRASdd/application/CareeMemberRegistrationAndManagementFlow.md",
+      "services": [
+        "service:CareeMemberManagement:RegisterCareeMemberInfo"
+      ],
+      "serviceHints": [
+        {
+          "context": "CareeMemberManagement",
+          "nameJa": "会員情報を登録する"
+        }
+      ],
+      "serviceNamesJa": [
+        "会員情報を登録する"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v1/caremembers/register",
+          "label": "△ POST /api/v1/caremembers/register"
+        }
+      ]
+    },
+    {
+      "id": "uc:CareeMemberRegistrationAndManagementFlow:介護会員情報を更新する",
+      "label": "UpdateCareeMemberInfo",
+      "labelJa": "介護会員情報を更新する",
+      "buc": "appbuc:CareeMemberRegistrationAndManagementFlow",
+      "filePath": "3_RDRASdd/application/CareeMemberRegistrationAndManagementFlow.md",
+      "services": [
+        "service:CareeMemberManagement:UpdateCareeMemberInfo"
+      ],
+      "serviceHints": [
+        {
+          "context": "CareeMemberManagement",
+          "nameJa": "会員情報を更新する"
+        }
+      ],
+      "serviceNamesJa": [
+        "会員情報を更新する"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/caremembers/:careeMemberId",
+          "label": "△ PATCH /api/v1/caremembers/:careeMemberId"
+        }
+      ]
+    },
+    {
+      "id": "uc:CareeMemberRegistrationAndManagementFlow:サービス利用を開始する",
+      "label": "StartServiceUse",
+      "labelJa": "サービス利用を開始する",
+      "buc": "appbuc:CareeMemberRegistrationAndManagementFlow",
+      "filePath": "3_RDRASdd/application/CareeMemberRegistrationAndManagementFlow.md",
+      "services": [
+        "service:CareeMemberManagement:StartServiceUse"
+      ],
+      "serviceHints": [
+        {
+          "context": "CareeMemberManagement",
+          "nameJa": "サービス利用開始"
+        }
+      ],
+      "serviceNamesJa": [
+        "サービス利用開始"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v1/caremembers/:careeMemberId/service/start",
+          "label": "△ POST /api/v1/caremembers/:careeMemberId/service/start"
+        }
+      ]
+    },
+    {
+      "id": "uc:CareeMemberRegistrationAndManagementFlow:サービス利用を休止する",
+      "label": "PauseServiceUse",
+      "labelJa": "サービス利用を休止する",
+      "buc": "appbuc:CareeMemberRegistrationAndManagementFlow",
+      "filePath": "3_RDRASdd/application/CareeMemberRegistrationAndManagementFlow.md",
+      "services": [
+        "service:CareeMemberManagement:PauseServiceUse"
+      ],
+      "serviceHints": [
+        {
+          "context": "CareeMemberManagement",
+          "nameJa": "サービス利用休止"
+        }
+      ],
+      "serviceNamesJa": [
+        "サービス利用休止"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v1/caremembers/:careeMemberId/service/pause",
+          "label": "△ POST /api/v1/caremembers/:careeMemberId/service/pause"
+        }
+      ]
+    },
+    {
+      "id": "uc:CareeMemberRegistrationAndManagementFlow:サービス利用を再開する",
+      "label": "ResumeServiceUse",
+      "labelJa": "サービス利用を再開する",
+      "buc": "appbuc:CareeMemberRegistrationAndManagementFlow",
+      "filePath": "3_RDRASdd/application/CareeMemberRegistrationAndManagementFlow.md",
+      "services": [
+        "service:CareeMemberManagement:ResumeServiceUse"
+      ],
+      "serviceHints": [
+        {
+          "context": "CareeMemberManagement",
+          "nameJa": "サービス利用再開"
+        }
+      ],
+      "serviceNamesJa": [
+        "サービス利用再開"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v1/caremembers/:careeMemberId/service/resume",
+          "label": "△ POST /api/v1/caremembers/:careeMemberId/service/resume"
+        }
+      ]
+    },
+    {
+      "id": "uc:CareeMemberRegistrationAndManagementFlow:サービス終了を処理する",
+      "label": "TerminateServiceUse",
+      "labelJa": "サービス終了を処理する",
+      "buc": "appbuc:CareeMemberRegistrationAndManagementFlow",
+      "filePath": "3_RDRASdd/application/CareeMemberRegistrationAndManagementFlow.md",
+      "services": [
+        "service:CareeMemberManagement:TerminateServiceUse"
+      ],
+      "serviceHints": [
+        {
+          "context": "CareeMemberManagement",
+          "nameJa": "サービス終了処理"
+        }
+      ],
+      "serviceNamesJa": [
+        "サービス終了処理"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v1/caremembers/:careeMemberId/service/terminate",
+          "label": "△ POST /api/v1/caremembers/:careeMemberId/service/terminate"
+        }
+      ]
+    },
+    {
+      "id": "uc:StaffRegistrationAndManagementFlow:スタッフ基本情報を提供する",
+      "label": "ProvideStaffInfo",
+      "labelJa": "スタッフ基本情報を提供する",
+      "buc": "appbuc:StaffRegistrationAndManagementFlow",
+      "filePath": "3_RDRASdd/application/StaffRegistrationAndManagementFlow.md",
+      "services": [],
+      "serviceHints": [],
+      "serviceNamesJa": [],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "GET",
+          "path": "/api/v1/staff/:staffId",
+          "label": "△ GET /api/v1/staff/:staffId"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/staff",
+          "label": "△ GET /api/v1/staff"
+        }
+      ]
+    },
+    {
+      "id": "uc:StaffRegistrationAndManagementFlow:スタッフ基本情報を登録する",
+      "label": "RegisterStaffInfo",
+      "labelJa": "スタッフ基本情報を登録する",
+      "buc": "appbuc:StaffRegistrationAndManagementFlow",
+      "filePath": "3_RDRASdd/application/StaffRegistrationAndManagementFlow.md",
+      "services": [
+        "service:StaffManagement:RegisterStaff"
+      ],
+      "serviceHints": [
+        {
+          "context": "StaffManagement",
+          "nameJa": "スタッフを登録"
+        }
+      ],
+      "serviceNamesJa": [
+        "スタッフを登録"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v1/staff/register",
+          "label": "△ POST /api/v1/staff/register"
+        }
+      ]
+    },
+    {
+      "id": "uc:StaffRegistrationAndManagementFlow:スタッフ基本情報を管理する",
+      "label": "ManageStaffInfo",
+      "labelJa": "スタッフ基本情報を管理する",
+      "buc": "appbuc:StaffRegistrationAndManagementFlow",
+      "filePath": "3_RDRASdd/application/StaffRegistrationAndManagementFlow.md",
+      "services": [
+        "service:StaffManagement:UpdateStaff"
+      ],
+      "serviceHints": [
+        {
+          "context": "StaffManagement",
+          "nameJa": "スタッフ情報を更新"
+        }
+      ],
+      "serviceNamesJa": [
+        "スタッフ情報を更新"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/staff/:staffId",
+          "label": "△ PATCH /api/v1/staff/:staffId"
+        }
+      ]
+    },
+    {
+      "id": "uc:StaffSkillManagementFlow:スタッフスキル情報を入力する",
+      "label": "RegisterSkillInfo",
+      "labelJa": "スタッフスキル情報を入力する",
+      "buc": "appbuc:StaffSkillManagementFlow",
+      "filePath": "3_RDRASdd/application/StaffSkillManagementFlow.md",
+      "services": [
+        "service:StaffManagement:RegisterSkillInfo"
+      ],
+      "serviceHints": [
+        {
+          "context": "StaffManagement",
+          "nameJa": "スキル申告"
+        }
+      ],
+      "serviceNamesJa": [
+        "スキル申告"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v1/staff-skills/register",
+          "label": "△ POST /api/v1/staff-skills/register"
+        }
+      ]
+    },
+    {
+      "id": "uc:StaffSkillManagementFlow:スタッフスキル情報を確認する",
+      "label": "VerifySkillInfo",
+      "labelJa": "スタッフスキル情報を確認する",
+      "buc": "appbuc:StaffSkillManagementFlow",
+      "filePath": "3_RDRASdd/application/StaffSkillManagementFlow.md",
+      "services": [
+        "service:StaffManagement:VerifySkillInfo"
+      ],
+      "serviceHints": [
+        {
+          "context": "StaffManagement",
+          "nameJa": "スキル確認"
+        }
+      ],
+      "serviceNamesJa": [
+        "スキル確認"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/staff-skills/:skillId/verify",
+          "label": "△ PATCH /api/v1/staff-skills/:skillId/verify"
+        }
+      ]
+    },
+    {
+      "id": "uc:StaffSkillManagementFlow:スタッフスキル情報を認定する",
+      "label": "ApproveSkillInfo",
+      "labelJa": "スタッフスキル情報を認定する",
+      "buc": "appbuc:StaffSkillManagementFlow",
+      "filePath": "3_RDRASdd/application/StaffSkillManagementFlow.md",
+      "services": [
+        "service:StaffManagement:ApproveSkillInfo"
+      ],
+      "serviceHints": [
+        {
+          "context": "StaffManagement",
+          "nameJa": "スキル認定"
+        }
+      ],
+      "serviceNamesJa": [
+        "スキル認定"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/staff-skills/:skillId/approve",
+          "label": "△ PATCH /api/v1/staff-skills/:skillId/approve"
+        }
+      ]
+    },
+    {
+      "id": "uc:StaffWorkingStyleSettingFlow:スタッフ働き方希望を設定する",
+      "label": "RegisterWorkingStyle",
+      "labelJa": "スタッフ働き方希望を設定する",
+      "buc": "appbuc:StaffWorkingStyleSettingFlow",
+      "filePath": "3_RDRASdd/application/StaffWorkingStyleSettingFlow.md",
+      "services": [
+        "service:StaffManagement:RegisterWorkingStyle"
+      ],
+      "serviceHints": [
+        {
+          "context": "StaffManagement",
+          "nameJa": "働き方希望登録"
+        }
+      ],
+      "serviceNamesJa": [
+        "働き方希望登録"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v1/staff-working-style/register",
+          "label": "△ POST /api/v1/staff-working-style/register"
+        }
+      ]
+    },
+    {
+      "id": "uc:StaffWorkingStyleSettingFlow:スタッフ働き方を審査する",
+      "label": "ReviewWorkingStyle",
+      "labelJa": "スタッフ働き方を審査する",
+      "buc": "appbuc:StaffWorkingStyleSettingFlow",
+      "filePath": "3_RDRASdd/application/StaffWorkingStyleSettingFlow.md",
+      "services": [
+        "service:StaffManagement:ReviewWorkingStyle"
+      ],
+      "serviceHints": [
+        {
+          "context": "StaffManagement",
+          "nameJa": "働き方審査"
+        }
+      ],
+      "serviceNamesJa": [
+        "働き方審査"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/staff-working-style/:workingStyleId/review",
+          "label": "△ PATCH /api/v1/staff-working-style/:workingStyleId/review"
+        }
+      ]
+    },
+    {
+      "id": "uc:StaffWorkingStyleSettingFlow:スタッフ働き方を承認する",
+      "label": "ApproveWorkingStyle",
+      "labelJa": "スタッフ働き方を承認する",
+      "buc": "appbuc:StaffWorkingStyleSettingFlow",
+      "filePath": "3_RDRASdd/application/StaffWorkingStyleSettingFlow.md",
+      "services": [
+        "service:StaffManagement:ApproveWorkingStyle"
+      ],
+      "serviceHints": [
+        {
+          "context": "StaffManagement",
+          "nameJa": "働き方承認"
+        }
+      ],
+      "serviceNamesJa": [
+        "働き方承認"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/staff-working-style/:workingStyleId/approve",
+          "label": "△ PATCH /api/v1/staff-working-style/:workingStyleId/approve"
+        }
+      ]
+    },
+    {
+      "id": "uc:StaffWorkingStyleSettingFlow:スタッフ働き方を実行する",
+      "label": "ExecuteWorkingStyle",
+      "labelJa": "スタッフ働き方を実行する",
+      "buc": "appbuc:StaffWorkingStyleSettingFlow",
+      "filePath": "3_RDRASdd/application/StaffWorkingStyleSettingFlow.md",
+      "services": [
+        "service:StaffManagement:ExecuteWorkingStyle"
+      ],
+      "serviceHints": [
+        {
+          "context": "StaffManagement",
+          "nameJa": "働き方実行開始"
+        }
+      ],
+      "serviceNamesJa": [
+        "働き方実行開始"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/staff-working-style/:workingStyleId/execute",
+          "label": "△ PATCH /api/v1/staff-working-style/:workingStyleId/execute"
+        }
+      ]
+    },
+    {
+      "id": "uc:SchedulePlanningFlow:スケジュール要望を確認する",
+      "label": "ConfirmScheduleRequest",
+      "labelJa": "スケジュール要望を確認する",
+      "buc": "appbuc:SchedulePlanningFlow",
+      "filePath": "3_RDRASdd/application/SchedulePlanningFlow.md",
+      "services": [],
+      "serviceHints": [],
+      "serviceNamesJa": [],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "GET",
+          "path": "/api/v1/schedules/:scheduleId",
+          "label": "△ GET /api/v1/schedules/:scheduleId"
+        }
+      ]
+    },
+    {
+      "id": "uc:SchedulePlanningFlow:スケジュールを計画する",
+      "label": "PlanSchedule",
+      "labelJa": "スケジュールを計画する",
+      "buc": "appbuc:SchedulePlanningFlow",
+      "filePath": "3_RDRASdd/application/SchedulePlanningFlow.md",
+      "services": [
+        "service:ScheduleManagement:PlanSchedule",
+        "service:ScheduleManagement:UpdateSchedulePlan"
+      ],
+      "serviceHints": [
+        {
+          "context": "ScheduleManagement",
+          "nameJa": "スケジュール計画作成"
+        },
+        {
+          "context": "ScheduleManagement",
+          "nameJa": "スケジュール計画修正"
+        }
+      ],
+      "serviceNamesJa": [
+        "スケジュール計画作成",
+        "スケジュール計画修正"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v1/schedules/plan",
+          "label": "△ POST /api/v1/schedules/plan"
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/v1/schedules/:scheduleId/plan",
+          "label": "△ PATCH /api/v1/schedules/:scheduleId/plan"
+        }
+      ]
+    },
+    {
+      "id": "uc:SchedulePlanningFlow:スケジュールを確定する",
+      "label": "ConfirmSchedule",
+      "labelJa": "スケジュールを確定する",
+      "buc": "appbuc:SchedulePlanningFlow",
+      "filePath": "3_RDRASdd/application/SchedulePlanningFlow.md",
+      "services": [
+        "service:ScheduleManagement:ConfirmSchedule"
+      ],
+      "serviceHints": [
+        {
+          "context": "ScheduleManagement",
+          "nameJa": "スケジュール確定"
+        }
+      ],
+      "serviceNamesJa": [
+        "スケジュール確定"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v1/schedules/:scheduleId/confirm",
+          "label": "△ POST /api/v1/schedules/:scheduleId/confirm"
+        }
+      ]
+    },
+    {
+      "id": "uc:ScheduleAdjustmentFlow:スケジュール変更要望を受け付ける",
+      "label": "ReceiveScheduleChangeRequest",
+      "labelJa": "スケジュール変更要望を受け付ける",
+      "buc": "appbuc:ScheduleAdjustmentFlow",
+      "filePath": "3_RDRASdd/application/ScheduleAdjustmentFlow.md",
+      "services": [
+        "service:ScheduleManagement:HandleScheduleChangeRequest"
+      ],
+      "serviceHints": [
+        {
+          "context": "ScheduleManagement",
+          "nameJa": "変更要望受け付け"
+        }
+      ],
+      "serviceNamesJa": [
+        "変更要望受け付け"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v1/schedules/:scheduleId/change-request",
+          "label": "△ POST /api/v1/schedules/:scheduleId/change-request"
+        }
+      ]
+    },
+    {
+      "id": "uc:ScheduleAdjustmentFlow:スケジュールを調整する",
+      "label": "AdjustSchedule",
+      "labelJa": "スケジュールを調整する",
+      "buc": "appbuc:ScheduleAdjustmentFlow",
+      "filePath": "3_RDRASdd/application/ScheduleAdjustmentFlow.md",
+      "services": [
+        "service:ScheduleManagement:AdjustSchedule"
+      ],
+      "serviceHints": [
+        {
+          "context": "ScheduleManagement",
+          "nameJa": "スケジュール調整"
+        }
+      ],
+      "serviceNamesJa": [
+        "スケジュール調整"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v1/schedules/:scheduleId/adjust",
+          "label": "△ POST /api/v1/schedules/:scheduleId/adjust"
+        }
+      ]
+    },
+    {
+      "id": "uc:ScheduleAdjustmentFlow:スケジュール調整困難時の対応を行う",
+      "label": "RespondToScheduleAdjustmentDifficulty",
+      "labelJa": "スケジュール調整困難時の対応を行う",
+      "buc": "appbuc:ScheduleAdjustmentFlow",
+      "filePath": "3_RDRASdd/application/ScheduleAdjustmentFlow.md",
+      "services": [
+        "service:ScheduleManagement:RespondToAdjustmentDifficulty"
+      ],
+      "serviceHints": [
+        {
+          "context": "ScheduleManagement",
+          "nameJa": "調整困難時対応"
+        }
+      ],
+      "serviceNamesJa": [
+        "調整困難時対応"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v1/schedules/:scheduleId/adjustment-difficulty-response",
+          "label": "△ POST /api/v1/schedules/:scheduleId/adjustment-difficulty-response"
+        }
+      ]
+    },
+    {
+      "id": "uc:HomeVisitServiceExecutionFlow:スタッフを確定する",
+      "label": "ConfirmStaffAssignment",
+      "labelJa": "スタッフを確定する",
+      "buc": "appbuc:HomeVisitServiceExecutionFlow",
+      "filePath": "3_RDRASdd/application/HomeVisitServiceExecutionFlow.md",
+      "services": [
+        "service:HomeVisitServiceExecution:ConfirmStaffAssignment"
+      ],
+      "serviceHints": [
+        {
+          "context": "HomeVisitServiceExecution",
+          "nameJa": "スタッフ確定"
+        }
+      ],
+      "serviceNamesJa": [
+        "スタッフ確定"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v1/schedules/:scheduleId/confirm-staff",
+          "label": "△ POST /api/v1/schedules/:scheduleId/confirm-staff"
+        }
+      ]
+    },
+    {
+      "id": "uc:HomeVisitServiceExecutionFlow:スタッフが移動する",
+      "label": "ReportStaffMovement",
+      "labelJa": "スタッフが移動する",
+      "buc": "appbuc:HomeVisitServiceExecutionFlow",
+      "filePath": "3_RDRASdd/application/HomeVisitServiceExecutionFlow.md",
+      "services": [
+        "service:HomeVisitServiceExecution:ReportStaffMovement"
+      ],
+      "serviceHints": [
+        {
+          "context": "HomeVisitServiceExecution",
+          "nameJa": "移動報告"
+        }
+      ],
+      "serviceNamesJa": [
+        "移動報告"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/execution-records/:executionRecordId/report-movement",
+          "label": "△ PATCH /api/v1/execution-records/:executionRecordId/report-movement"
+        }
+      ]
+    },
+    {
+      "id": "uc:HomeVisitServiceExecutionFlow:訪問介護サービスを実施する",
+      "label": "ExecuteHomeVisitService",
+      "labelJa": "訪問介護サービスを実施する",
+      "buc": "appbuc:HomeVisitServiceExecutionFlow",
+      "filePath": "3_RDRASdd/application/HomeVisitServiceExecutionFlow.md",
+      "services": [
+        "service:HomeVisitServiceExecution:StartServiceExecution",
+        "service:HomeVisitServiceExecution:CompleteServiceExecution"
+      ],
+      "serviceHints": [
+        {
+          "context": "HomeVisitServiceExecution",
+          "nameJa": "サービス実施開始"
+        },
+        {
+          "context": "HomeVisitServiceExecution",
+          "nameJa": "サービス実施完了"
+        }
+      ],
+      "serviceNamesJa": [
+        "サービス実施開始",
+        "サービス実施完了"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/execution-records/:executionRecordId/start-service",
+          "label": "△ PATCH /api/v1/execution-records/:executionRecordId/start-service"
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/v1/execution-records/:executionRecordId/complete-service",
+          "label": "△ PATCH /api/v1/execution-records/:executionRecordId/complete-service"
+        }
+      ]
+    },
+    {
+      "id": "uc:ExecutionRecordCreationFlow:実施記録を作成する",
+      "label": "CreateExecutionRecord",
+      "labelJa": "実施記録を作成する",
+      "buc": "appbuc:ExecutionRecordCreationFlow",
+      "filePath": "3_RDRASdd/application/ExecutionRecordCreationFlow.md",
+      "services": [
+        "service:HomeVisitServiceExecution:CreateExecutionRecord"
+      ],
+      "serviceHints": [
+        {
+          "context": "HomeVisitServiceExecution",
+          "nameJa": "実施記録作成"
+        }
+      ],
+      "serviceNamesJa": [
+        "実施記録作成"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v1/execution-records/create",
+          "label": "△ POST /api/v1/execution-records/create"
+        }
+      ]
+    },
+    {
+      "id": "uc:ExecutionRecordCreationFlow:実施記録をシステムに登録する",
+      "label": "RegisterExecutionRecordToSystem",
+      "labelJa": "実施記録をシステムに登録する",
+      "buc": "appbuc:ExecutionRecordCreationFlow",
+      "filePath": "3_RDRASdd/application/ExecutionRecordCreationFlow.md",
+      "services": [
+        "service:HomeVisitServiceExecution:RegisterExecutionRecordToSystem"
+      ],
+      "serviceHints": [
+        {
+          "context": "HomeVisitServiceExecution",
+          "nameJa": "実施記録登録"
+        }
+      ],
+      "serviceNamesJa": [
+        "実施記録登録"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/execution-records/:executionRecordId/register",
+          "label": "△ PATCH /api/v1/execution-records/:executionRecordId/register"
+        }
+      ]
+    },
+    {
+      "id": "uc:ExecutionRecordCreationFlow:実施記録を確認する",
+      "label": "ConfirmExecutionRecord",
+      "labelJa": "実施記録を確認する",
+      "buc": "appbuc:ExecutionRecordCreationFlow",
+      "filePath": "3_RDRASdd/application/ExecutionRecordCreationFlow.md",
+      "services": [],
+      "serviceHints": [],
+      "serviceNamesJa": [],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "GET",
+          "path": "/api/v1/execution-records/:executionRecordId",
+          "label": "△ GET /api/v1/execution-records/:executionRecordId"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/execution-records",
+          "label": "△ GET /api/v1/execution-records"
+        }
+      ]
+    },
+    {
+      "id": "uc:CareCostCalculationFlow:実施記録を確認する",
+      "label": "ConfirmExecutionRecords",
+      "labelJa": "実施記録を確認する",
+      "buc": "appbuc:CareCostCalculationFlow",
+      "filePath": "3_RDRASdd/application/CareCostCalculationFlow.md",
+      "services": [],
+      "serviceHints": [],
+      "serviceNamesJa": [],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "GET",
+          "path": "/api/v1/execution-records",
+          "label": "△ GET /api/v1/execution-records"
+        }
+      ]
+    },
+    {
+      "id": "uc:CareCostCalculationFlow:介護費用を計算する",
+      "label": "CalculateCost",
+      "labelJa": "介護費用を計算する",
+      "buc": "appbuc:CareCostCalculationFlow",
+      "filePath": "3_RDRASdd/application/CareCostCalculationFlow.md",
+      "services": [
+        "service:BillingManagement:CalculateMonthlyCost"
+      ],
+      "serviceHints": [
+        {
+          "context": "BillingManagement",
+          "nameJa": "月別費用計算"
+        }
+      ],
+      "serviceNamesJa": [
+        "月別費用計算"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v1/costs/calculate",
+          "label": "△ POST /api/v1/costs/calculate"
+        }
+      ]
+    },
+    {
+      "id": "uc:BillingFlow:介護費用を請求する",
+      "label": "IssueBillingInvoice",
+      "labelJa": "介護費用を請求する",
+      "buc": "appbuc:BillingFlow",
+      "filePath": "3_RDRASdd/application/BillingFlow.md",
+      "services": [
+        "service:BillingManagement:IssueBillingInvoice"
+      ],
+      "serviceHints": [
+        {
+          "context": "BillingManagement",
+          "nameJa": "請求発行"
+        }
+      ],
+      "serviceNamesJa": [
+        "請求発行"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v1/billing/issue",
+          "label": "△ POST /api/v1/billing/issue"
+        }
+      ]
+    },
+    {
+      "id": "uc:CollectionManagementFlow:支払い状況を確認する",
+      "label": "ConfirmPaymentStatus",
+      "labelJa": "支払い状況を確認する",
+      "buc": "appbuc:CollectionManagementFlow",
+      "filePath": "3_RDRASdd/application/CollectionManagementFlow.md",
+      "services": [
+        "service:BillingManagement:ConfirmPaymentStatus"
+      ],
+      "serviceHints": [
+        {
+          "context": "BillingManagement",
+          "nameJa": "支払い状況確認"
+        }
+      ],
+      "serviceNamesJa": [
+        "支払い状況確認"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "GET",
+          "path": "/api/v1/payment-status",
+          "label": "△ GET /api/v1/payment-status"
+        }
+      ]
+    },
+    {
+      "id": "uc:CollectionManagementFlow:売上を把握・管理する",
+      "label": "ManageRevenue",
+      "labelJa": "売上を把握・管理する",
+      "buc": "appbuc:CollectionManagementFlow",
+      "filePath": "3_RDRASdd/application/CollectionManagementFlow.md",
+      "services": [],
+      "serviceHints": [],
+      "serviceNamesJa": [],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "GET",
+          "path": "/api/v1/revenue",
+          "label": "△ GET /api/v1/revenue"
+        }
+      ]
+    },
+    {
+      "id": "uc:CollectionManagementFlow:支払い滞納に対応する",
+      "label": "RespondToPaymentDelinquency",
+      "labelJa": "支払い滞納に対応する",
+      "buc": "appbuc:CollectionManagementFlow",
+      "filePath": "3_RDRASdd/application/CollectionManagementFlow.md",
+      "services": [
+        "service:BillingManagement:RespondToPaymentDelinquency"
+      ],
+      "serviceHints": [
+        {
+          "context": "BillingManagement",
+          "nameJa": "滞納対応"
+        }
+      ],
+      "serviceNamesJa": [
+        "滞納対応"
+      ],
+      "screens": [],
+      "endpoints": [
+        {
+          "method": "PATCH",
+          "path": "/api/v1/payment-status/:invoiceId/respond-delinquency",
+          "label": "△ PATCH /api/v1/payment-status/:invoiceId/respond-delinquency"
+        }
+      ]
+    }
+  ]
+}

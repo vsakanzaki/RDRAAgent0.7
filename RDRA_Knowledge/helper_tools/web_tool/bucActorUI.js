@@ -4,6 +4,8 @@ const path = require('path');
 
 const PORT = 3002;
 const HOST = 'localhost';
+const HEARTBEAT_TIMEOUT_MS = 15000;
+const HEARTBEAT_CHECK_INTERVAL_MS = 2000;
 
 // 入力JSON（優先: 画面照会.json、フォールバック: ui.json）
 const SPEC_DIR = path.join(__dirname, '../../../2_RDRASpec');
@@ -28,23 +30,59 @@ const mimeTypes = {
   '.ico': 'image/x-icon',
 };
 
+let lastHeartbeatAt = Date.now();
+let shuttingDown = false;
+let heartbeatMonitorTimer = null;
+
+function markHeartbeat() {
+  lastHeartbeatAt = Date.now();
+}
+
+function requestShutdown(reason) {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  console.log(reason);
+  if (heartbeatMonitorTimer) clearInterval(heartbeatMonitorTimer);
+  setTimeout(() => {
+    server.close(() => {
+      console.log('サーバーが正常に終了しました。');
+      process.exit(0);
+    });
+  }, 100);
+}
+
+function startHeartbeatMonitor() {
+  if (heartbeatMonitorTimer) return;
+  heartbeatMonitorTimer = setInterval(() => {
+    if (shuttingDown) return;
+    const idleMs = Date.now() - lastHeartbeatAt;
+    if (idleMs >= HEARTBEAT_TIMEOUT_MS) {
+      requestShutdown(`ハートビートが ${idleMs}ms 途絶しました。サーバーを終了します...`);
+    }
+  }, HEARTBEAT_CHECK_INTERVAL_MS);
+}
+
 const server = http.createServer((req, res) => {
+  const reqPath = new URL(req.url || '/', `http://${HOST}:${PORT}`).pathname;
   // シャットダウン（クライアントの「閉じる」ボタン用）
-  if (req.url === '/shutdown') {
+  if (reqPath === '/shutdown') {
+    markHeartbeat();
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify({ message: 'サーバーをシャットダウンします' }), 'utf-8');
-    console.log('シャットダウンリクエストを受信しました。サーバーを終了します...');
-    setTimeout(() => {
-      server.close(() => {
-        console.log('サーバーが正常に終了しました。');
-        process.exit(0);
-      });
-    }, 100);
+    requestShutdown('シャットダウンリクエストを受信しました。サーバーを終了します...');
+    return;
+  }
+
+  if (reqPath === '/heartbeat') {
+    markHeartbeat();
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify({ ok: true }), 'utf-8');
     return;
   }
 
   // 画面照会JSON
-  if (req.url === '/ui.json') {
+  if (reqPath === '/ui.json') {
+    markHeartbeat();
     const uiJsonPath = resolveUiJsonPath();
     if (!uiJsonPath) {
       res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' });
@@ -77,12 +115,13 @@ const server = http.createServer((req, res) => {
 
   // 静的配信
   let filePath;
-  if (req.url === '/' || req.url === '/index.html') {
+  if (reqPath === '/' || reqPath === '/index.html') {
+    markHeartbeat();
     filePath = path.join(__dirname, 'bucActorUI.html');
   } else {
     // 安全のため web_tool 配下のみ配信（パストラバーサル対策）
-    const reqPath = decodeURIComponent(req.url);
-    const normalized = path.normalize(reqPath).replace(/^(\.\.[/\\])+/, '');
+    const decodedPath = decodeURIComponent(reqPath);
+    const normalized = path.normalize(decodedPath).replace(/^(\.\.[/\\])+/, '');
     filePath = path.join(__dirname, normalized);
   }
 
@@ -108,6 +147,7 @@ const server = http.createServer((req, res) => {
 server.listen(PORT, HOST, () => {
   console.log(`簡易HTTPサーバーが起動しました: http://${HOST}:${PORT}/`);
   console.log('サーバーを停止するには Ctrl+C を押してください');
+  startHeartbeatMonitor();
 });
 
 server.on('error', (error) => {
@@ -122,6 +162,7 @@ server.on('error', (error) => {
 
 process.on('SIGINT', () => {
   console.log('\nサーバーを終了しています...');
+  if (heartbeatMonitorTimer) clearInterval(heartbeatMonitorTimer);
   server.close(() => {
     console.log('サーバーが終了しました。');
     process.exit(0);

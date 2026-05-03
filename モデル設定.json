@@ -32,31 +32,6 @@
         ]
       }
     },
-    "gemini": {
-      "command": "gemini",
-      "useStdin": false,
-      "env": {
-        "NO_COLOR": "1",
-        "CI": "1"
-      },
-      "vars": {
-        "model": "gemini-3.1-flash-lite-preview",
-        "yolo": true
-      },
-      "args": [],
-      "argsIf": {
-        "model": [
-          "--model",
-          "{model}"
-        ],
-        "yolo": [
-          "--yolo"
-        ],
-        "prompt": [
-          "{prompt}"
-        ]
-      }
-    },
     "cursor": {
       "command": "agent",
       "useStdin": true,
@@ -72,27 +47,6 @@
         "--output-format",
         "text",
         "--force"
-      ],
-      "argsIf": {
-        "model": [
-          "--model",
-          "{model}"
-        ]
-      }
-    },
-    "codex": {
-      "command": "codex",
-      "useStdin": true,
-      "env": {
-        "NO_COLOR": "1",
-        "CI": "1"
-      },
-      "vars": {
-        "model": "gpt-5"
-      },
-      "args": [
-        "exec",
-        "--full-auto"
       ],
       "argsIf": {
         "model": [

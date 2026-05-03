@@ -1,101 +1,59 @@
 const { exec, spawn } = require('child_process');
 const fs = require('fs');
+const path = require('path');
 
-// ファイル削除ユーティリティ
-const { deleteFilesInFolder } = require('./deleteFiles');
+const { deleteFilesInFolder, deleteFolderRecursive, deleteAllArtifacts } = require('./deleteFiles');
+const dagRunner = require('./parallelRun/dag-runner');
+const sddPostCheck = require('./sddPostCheck');
 
-// RDRA設定（プロンプトマップ／成果物ファイル定義）は settings に集約
 const {
-    phase1PromptMap,
-    phase2PromptMap,
-    phase3PromptMap,
-    phase4PromptMap,
     specPhase1PromptMap,
     specPhase2PromptMap,
-    phase1Files,
-    phase2Files,
-    phase3Files,
-    phase4Files,
+    createDomainPromptMap,
+    createApplicationPromptMap,
+    createCallgraphPromptMap,
     rdraFiles,
-    specFiles,
 } = require('./settings/rdraConfig');
 
-let grahUrl = 'https://vsa.co.jp/rdratool/graph/v0.96/index.html?clipboard'
+let grahUrl = 'https://vsa.co.jp/rdratool/graph/v0.96/index.html?clipboard';
 
 /**
  * menu.js から「実行部分」を切り出したアクション実装。
- * - createMenuAction({ rl, promptUser }) により実行ディスパッチ関数を生成する
  */
 function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
-    // メニュー「8」(一括要件定義)の自動連続実行フラグ（メニュー1〜4でも使用）
-    let isAllPhaseAutoRunning = false;
-
-    // メニュー「7」：Phase4 実行後に Phase5 を自動実行するためのフラグ
-    let autoRunPhase5AfterPhase4 = false;
-
-    // メニュー「8」：今回の一括実行で Phase4 を実行した場合、1_RDRA が既に存在していても Phase5 を1回実行する
-    let forceRunPhase5AfterPhase4InAllPhase = false;
-
-    /**
-     * プラットフォームに応じたクリップボードコマンドを生成する
-     * @param {string} filePath - コピーするファイルのパス
-     * @returns {string|null} クリップボードコマンド文字列、またはサポートされていない場合null
-     */
     function getClipboardCommand(filePath) {
         const platform = process.platform;
         if (platform === 'win32') {
-            // Windowsの場合：PowerShellを使用
             const windowsPath = filePath.replace(/\//g, '\\');
             return `powershell -Command "Get-Content -Path ${windowsPath} -Encoding UTF8 | Set-Clipboard"`;
         } else if (platform === 'darwin') {
-            // macOSの場合：pbcopyを使用
             return `cat "${filePath}" | pbcopy`;
-        } else {
-            return null;
         }
+        return null;
     }
 
-    /**
-     * プラットフォームに応じたブラウザ起動コマンドを生成する
-     * @param {string} url - 開くURL
-     * @returns {string|null} ブラウザ起動コマンド文字列、またはサポートされていない場合null
-     */
     function getBrowserCommand(url) {
         const platform = process.platform;
         if (platform === 'win32') {
-            // Windowsの場合：startコマンドを使用
             return `powershell -Command "Start-Process ${url}"`;
         } else if (platform === 'darwin') {
-            // macOSの場合：openコマンドを使用
             return `open "${url}"`;
-        } else {
-            return null;
         }
+        return null;
     }
 
-    /**
-     * 指定した配列のファイル名が全て指定フォルダー内に存在するか確認する
-     * @param {string[]} fileNames - チェックするファイル名の配列
-     * @param {string} folderPath - 検査するフォルダーのパス
-     * @returns {boolean} - 全て存在すればtrue、1つでもなければfalse
-     */
     function checkAllFilesExistInFolder(fileNames, folderPath) {
         try {
-            // 正規化関数（NFC に統一）
-            const normalize = s => s.normalize('NFC');
-            // フォルダ側を正規化
+            const normalize = (s) => s.normalize('NFC');
             const filesInDir = fs.readdirSync(folderPath);
             const filesInDirNormalized = filesInDir.map(normalize);
-            return fileNames.every(file => filesInDirNormalized.includes(file));
+            return fileNames.every((file) => filesInDirNormalized.includes(file));
         } catch (err) {
             console.error(`ディレクトリの読み込みエラー: ${err}`);
             return false;
         }
     }
 
-    /**
-     * 出力フォルダーが存在しない場合は作成する
-     */
     function ensureOutputFolders() {
         const dirs = [
             '0_RDRAZeroOne/phase1',
@@ -108,7 +66,7 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
             '2_RDRASpec/phase1',
             '2_RDRASpec/phase2',
         ];
-        dirs.forEach(dir => {
+        dirs.forEach((dir) => {
             if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir, { recursive: true });
                 console.log(`フォルダーを作成しました: ${dir}`);
@@ -116,8 +74,6 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
         });
     }
 
-    // menu.js 側の入力ループ（rl.on('line')）と競合しないよう、Enter待ちは外部から注入する。
-    // 互換のため未指定なら従来の rl.question 方式にフォールバックする。
     const waitForEnter =
         typeof waitForEnterThenNext === 'function'
             ? waitForEnterThenNext
@@ -127,363 +83,109 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
                   });
               };
 
-    /**
-     * 単一の Node スクリプトを spawn して実行する
-     * @param {string} scriptPath - 実行するスクリプトのパス
-     * @param {string|null} successMessage - 成功時に表示するメッセージ（null なら省略）
-     * @param {Function} callbackOnSuccess - 成功時に呼ぶコールバック
-     */
-    function runNodeScript(scriptPath, successMessage, callbackOnSuccess) {
-        const proc = spawn('node', [scriptPath], {
-            stdio: 'inherit',
-            shell: true
-        });
-
-        proc.on('close', (code) => {
-            if (code !== 0) {
-                console.error(`${scriptPath} がエラーで終了しました。終了コード: ${code}`);
-                isAllPhaseAutoRunning = false;
-                autoRunPhase5AfterPhase4 = false;
-                forceRunPhase5AfterPhase4InAllPhase = false;
-                waitForEnter();
-                return;
-            }
-            if (successMessage) console.log(successMessage);
-            callbackOnSuccess();
-        });
-
-        proc.on('error', (error) => {
-            console.error(`${scriptPath} 実行エラー: ${error.message}`);
-            isAllPhaseAutoRunning = false;
-            autoRunPhase5AfterPhase4 = false;
-            forceRunPhase5AfterPhase4InAllPhase = false;
-            waitForEnter();
-        });
+    function getProjectRoot() {
+        return dagRunner.findProjectRootByInitialRequest(process.cwd());
     }
 
     /**
-     * Phase4 後処理チェーン: makeBUC → attachContext → rdraFileCopy を順に実行する
-     * Phase4 完了直後と executePhase5Auto() の両方から呼ばれる共通処理。
-     * @param {Function} onComplete - 全ステップ成功後に呼ぶコールバック
+     * メニュー1: Phase1〜4 と 1_RDRA を削除し、DAG で一括生成
      */
-    function runPhase4PostProcess(onComplete) {
-        console.log('1_RDRA を再構築します（makeBUC → attachContext → rdraFileCopy）...');
-        runNodeScript('RDRA_Knowledge/helper_tools/makeBUC.js', 'BUC作成が完了しました。', () => {
-            runNodeScript('RDRA_Knowledge/helper_tools/attachContext.js', 'コンテキスト付与が完了しました。', () => {
-                runNodeScript('RDRA_Knowledge/helper_tools/rdraFileCopy.js', '1_RDRAへの反映が完了しました。', onComplete);
+    function executeFromScratch() {
+        ensureOutputFolders();
+        const root = getProjectRoot();
+        console.log('Phase1〜Phase4、1_RDRA、2_RDRASpec、3_RDRASdd配下を削除します...');
+        for (let i = 1; i <= 4; i++) {
+            deleteFilesInFolder(`0_RDRAZeroOne/phase${i}`, root);
+        }
+        deleteFilesInFolder('1_RDRA', root);
+        deleteFilesInFolder('2_RDRASpec', root);
+        deleteFilesInFolder('3_RDRASdd', root);
+        console.log('削除完了。DAG により一括生成します...');
+        dagRunner
+            .runMenu8(root)
+            .then(() => {
+                console.log('');
+                console.log('処理が完了しました。');
+                waitForEnter();
+            })
+            .catch((err) => {
+                console.error(err.message || err);
+                waitForEnter();
             });
-        });
     }
 
     /**
-     * Phase番号に対応するファイル配列とプロンプトマップを取得
-     */
-    function getPhaseConfig(phaseNumber) {
-        const configs = {
-            1: { files: phase1Files, promptMap: phase1PromptMap },
-            2: { files: phase2Files, promptMap: phase2PromptMap },
-            3: { files: phase3Files, promptMap: phase3PromptMap },
-            4: { files: phase4Files, promptMap: phase4PromptMap }
-        };
-        return configs[phaseNumber];
-    }
-
-    /**
-     * 指定されたPhaseを並列実行する（parallel-runner.jsを使用）
-     * @param {number} phaseNumber - 実行するPhase番号 (1-4)
-     */
-    function executePhaseParallel(phaseNumber) {
-        const config = getPhaseConfig(phaseNumber);
-        if (!config) {
-            console.error(`不正なPhase番号です: ${phaseNumber}`);
-            waitForEnter();
-            return;
-        }
-
-        // 前Phaseの成果物が揃っているか確認（Phase2以降）
-        if (phaseNumber >= 2) {
-            const prevPhaseNumber = phaseNumber - 1;
-            const prevConfig = getPhaseConfig(prevPhaseNumber);
-            const prevOutputDir = `0_RDRAZeroOne/phase${prevPhaseNumber}`;
-            if (!checkAllFilesExistInFolder(prevConfig.files, prevOutputDir)) {
-                console.error(`エラー: Phase${prevPhaseNumber}の成果物が揃っていません。先にPhase${prevPhaseNumber}を実行してください。`);
-                isAllPhaseAutoRunning = false;
-                autoRunPhase5AfterPhase4 = false;
-                forceRunPhase5AfterPhase4InAllPhase = false;
-                waitForEnter();
-                return;
-            }
-        }
-
-	    console.log(`Phase${phaseNumber}を並列実行します...`);
-	    
-	    // 出力フォルダが存在しない場合は作成
-	    const outputDir = `0_RDRAZeroOne/phase${phaseNumber}`;
-	    if (!fs.existsSync(outputDir)) {
-	        fs.mkdirSync(outputDir, { recursive: true });
-	        console.log(`出力フォルダを作成しました: ${outputDir}`);
-	    }
-
-	    const runPhase = () => {
-	        // 既にphaseが完了しているか確認
-	        const phaseExist = checkAllFilesExistInFolder(config.files, outputDir);
-	        if (phaseExist) {
-	            console.log(`phase${phaseNumber}は既に定義されています。`);
-	            // メニュー1〜4,8の自動連続実行中は次の不足フェーズへ進める
-	            if (isAllPhaseAutoRunning) {
-	                // phase4の実行が発生していないので、phase5自動実行フラグは落とす
-	                if (phaseNumber === 4) {
-	                    autoRunPhase5AfterPhase4 = false;
-	                }
-	                executeMissingPhasesTo5();
-	                return;
-	            }
-	            // メニュー7：Phase4が揃ったならPhase5を更新する（Phase4実行の有無に関わらず）
-	            if (phaseNumber === 4 && autoRunPhase5AfterPhase4) {
-	                autoRunPhase5AfterPhase4 = false;
-	                executePhase5Auto();
-	                return;
-	            }
-	            if (phaseNumber === 4) {
-	                autoRunPhase5AfterPhase4 = false;
-	            }
-	            waitForEnter();
-	            return;
-	        }
-
-	        // parallel-runner.jsに渡す引数を構築
-	        const args = config.promptMap.map(pair => pair.prompt);
-
-	        console.log('実行するプロンプトファイル:');
-	        config.promptMap.forEach(pair => {
-	            console.log(`  ${pair.prompt}`);
-	        });
-	        console.log('');
-
-	        const child = spawn('node', [
-	            'RDRA_Knowledge/helper_tools/parallelRun/parallel-runner.js',
-	            ...args
-	        ], {
-	            stdio: 'inherit',
-	            shell: true
-	        });
-
-	        child.on('close', (code) => {
-	            if (code === 0) {
-	                console.log('');
-	                console.log(`Phase${phaseNumber}の並列実行が完了しました。`);
-
-	                // Phase4 の後処理：makeBUC → attachContext → rdraFileCopy で 1_RDRA を再構築
-	                if (phaseNumber === 4) {
-	                    runPhase4PostProcess(() => {
-	                        console.log('Phase4の後処理が完了しました。');
-	                        if (isAllPhaseAutoRunning) {
-	                            forceRunPhase5AfterPhase4InAllPhase = true;
-	                            executeMissingPhasesTo5();
-	                            return;
-	                        }
-	                        if (autoRunPhase5AfterPhase4) {
-	                            autoRunPhase5AfterPhase4 = false;
-	                            executePhase5Auto();
-	                            return;
-	                        }
-	                        waitForEnter();
-	                    });
-	                    return;
-	                }
-
-	                // メニュー1〜4,8の自動連続実行中は次の不足フェーズへ
-	                if (isAllPhaseAutoRunning) {
-	                    executeMissingPhasesTo5();
-	                    return;
-	                }
-	            } else {
-	                console.error(`Phase${phaseNumber}の並列実行がエラーで終了しました。終了コード: ${code}`);
-	                isAllPhaseAutoRunning = false;
-	                autoRunPhase5AfterPhase4 = false;
-	                forceRunPhase5AfterPhase4InAllPhase = false;
-	            }
-	            waitForEnter();
-	        });
-
-	        child.on('error', (error) => {
-	            console.error(`エラー: ${error.message}`);
-	            isAllPhaseAutoRunning = false;
-	            autoRunPhase5AfterPhase4 = false;
-	            forceRunPhase5AfterPhase4InAllPhase = false;
-	            waitForEnter();
-	        });
-	    };
-
-	    runPhase();
-    }
-
-    /**
-     * Phase5を実行する（1_RDRA再構築＋関連データ.txt作成）
-     * runPhase4PostProcess() で makeBUC → attachContext → rdraFileCopy を実行後、
-     * makeGraphData.js で関連データ.txt を生成する。
-     * menu7/menu8 で phase4 を再実行しない経路でも 1_RDRA を再構築できる。
-     */
-    function executePhase5Auto() {
-	    console.log('Phase5を実行します（1_RDRA再構築 + 関連データ.txt作成）...');
-
-	    runPhase4PostProcess(() => {
-	        console.log('1_RDRAの再構築が完了しました。関連データ.txtを作成します...');
-	        runNodeScript('RDRA_Knowledge/helper_tools/makeGraphData.js', 'Phase5(関連データ)が完了しました。', () => {
-	            if (isAllPhaseAutoRunning) {
-	                executeMissingPhasesTo5();
-	                return;
-	            }
-	            waitForEnter();
-	        });
-	    });
-    }
-
-    /**
-     * メニュー1〜4,8：Phase1〜5を上から確認し、未定義の最初のフェーズから最終まで連続実行する
-     */
-    function executeMissingPhasesTo5() {
-	    // Phase1〜4：不足している最初のフェーズを実行
-	    if (!checkAllFilesExistInFolder(phase1Files, '0_RDRAZeroOne/phase1')) { executePhaseParallel(1); return; }
-	    if (!checkAllFilesExistInFolder(phase2Files, '0_RDRAZeroOne/phase2')) { executePhaseParallel(2); return; }
-	    if (!checkAllFilesExistInFolder(phase3Files, '0_RDRAZeroOne/phase3')) { executePhaseParallel(3); return; }
-	    if (!checkAllFilesExistInFolder(phase4Files, '0_RDRAZeroOne/phase4')) { executePhaseParallel(4); return; }
-
-	    // Phase5：1_RDRA を再構築し関連データ.txt を作成する
-	    // ただし、メニュー1〜4,8で Phase4 を今回実行した場合は、1_RDRA が既に揃っていても Phase5 を更新する
-	    if (forceRunPhase5AfterPhase4InAllPhase || !checkAllFilesExistInFolder(rdraFiles, '1_RDRA')) {
-	        forceRunPhase5AfterPhase4InAllPhase = false;
-	        executePhase5Auto();
-	        return;
-	    }
-
-	    // 完了
-	    console.log('すべてのフェーズが定義されています。');
-	    isAllPhaseAutoRunning = false;
-	    forceRunPhase5AfterPhase4InAllPhase = false;
-        waitForEnter();
-    }
-
-    /**
-     * フェーズ単位のRDRA定義を実行する（定義されていないフェーズがあれば実行する）
+     * メニュー7: 未完了の最小フェーズを 1 回だけ実行（従来のフェーズ単位）
      */
     function executeEachPhase() {
-	    ensureOutputFolders();
-	    // メニュー7用フラグは毎回リセット
-	    autoRunPhase5AfterPhase4 = false;
-	    // メニュー8用フラグが残っていても影響しないようにリセット
-	    forceRunPhase5AfterPhase4InAllPhase = false;
-
-	    const phaseExist1 = checkAllFilesExistInFolder(phase1Files, '0_RDRAZeroOne/phase1');
-	    if (phaseExist1) {
-	        console.log('phase1は定義されています。');
-	    } else {
-	        executePhaseParallel(1);
-	        return;
-	    }
-	    const phaseExist2 = checkAllFilesExistInFolder(phase2Files, '0_RDRAZeroOne/phase2');
-	    if (phaseExist2) {
-	        console.log('phase2は定義されています。');
-	    } else {
-	        executePhaseParallel(2);
-	        return;
-	    }
-	    const phaseExist3 = checkAllFilesExistInFolder(phase3Files, '0_RDRAZeroOne/phase3');
-	    if (phaseExist3) {
-	        console.log('phase3は定義されています。');
-	    } else {
-	        executePhaseParallel(3);
-	        return;
-	    }
-	    const phaseExist4 = checkAllFilesExistInFolder(phase4Files, '0_RDRAZeroOne/phase4');
-	    if (phaseExist4) {
-	        console.log('phase4は定義されています。');
-	    } else {
-	        // Phase4を実行した後にPhase5を自動実行する
-	        autoRunPhase5AfterPhase4 = true;
-	        executePhaseParallel(4);
-	        return;
-	    }
-	    // Phase4が揃っているなら、1_RDRA が既に存在していても Phase5 を実行して更新する
-	    executePhase5Auto();
-	    return;
+        ensureOutputFolders();
+        const root = getProjectRoot();
+        dagRunner
+            .runMenu7(root)
+            .then(() => {
+                console.log('');
+                console.log('処理が完了しました。');
+                waitForEnter();
+            })
+            .catch((err) => {
+                console.error(err.message || err);
+                waitForEnter();
+            });
     }
 
     /**
-     * 全フェーズのRDRA定義を実行する（定義されていないフェーズがあれば実行する）
+     * メニュー8: 依存 DAG に基づき未生成ノードを波状並列実行
      */
     function executeAllPhase() {
-	    ensureOutputFolders();
-	    console.log('全フェーズのRDRA定義を行います...');
-	    isAllPhaseAutoRunning = true;
-	    executeMissingPhasesTo5();
-    }
-
-    /**
-     * 指定されたPhaseから成果物を削除し、Phase1〜5を再実行する（メニュー1〜4用）
-     * @param {number} startPhase - 削除開始のPhase番号 (1-4)
-     */
-    function executeFromPhase(startPhase) {
         ensureOutputFolders();
-        console.log(`Phase${startPhase}〜Phase4、1_RDRA配下のファイルを削除します...`);
-
-        // startPhaseからphase4までを削除
-        for (let i = startPhase; i <= 4; i++) {
-            deleteFilesInFolder(`0_RDRAZeroOne/phase${i}`);
-        }
-        // 1_RDRA配下を削除
-        deleteFilesInFolder('1_RDRA');
-        deleteFilesInFolder('1_RDRA/if');
-        console.log('削除完了。Phase1からPhase5まで実行します...');
-        isAllPhaseAutoRunning = true;
-        forceRunPhase5AfterPhase4InAllPhase = false;
-        executeMissingPhasesTo5();
+        console.log('全フェーズのRDRA定義を行います（DAG 並列）...');
+        const root = getProjectRoot();
+        dagRunner
+            .runMenu8(root)
+            .then(() => {
+                console.log('');
+                console.log('処理が完了しました。');
+                waitForEnter();
+            })
+            .catch((err) => {
+                console.error(err.message || err);
+                waitForEnter();
+            });
     }
 
-    /**
-     * 仕様作成を並列実行する（論理データ/UI/ビジネスルール）
-     */
     function executeSpec() {
         console.log('仕様の作成を実行します（phase1 → phase2）...');
+        const specTimeoutMs = 600000;
 
-        // 仕様生成は時間がかかることがあるため、タイムアウトを長めに設定する
-        const specTimeoutMs = 600000; // 10分
-
-        // 出力フォルダが存在しない場合は作成
         const outputDir = '2_RDRASpec';
         if (!fs.existsSync(outputDir)) {
             fs.mkdirSync(outputDir, { recursive: true });
             console.log(`出力フォルダを作成しました: ${outputDir}`);
         }
-        
-        // phase1のサブフォルダも作成
         const phase1Dir = '2_RDRASpec/phase1';
         if (!fs.existsSync(phase1Dir)) {
             fs.mkdirSync(phase1Dir, { recursive: true });
             console.log(`出力フォルダを作成しました: ${phase1Dir}`);
         }
 
-        const runParallel = async (promptMap, specPhaseNumber) => {
-            const args = promptMap.map(pair => pair.prompt);
-
+        const runParallel = async (promptMap) => {
+            const args = promptMap.map((pair) => pair.prompt);
             console.log('実行するプロンプトファイル:');
-            promptMap.forEach(pair => {
+            promptMap.forEach((pair) => {
                 console.log(`  ${pair.prompt}`);
             });
             console.log('');
 
             try {
                 const code = await new Promise((resolve, reject) => {
-                    const child = spawn('node', [
-                        'RDRA_Knowledge/helper_tools/parallelRun/parallel-runner.js',
-                        ...args,
-                        '--timeout',
-                        String(specTimeoutMs),
-                    ], {
-                        stdio: 'inherit',
-                        shell: true
-                    });
-
+                    const child = spawn(
+                        'node',
+                        ['RDRA_Knowledge/helper_tools/parallelRun/parallel-runner.js', ...args, '--timeout', String(specTimeoutMs)],
+                        {
+                            stdio: 'inherit',
+                            shell: true,
+                        }
+                    );
                     child.on('close', (exitCode) => resolve(exitCode ?? 1));
                     child.on('error', (error) => reject(error));
                 });
@@ -494,32 +196,308 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
             }
         };
 
-        // Phase1（論理データ/ビジネスルール/画面一覧等）を先に実行し、成功したら Phase2（画面照会）を実行する
         (async () => {
-            const code1 = await runParallel(specPhase1PromptMap, 1);
+            const code1 = await runParallel(specPhase1PromptMap);
             if (code1 !== 0) {
-                console.error(`仕様(phase1)がエラーで終了しました。`);
+                console.error('仕様(phase1)がエラーで終了しました。');
                 waitForEnterThenNext();
                 return;
             }
-
-            const code2 = await runParallel(specPhase2PromptMap, 2);
+            const code2 = await runParallel(specPhase2PromptMap);
             if (code2 === 0) {
                 console.log('');
                 console.log('仕様の作成が完了しました。');
             } else {
-                console.error(`仕様(phase2)がエラーで終了しました。`);
+                console.error('仕様(phase2)がエラーで終了しました。');
             }
             waitForEnterThenNext();
         })();
     }
 
+    function hasSpecBaseInputs() {
+        return (
+            fs.existsSync('2_RDRASpec/論理データモデル.md') &&
+            fs.existsSync('2_RDRASpec/ビジネスルール.md') &&
+            fs.existsSync('2_RDRASpec/画面照会.json')
+        );
+    }
+
+    function runPromptMap(promptMap, label) {
+        const specTimeoutMs = 600000;
+        console.log(`${label}を実行します...`);
+
+        return (async () => {
+            const args = promptMap.map((pair) => pair.prompt);
+            console.log('実行するプロンプトファイル:');
+            promptMap.forEach((pair) => {
+                console.log(`  ${pair.prompt}`);
+            });
+            console.log('');
+
+            try {
+                const code = await new Promise((resolve, reject) => {
+                    const child = spawn(
+                        'node',
+                        ['RDRA_Knowledge/helper_tools/parallelRun/parallel-runner.js', ...args, '--timeout', String(specTimeoutMs)],
+                        {
+                            stdio: 'inherit',
+                            shell: true,
+                        }
+                    );
+                    child.on('close', (exitCode) => resolve(exitCode ?? 1));
+                    child.on('error', (error) => reject(error));
+                });
+                return code === 0 ? 0 : 1;
+            } catch (error) {
+                console.error(`エラー: ${error.message}`);
+                return 1;
+            }
+        })();
+    }
+
     /**
-     * 関連データを作成しRDRAGraphを表示する
+     * BUC 単位 UI 生成用にプロンプト先頭へ付与するブロック（parallel-runner の buildContextHeader に続けて解釈される）
+     * @param {string} projectRoot
+     * @param {string} bucEnglishName
+     * @returns {string}
      */
+    function buildUiBucContextBlock(projectRoot, bucEnglishName) {
+        void projectRoot;
+        const appRel = `3_RDRASdd/application/${bucEnglishName}.md`;
+        return [
+            '# BUC 単位実行コンテキスト（自動付与）',
+            '',
+            `- **TARGET_BUC（英語名）**: ${bucEnglishName}`,
+            `- **入力 Application 仕様**: \`${appRel}\``,
+            `- **出力先ディレクトリ**: \`3_RDRASdd/ui/${bucEnglishName}/\``,
+            `- 今回は **この BUC に属する画面だけ** を生成する。**他 BUC のフォルダーや画面ファイルは作成・変更・削除しない。**`,
+            `- \`${appRel}\` の「利用画面」に列挙された画面数と、\`3_RDRASdd/ui/${bucEnglishName}/\` の本体 \`.md\` 件数（先頭 \`_` 以外、サブフォルダ含む）が一致するまで完了を宣言しない。`,
+            '',
+            '---',
+            '',
+            '',
+        ].join('\n');
+    }
+
+    /**
+     * `33_Create_UI.md` に BUC コンテキストを前置した一時プロンプトを `3_RDRASdd/_ui_prompt_work/` に書き出す。
+     * @param {string} projectRoot
+     * @param {string} bucEnglishName
+     * @returns {string} プロジェクトルート相対パス（POSIX 区切り）
+     */
+    function writeCombinedUiPromptForBuc(projectRoot, bucEnglishName) {
+        const srcAbs = path.join(projectRoot, 'RDRA_Knowledge', '_3_RDRASdd', '33_Create_UI.md');
+        const workDir = path.join(projectRoot, '3_RDRASdd', '_ui_prompt_work');
+        if (!fs.existsSync(workDir)) {
+            fs.mkdirSync(workDir, { recursive: true });
+        }
+        if (!fs.existsSync(srcAbs)) {
+            throw new Error(`UI プロンプトが見つかりません: ${srcAbs}`);
+        }
+        const base = fs.readFileSync(srcAbs, 'utf8');
+        const combined = buildUiBucContextBlock(projectRoot, bucEnglishName) + base;
+        const outAbs = path.join(workDir, `33_Create_UI__${bucEnglishName}.md`);
+        fs.writeFileSync(outAbs, combined, 'utf8');
+        return path.relative(projectRoot, outAbs).split(path.sep).join('/');
+    }
+
+    /**
+     * @param {string} projectRoot
+     * @returns {string[]} `CareFooFlow.md` のようなファイル名（拡張子付き）をソート済みで返す
+     */
+    function listApplicationMdFiles(projectRoot) {
+        const appDir = path.join(projectRoot, '3_RDRASdd', 'application');
+        if (!fs.existsSync(appDir)) return [];
+        return fs
+            .readdirSync(appDir, { withFileTypes: true })
+            .filter((e) => e.isFile() && e.name.endsWith('.md') && !e.name.startsWith('_'))
+            .map((e) => e.name)
+            .sort();
+    }
+
+    /**
+     * @param {string[]} promptRelPaths - プロジェクトルート相対のプロンプトファイルパス
+     * @param {string} label
+     * @returns {Promise<number>} 成功時 0
+     */
+    function runPromptPaths(promptRelPaths, label) {
+        const specTimeoutMs = 600000;
+        console.log(`${label}を実行します...`);
+
+        return (async () => {
+            console.log('実行するプロンプトファイル:');
+            promptRelPaths.forEach((p) => console.log(`  ${p}`));
+            console.log('');
+
+            try {
+                const code = await new Promise((resolve, reject) => {
+                    const child = spawn(
+                        'node',
+                        ['RDRA_Knowledge/helper_tools/parallelRun/parallel-runner.js', ...promptRelPaths, '--timeout', String(specTimeoutMs)],
+                        {
+                            stdio: 'inherit',
+                            shell: true,
+                        }
+                    );
+                    child.on('close', (exitCode) => resolve(exitCode ?? 1));
+                    child.on('error', (error) => reject(error));
+                });
+                return code === 0 ? 0 : 1;
+            } catch (error) {
+                console.error(`エラー: ${error.message}`);
+                return 1;
+            }
+        })();
+    }
+
+    /**
+     * domain / application / ui の部分 JSON を統合して 3_RDRASdd/_callgraph/callgraph_data.json を生成する。
+     * @returns {Promise<number>} 成功時 0、失敗時 1
+     */
+    function runMergeCallgraphData() {
+        return new Promise((resolve, reject) => {
+            const root = getProjectRoot();
+            const child = spawn(
+                'node',
+                ['RDRA_Knowledge/helper_tools/mergeCallgraphData.js'],
+                {
+                    stdio: 'inherit',
+                    shell: true,
+                    cwd: root,
+                }
+            );
+            child.on('close', (exitCode) => resolve(exitCode === 0 ? 0 : 1));
+            child.on('error', (error) => reject(error));
+        });
+    }
+
+    /**
+     * `3_RDRASdd/ui` 配下の .md ファイル数（再帰）。
+     * @param {string} dir
+     * @returns {number}
+     */
+    function countMarkdownFilesRecursive(dir) {
+        if (!fs.existsSync(dir)) return 0;
+        let n = 0;
+        function walk(d) {
+            let entries;
+            try {
+                entries = fs.readdirSync(d, { withFileTypes: true });
+            } catch {
+                return;
+            }
+            for (const e of entries) {
+                const p = path.join(d, e.name);
+                if (e.isDirectory()) walk(p);
+                else if (e.isFile() && e.name.toLowerCase().endsWith('.md')) n += 1;
+            }
+        }
+        walk(dir);
+        return n;
+    }
+
+    /**
+     * Callgraph 用の3つの部分 JSON が生成済みか検証する（mergeCallgraphData.js 実行前）。
+     * @returns {{ ok: boolean, errors: string[] }}
+     */
+    function validateCallgraphPartialJsons() {
+        const errors = [];
+        const checks = [
+            {
+                rel: '3_RDRASdd/_callgraph/callgraph_domain_data.json',
+                label: 'domain',
+                validate: (obj) => {
+                    if (!Array.isArray(obj.contexts) || !Array.isArray(obj.services) || !Array.isArray(obj.entities)) {
+                        return 'contexts / services / entities は配列である必要があります。';
+                    }
+                    return null;
+                },
+            },
+            {
+                rel: '3_RDRASdd/_callgraph/callgraph_application_data.json',
+                label: 'application',
+                validate: (obj) => {
+                    if (!Array.isArray(obj.appBucs) || !Array.isArray(obj.ucs)) {
+                        return 'appBucs / ucs は配列である必要があります。';
+                    }
+                    return null;
+                },
+            },
+            {
+                rel: '3_RDRASdd/_callgraph/callgraph_ui_data.json',
+                label: 'ui',
+                validate: (obj) => {
+                    if (!Array.isArray(obj.uiBucs) || !Array.isArray(obj.screens)) {
+                        return 'uiBucs / screens は配列である必要があります。';
+                    }
+                    const uiMdCount = countMarkdownFilesRecursive('3_RDRASdd/ui');
+                    if (uiMdCount > 0 && obj.screens.length === 0) {
+                        return `3_RDRASdd/ui に .md が ${uiMdCount} 件あるのに screens が空です。`;
+                    }
+                    return null;
+                },
+            },
+        ];
+
+        for (const c of checks) {
+            if (!fs.existsSync(c.rel)) {
+                errors.push(
+                    `部分的な JSON がありません: ${c.rel}（${c.label}）。対応する callgraph_${c.label}_data_maker.md がファイルを出力しなかった可能性があります。parallel-runner の該当ログを確認してください。`
+                );
+                continue;
+            }
+            let obj;
+            try {
+                obj = JSON.parse(fs.readFileSync(c.rel, 'utf8'));
+            } catch (e) {
+                errors.push(`${c.rel}: JSON として読めません (${e.message || e})`);
+                continue;
+            }
+            const msg = c.validate(obj);
+            if (msg) errors.push(`${c.rel}: ${msg}`);
+        }
+
+        return { ok: errors.length === 0, errors };
+    }
+
+    function executePromptMap(promptMap, label, postCheck) {
+        (async () => {
+            const code = await runPromptMap(promptMap, label);
+            if (code === 0) {
+                console.log('');
+                console.log(`${label}が完了しました。`);
+                if (typeof postCheck === 'function') {
+                    try {
+                        postCheck();
+                    } catch (e) {
+                        console.warn(`[SDD事後チェック] 例外: ${e.message || e}`);
+                    }
+                }
+            } else {
+                console.error(`${label}がエラーで終了しました。`);
+            }
+            waitForEnter();
+        })();
+    }
+
+    function ensureRdraFuncFolders() {
+        const dirs = ['3_RDRASdd/domain', '3_RDRASdd/application', '3_RDRASdd/ui'];
+        dirs.forEach((dir) => {
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+                console.log(`フォルダーを作成しました: ${dir}`);
+            }
+        });
+    }
+
+    function deleteRdraFuncFoldersBefore(folders) {
+        const root = getProjectRoot();
+        folders.forEach((folder) => deleteFolderRecursive(folder, root));
+    }
+
     function showRDRAGraph() {
         console.log('関連データを作成しています...');
-        exec('node RDRA_Knowledge/helper_tools/makeGraphData.js', (error, stdout, stderr) => {
+        exec('node RDRA_Knowledge/helper_tools/makeGraphData.js', (error) => {
             if (error) {
                 console.error(`エラー: ${error}`);
                 promptUser();
@@ -555,9 +533,6 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
         });
     }
 
-    /**
-     * ZeroOneデータをクリップボードにコピーする
-     */
     function makeZeroOneData() {
         console.log('ZeroOneデータをクリップボードにコピーします...');
         exec('node RDRA_Knowledge/helper_tools/makeZeroOneData.js', (error, stdout, stderr) => {
@@ -566,31 +541,23 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
                 promptUser();
                 return;
             }
-            if (stdout) {
-                console.log(stdout);
-            }
-            if (stderr) {
-                console.error(stderr);
-            }
+            if (stdout) console.log(stdout);
+            if (stderr) console.error(stderr);
             console.log('ZeroOneデータの処理が完了しました。');
-            
-            // makeZeroOneData.jsが完了してからcopyToClipboard.jsを実行
+
             exec('node RDRA_Knowledge/helper_tools/copyToClipboard.js zeroone', (error2, stdout2, stderr2) => {
                 if (error2) {
                     console.error(`エラー: ${error2}`);
                     promptUser();
                     return;
                 }
-                if (stdout2) {
-                    console.log(stdout2);
-                }
-                if (stderr2) {
-                    console.error(stderr2);
-                }
+                if (stdout2) console.log(stdout2);
+                if (stderr2) console.error(stderr2);
                 console.log('データはクリップボードにコピーされました。スプレッドシートに貼り付けてください。');
-                
-                // クリップボードコピーが完了してからブラウザを開き、その後promptUserを呼ぶ
-                const browserCmd = getBrowserCommand('https://docs.google.com/spreadsheets/d/1h7J70l6DyXcuG0FKYqIpXXfdvsaqjdVFwc6jQXSh9fM/edit?gid=1240873646#gid=1240873646');
+
+                const browserCmd = getBrowserCommand(
+                    'https://docs.google.com/spreadsheets/d/1h7J70l6DyXcuG0FKYqIpXXfdvsaqjdVFwc6jQXSh9fM/edit?gid=1240873646#gid=1240873646'
+                );
                 if (browserCmd) {
                     exec(browserCmd, (browserError) => {
                         if (browserError) {
@@ -598,20 +565,15 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
                         } else {
                             console.log('スプレッドシートをブラウザで開きました。');
                         }
-                        // ブラウザ起動後（成功/失敗問わず）にpromptUserを呼ぶ
                         promptUser();
                     });
                 } else {
-                    // ブラウザコマンドが無い場合もpromptUserを呼ぶ
                     promptUser();
                 }
             });
         });
     }
 
-    /**
-     * アクター別画面を表示する
-     */
     function showActorUI() {
         console.log('画面照会（BUC/アクター）を表示する');
         if (!fs.existsSync('2_RDRASpec/画面照会.json') && !fs.existsSync('2_RDRASpec/ui.json')) {
@@ -621,21 +583,15 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
             return;
         }
 
-        // 既にサーバーが起動しているかチェック
         const existingServer = global.bucActorUIServer;
-        const isServerRunning =
-            existingServer &&
-            existingServer.exitCode === null &&
-            !existingServer.killed;
+        const isServerRunning = existingServer && existingServer.exitCode === null && !existingServer.killed;
 
         if (isServerRunning) {
             console.log('サーバーは既に起動しています。ブラウザで画面を開きます...');
             const browserCmd = getBrowserCommand('http://localhost:3002/');
             if (browserCmd) {
                 exec(browserCmd, (browserError) => {
-                    if (browserError) {
-                        console.error(`ブラウザ起動エラー: ${browserError}`);
-                    }
+                    if (browserError) console.error(`ブラウザ起動エラー: ${browserError}`);
                 });
             }
             console.log('画面照会（BUC/アクター）を表示しました。');
@@ -643,110 +599,146 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
             return;
         }
 
-        // 終了済みプロセス参照が残っている場合は破棄して再起動する
         if (existingServer && !isServerRunning) {
             global.bucActorUIServer = null;
         }
 
         console.log('HTTPサーバーを起動してブラウザで画面を開きます...');
-
-        // HTTPサーバーを起動
         const serverProcess = spawn('node', ['RDRA_Knowledge/helper_tools/web_tool/bucActorUI.js'], {
             stdio: ['pipe', 'pipe', 'pipe'],
-            detached: false
+            detached: false,
         });
 
         let serverStarted = false;
-
         serverProcess.stdout.on('data', (data) => {
             console.log(`${data}`);
             if (!serverStarted && data.toString().includes('簡易HTTPサーバーが起動しました')) {
                 serverStarted = true;
-                // サーバー起動後、少し待ってからブラウザを開く
                 setTimeout(() => {
                     const browserCmd = getBrowserCommand('http://localhost:3002/');
                     if (browserCmd) {
                         exec(browserCmd, (browserError) => {
-                            if (browserError) {
-                                console.error(`ブラウザ起動エラー: ${browserError}`);
-                            }
+                            if (browserError) console.error(`ブラウザ起動エラー: ${browserError}`);
                         });
                     }
                 }, 500);
             }
         });
-
         serverProcess.stderr.on('data', (data) => {
             console.error(`${data}`);
         });
-
         serverProcess.on('error', (error) => {
             console.error(`サーバー起動エラー: ${error}`);
         });
-
-        serverProcess.on('close', (code) => {
+        serverProcess.on('close', () => {
             console.log('画面照会（BUC/アクター）サーバーが終了しました。');
             global.bucActorUIServer = null;
         });
-
-        // プロセスIDを保存
         global.bucActorUIServer = serverProcess;
-
         console.log('画面照会（BUC/アクター）を表示しました。');
+        console.log('画面の「閉じる」ボタン、またはタブ/ブラウザを閉じると自動でサーバーが停止します。');
+        promptUser();
+    }
+
+    function showCallgraphUI() {
+        console.log('Callgraphを表示する');
+        const hasRdraFuncOutputs =
+            fs.existsSync('3_RDRASdd/domain') &&
+            fs.existsSync('3_RDRASdd/application') &&
+            fs.existsSync('3_RDRASdd/ui');
+        if (!hasRdraFuncOutputs) {
+            console.error('エラー: 3_RDRASdd/domain, 3_RDRASdd/application, 3_RDRASdd/ui が不足しています。');
+            console.error('先にメニュー31〜33で機能仕様を作成してください。');
+            promptUser();
+            return;
+        }
+
+        const existingServer = global.callgraphServer;
+        const isServerRunning = existingServer && existingServer.exitCode === null && !existingServer.killed;
+        const callgraphUrl = 'http://127.0.0.1:3000/callgraph.html';
+        if (isServerRunning) {
+            console.log('Callgraphサーバーは既に起動しています。ブラウザで画面を開きます...');
+            const browserCmd = getBrowserCommand(callgraphUrl);
+            if (browserCmd) {
+                exec(browserCmd, (browserError) => {
+                    if (browserError) console.error(`ブラウザ起動エラー: ${browserError}`);
+                });
+            }
+            promptUser();
+            return;
+        }
+        if (existingServer && !isServerRunning) {
+            global.callgraphServer = null;
+        }
+
+        const serverProcess = spawn('node', ['RDRA_Knowledge/helper_tools/web_tool/callgraph_server.js'], {
+            stdio: ['pipe', 'pipe', 'pipe'],
+            detached: false,
+        });
+        let serverStarted = false;
+        serverProcess.stdout.on('data', (data) => {
+            const text = data.toString();
+            console.log(text);
+            if (!serverStarted && text.includes('callgraph_server: listening on ')) {
+                serverStarted = true;
+                setTimeout(() => {
+                    const browserCmd = getBrowserCommand(callgraphUrl);
+                    if (browserCmd) {
+                        exec(browserCmd, (browserError) => {
+                            if (browserError) console.error(`ブラウザ起動エラー: ${browserError}`);
+                        });
+                    }
+                }, 500);
+            }
+        });
+        serverProcess.stderr.on('data', (data) => {
+            console.error(`${data}`);
+        });
+        serverProcess.on('error', (error) => {
+            console.error(`サーバー起動エラー: ${error}`);
+        });
+        serverProcess.on('close', () => {
+            console.log('Callgraphサーバーが終了しました。');
+            global.callgraphServer = null;
+        });
+        global.callgraphServer = serverProcess;
+        console.log('Callgraphサーバーを起動しました。');
         console.log('画面の「閉じる」ボタンでサーバーを停止できます。');
         promptUser();
     }
 
-    /**
-     * 生成された成果物を削除する
-     */
     function deleteGeneratedFiles() {
         console.log('生成された成果物を削除しています...');
-        exec('node RDRA_Knowledge/helper_tools/deleteFiles.js', (error, stdout, stderr) => {
-            if (error) {
-                console.error(`エラー: ${error}`);
-            } else {
-                console.log('成果物の削除が完了しました。');
-                if (stdout) console.log(stdout);
-            }
-            promptUser();
-        });
+        try {
+            deleteAllArtifacts(getProjectRoot());
+            console.log('成果物の削除が完了しました。');
+        } catch (e) {
+            console.error(`エラー: ${e.message || e}`);
+        }
+        promptUser();
     }
 
-    /**
-     * プログラムを終了する
-     */
     function exitProgram() {
         console.log('プログラムを終了します。');
         if (global.bucActorUIServer) {
             global.bucActorUIServer.kill('SIGTERM');
         }
+        if (global.callgraphServer) {
+            global.callgraphServer.kill('SIGTERM');
+        }
         rl.close();
         process.exit(0);
     }
 
-    /**
-     * ユーザーの選択に応じて処理を実行する
-     * @param {string} option - 選択された番号
-     */
     function executeOption(option) {
         switch (option) {
             case '1':
-                executeFromPhase(1);
+                executeFromScratch();
                 break;
             case '2':
-                executeFromPhase(2);
-                break;
-            case '3':
-                executeFromPhase(3);
-                break;
-            case '4':
-                executeFromPhase(4);
-                break;
-            case '7':
                 executeEachPhase();
                 break;
-            case '8':
+            case '3':
                 executeAllPhase();
                 break;
             case '11':
@@ -768,22 +760,20 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
                 }
                 break;
             case '21':
-                // 仕様生成の前提として 1_RDRA の全ファイルと「関連データ.txt」の存在をチェックする
                 if (checkAllFilesExistInFolder(rdraFiles, '1_RDRA') && fs.existsSync('1_RDRA/if/関連データ.txt')) {
                     executeSpec();
                 } else {
-                    console.log('1_RDRA または 1_RDRA/if/関連データ.txt が不足しています。先にRDRA定義を生成し、メニュー11で関連データを作成してください。');
+                    console.log(
+                        '1_RDRA または 1_RDRA/if/関連データ.txt が不足しています。先にRDRA定義を生成し、メニュー11で関連データを作成してください。'
+                    );
                     waitForEnter();
                 }
                 break;
-            case '22':
-                // 画面定義ファイルは「画面照会.json」を正としつつ、過去互換で ui.json も許容する
+            case '22': {
                 const hasSpecPhase1Outputs =
-                    fs.existsSync('2_RDRASpec/論理データモデル.md') &&
-                    fs.existsSync('2_RDRASpec/ビジネスルール.md');
+                    fs.existsSync('2_RDRASpec/論理データモデル.md') && fs.existsSync('2_RDRASpec/ビジネスルール.md');
                 const hasScreenJson =
                     fs.existsSync('2_RDRASpec/画面照会.json') || fs.existsSync('2_RDRASpec/ui.json');
-
                 if (hasSpecPhase1Outputs && hasScreenJson) {
                     console.log('画面照会（BUC/アクター）を表示する。');
                     showActorUI();
@@ -792,6 +782,210 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
                     console.log('必要ファイル: 論理データモデル.md / ビジネスルール.md / 画面照会.json');
                     waitForEnter();
                 }
+                break;
+            }
+            case '31':
+                if (checkAllFilesExistInFolder(rdraFiles, '1_RDRA') && fs.existsSync('1_RDRA/if/関連データ.txt') && hasSpecBaseInputs()) {
+                    deleteRdraFuncFoldersBefore(['3_RDRASdd/domain', '3_RDRASdd/application', '3_RDRASdd/ui']);
+                    ensureRdraFuncFolders();
+                    executePromptMap(createDomainPromptMap, 'ドメイン仕様書の作成', () =>
+                        sddPostCheck.reportDomain(getProjectRoot())
+                    );
+                } else {
+                    console.log(
+                        '実行に必要なファイルが不足しています。必要ファイル: 1_RDRA/*, 1_RDRA/if/関連データ.txt, 2_RDRASpec/論理データモデル.md, 2_RDRASpec/ビジネスルール.md, 2_RDRASpec/画面照会.json'
+                    );
+                    waitForEnter();
+                }
+                break;
+            case '32':
+                if (checkAllFilesExistInFolder(rdraFiles, '1_RDRA') && fs.existsSync('1_RDRA/if/関連データ.txt') && hasSpecBaseInputs()) {
+                    deleteRdraFuncFoldersBefore(['3_RDRASdd/application', '3_RDRASdd/ui']);
+                    ensureRdraFuncFolders();
+                    executePromptMap(createApplicationPromptMap, 'アプリケーション仕様書の作成', () =>
+                        sddPostCheck.reportApplication(getProjectRoot())
+                    );
+                } else {
+                    console.log(
+                        '実行に必要なファイルが不足しています。必要ファイル: 1_RDRA/*, 1_RDRA/if/関連データ.txt, 2_RDRASpec/論理データモデル.md, 2_RDRASpec/ビジネスルール.md, 2_RDRASpec/画面照会.json'
+                    );
+                    waitForEnter();
+                }
+                break;
+            case '33':
+                if (checkAllFilesExistInFolder(rdraFiles, '1_RDRA') && fs.existsSync('1_RDRA/if/関連データ.txt') && hasSpecBaseInputs()) {
+                    deleteRdraFuncFoldersBefore(['3_RDRASdd/ui']);
+                    ensureRdraFuncFolders();
+                    (async () => {
+                        const root = getProjectRoot();
+                        const appFiles = listApplicationMdFiles(root);
+                        if (appFiles.length === 0) {
+                            console.error('エラー: 3_RDRASdd/application に .md がありません。先にメニュー32でアプリケーション仕様を作成してください。');
+                            waitForEnter();
+                            return;
+                        }
+                        for (const appFile of appFiles) {
+                            const bucEnglishName = path.basename(appFile, '.md');
+                            let promptRel;
+                            try {
+                                promptRel = writeCombinedUiPromptForBuc(root, bucEnglishName);
+                            } catch (e) {
+                                console.error(`エラー: ${e.message || e}`);
+                                waitForEnter();
+                                return;
+                            }
+                            const uiCode = await runPromptPaths([promptRel], `UI仕様書の作成 (${bucEnglishName})`);
+                            if (uiCode !== 0) {
+                                console.error(`UI仕様書の作成がエラーで終了しました（BUC: ${bucEnglishName}）。`);
+                                waitForEnter();
+                                return;
+                            }
+                            const bucCheck = sddPostCheck.checkUIBuc(root, bucEnglishName);
+                            if (!bucCheck.ok) {
+                                console.error(
+                                    `UI仕様書の件数が一致しません（BUC: ${bucEnglishName}）。期待=${bucCheck.expected}, 実際=${bucCheck.actual}, 不足≈${bucCheck.missingCount}`
+                                );
+                                if (bucCheck.underscoreFiles.length > 0) {
+                                    console.error(`  先頭 _ の .md が ${bucCheck.underscoreFiles.length} 件あります（中間ファイル禁止）。`);
+                                }
+                                console.error('Callgraphデータ生成を中止します。該当 BUC の 33_Create_UI 実行ログを確認してください。');
+                                waitForEnter();
+                                return;
+                            }
+                        }
+                        console.log('');
+                        console.log('全 BUC の UI 仕様書の作成が完了しました。');
+                        try {
+                            sddPostCheck.reportUI(root);
+                        } catch (e) {
+                            console.warn(`[SDD事後チェック] reportUI 例外: ${e.message || e}`);
+                        }
+                        const uiCheck = sddPostCheck.checkUI(root);
+                        if (!uiCheck.ok) {
+                            if (uiCheck.error) {
+                                console.error(`[SDD事後チェック] ${uiCheck.error}`);
+                            } else {
+                                console.error(
+                                    `UI仕様書の出力件数が不足しています: expected=${uiCheck.expected}, actual=${uiCheck.actual}, 不足≈${uiCheck.missingCount}`
+                                );
+                            }
+                            if (uiCheck.underscoreFiles.length > 0) {
+                                console.error(`  先頭 _ の .md が ${uiCheck.underscoreFiles.length} 件あります。`);
+                            }
+                            console.error('Callgraphデータ生成を中止します。33_Create_UI.md の出力ログを確認してください。');
+                            waitForEnter();
+                            return;
+                        }
+                        try {
+                            sddPostCheck.reportApiUiAlignment(root);
+                        } catch (e) {
+                            console.warn(`[SDD事後チェック] reportApiUiAlignment 例外: ${e.message || e}`);
+                        }
+                        console.log('');
+                        console.log('Callgraphデータを生成します...');
+                        const callgraphCode = await runPromptMap(createCallgraphPromptMap, 'Callgraphデータの作成');
+                        if (callgraphCode !== 0) {
+                            console.error('Callgraphデータの作成がエラーで終了しました。');
+                            waitForEnter();
+                            return;
+                        }
+                        const partialCheck = validateCallgraphPartialJsons();
+                        if (!partialCheck.ok) {
+                            console.error('Callgraph 部分 JSON の検証に失敗しました:');
+                            partialCheck.errors.forEach((err) => console.error(`  - ${err}`));
+                            console.error(
+                                'AI が確認質問のみで終了しファイルを書いていない可能性があります。該当の callgraph_*_data_maker.md を単体再実行するか、プロンプト冒頭の実行モードを確認してください。'
+                            );
+                            waitForEnter();
+                            return;
+                        }
+                        console.log('');
+                        console.log('部分 JSON を統合して callgraph_data.json を生成します...');
+                        let mergeCode;
+                        try {
+                            mergeCode = await runMergeCallgraphData();
+                        } catch (e) {
+                            console.error(`Callgraph 統合エラー: ${e.message || e}`);
+                            waitForEnter();
+                            return;
+                        }
+                        if (mergeCode !== 0) {
+                            console.error(
+                                'Callgraph データの統合に失敗しました。3_RDRASdd の部分 JSON と mergeCallgraphData.js を確認してください。'
+                            );
+                            waitForEnter();
+                            return;
+                        }
+                        console.log('');
+                        console.log('Callgraphデータの作成が完了しました。');
+                        waitForEnter();
+                    })();
+                } else {
+                    console.log(
+                        '実行に必要なファイルが不足しています。必要ファイル: 1_RDRA/*, 1_RDRA/if/関連データ.txt, 2_RDRASpec/論理データモデル.md, 2_RDRASpec/ビジネスルール.md, 2_RDRASpec/画面照会.json'
+                    );
+                    waitForEnter();
+                }
+                break;
+            case '34':
+                (async () => {
+                    const hasRdraFuncOutputs =
+                        fs.existsSync('3_RDRASdd/domain') &&
+                        fs.existsSync('3_RDRASdd/application') &&
+                        fs.existsSync('3_RDRASdd/ui');
+                    if (!hasRdraFuncOutputs) {
+                        console.error('エラー: 3_RDRASdd/domain, 3_RDRASdd/application, 3_RDRASdd/ui が不足しています。');
+                        console.error('先にメニュー31〜33で機能仕様を作成してください。');
+                        waitForEnter();
+                        return;
+                    }
+                    const callgraphDataPath = '3_RDRASdd/_callgraph/callgraph_data.json';
+                    if (!fs.existsSync(callgraphDataPath)) {
+                        console.log('');
+                        console.log('callgraph_data.json が無いため、Callgraphデータを生成します...');
+                        const code = await runPromptMap(createCallgraphPromptMap, 'Callgraphデータの作成');
+                        if (code !== 0) {
+                            console.error('Callgraphデータの作成がエラーで終了しました。');
+                            waitForEnter();
+                            return;
+                        }
+                        const partialCheck = validateCallgraphPartialJsons();
+                        if (!partialCheck.ok) {
+                            console.error('Callgraph 部分 JSON の検証に失敗しました:');
+                            partialCheck.errors.forEach((err) => console.error(`  - ${err}`));
+                            console.error(
+                                'AI が確認質問のみで終了しファイルを書いていない可能性があります。該当の callgraph_*_data_maker.md を単体再実行するか、プロンプト冒頭の実行モードを確認してください。'
+                            );
+                            waitForEnter();
+                            return;
+                        }
+                        console.log('');
+                        console.log('部分 JSON を統合して callgraph_data.json を生成します...');
+                        let mergeCode;
+                        try {
+                            mergeCode = await runMergeCallgraphData();
+                        } catch (e) {
+                            console.error(`Callgraph 統合エラー: ${e.message || e}`);
+                            waitForEnter();
+                            return;
+                        }
+                        if (mergeCode !== 0) {
+                            console.error(
+                                'Callgraph データの統合に失敗しました。3_RDRASdd の部分 JSON と mergeCallgraphData.js を確認してください。'
+                            );
+                            waitForEnter();
+                            return;
+                        }
+                        console.log('');
+                        console.log('Callgraphデータの作成が完了しました。');
+                        if (!fs.existsSync(callgraphDataPath)) {
+                            console.warn(
+                                '警告: Callgraphデータ作成後も callgraph_data.json が見つかりません。ブラウザで読み込みに失敗する可能性があります。'
+                            );
+                        }
+                    }
+                    showCallgraphUI();
+                })();
                 break;
             case '0':
                 exitProgram();
@@ -810,4 +1004,3 @@ function createMenuAction({ rl, promptUser, waitForEnterThenNext }) {
 }
 
 module.exports = { createMenuAction };
-

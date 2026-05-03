@@ -7,15 +7,18 @@ see @初期要望.txt
 - 回答は入力された言語で行う
 
 ## このプロジェクトの重要ルール
-- `RDRA_Knowledge/` 配下には成果物を出力しない（知識・ツール置き場）。
-- TSV はヘッダー行を必須とし、UTF-8 で扱う。
+- `RDRA_Knowledge/` 配下には成果物を絶対に出力しない
+- TSV はヘッダー行を必須とし、UTF-8 で扱う
 - 各フォルダのAIによる入出力の分類:
-  - 入力: `初期要望.txt`    処理対象の要望を入力する
-  - 入力: `RDRA_Knowledge/`AIに対する指示を入力する
-  - 出力: `0_RDRAZeroOne/` フェーズ別にAIがRDRA定義を出力する
-  - 出力: `1_RDRA/`        最終的なRDRA定義をプログラムでコピーする
-  - 出力: `2_RDRASpec/`    フェーズ別にAIが仕様を出力する
-- AIは出力フォルダーにのみ出力する
+  - 入力: `初期要望.txt`
+  - 入力: `RDRA_Knowledge/`
+  - 出力: `0_RDRAZeroOne/`
+  - 出力: `1_RDRA/`
+  - 出力: `2_RDRASpec/`
+  - 出力: `3_RDRASdd/`
+- LLMは出力フォルダーにのみ出力する
+- 「初期要望.txt」と同じフォルダをプロジェクトルートとする
+- ファイルのパス指定「xxxx/xxxx/xxxx」の先頭位置は必ずプロジェクトルートになる
 
 ## 実行ルール
 - AI出力のためにProgramを絶対に生成しない
@@ -26,12 +29,13 @@ see @初期要望.txt
 RDRAAgent は、体系的なソフトウェア要件定義のために **RDRA（Relationship Driven Requirement Analysis）** 手法を実装した Node.js ベースのシステムです。初期要望からRDRA定義を、4フェーズで段階的に具体化し、そこから仕様を生成する
 - フォルダの役割:
   - `初期要望.txt`   RDRA定義対象の要求を記述したファイル
-  - `モデル設定.json` AIプロバイダ（claude, gemini, cursor, codex）とモデルの設定
+  - `モデル設定.json` AIプロバイダ（claude, cursor, cline）とモデルの設定
   - `0_RDRAZeroOne/` フェーズ別のRDRA定義を出力する
   - `1_RDRA/`        最終的なRDRA定義がコピーされる
-  - `2_RDRASpec/`    仕様が出力される
-  - `Samples/`       サンプルプロジェクト（図書館システム、貸し会議室SaaS、介護事業者向けシステム）
-  - `RDRA_Knowledge/`出力フォルダーに対応するフォルダー名で存在する
+  - `2_RDRASpec/`    アーキテクチャ依存しない仕様が出力される
+  - `3_RDRASdd/`    AIでプログラムを生成するための仕様が出力される
+  - `Samples/`       サンプルプロジェクト
+  - `RDRA_Knowledge/`出力フォルダーに対応するフォルダー名でPromptが存在する
 
 **主な特徴:**
 - 外部依存なし（Node.js 標準モジュールのみ）
@@ -48,7 +52,11 @@ RDRAAgent は、体系的なソフトウェア要件定義のために **RDRA（
 ### 「2_RDRASpec」フォルダー
 - AIが仕様を生成し出力するフォルダー
 - phase1,2ファルダ―は中間生成物を保持する
-### 「RDRA_Knowledge/0_RDRAZeroOne」フォルダー
+### 「3_RDRASdd」フォルダー
+- domain:RDRAのシステムレイヤーをドメインレイヤーとして仕機能仕様を生成し出力するフォルダー
+- application:RDRAのシステム境界レイヤーのBUC毎のUCをAIが機能仕様を生成し出力するフォルダー
+- UI:RDRAのシステム境界レイヤーのBUC毎のUCをAIが機能仕様を生成し出力するフォルダー
+### 「RDRA_Knowledge/_0_RDRAZeroOne」フォルダー
 - Phase1〜4: 初期要望から４フェーズでRDRA定義を生成するプロンプトを保持
 
 ### 「RDRA_Knowledge/.rdracore」フォルダー
@@ -57,36 +65,56 @@ RDRAAgent は、体系的なソフトウェア要件定義のために **RDRA（
 - RDRASheet.md: RDRA定義をSpreadsheetで行う各シートのフォーマットの説明
 - RDRAGraph.md: RDRAGraphのデータ構造「関連データ.txt」の説明
 
-### 「RDRA_Knowledge/2_RDRASpec」フォルダー
+### 「RDRA_Knowledge/_2_RDRASpec」フォルダー
 - 関連データ.txtファイルからビジネスルール、画面照会、ER図を生成するPromptファイルを保持
 
-## 「helper_tools」フォルダー
+### 「RDRA_Knowledge/helper_tools」フォルダー
 ファイルの削除やコピーなどのツールを保持する
 
 ## アーキテクチャ概要
 - `RDRA_Knowledge` フォルダー
   - Agent に対する実行プロンプトを保持する
-  - このフォルダー配下には絶対にファイルを出力しない
+  - このフォルダー配下にはAIは絶対にファイルを出力しない
   - 配下のフォルダー構成は出力するフォルダー構成と対応する
-    - RDRA_Knowledge/0_RDRAZeroOne/phase1/   -> /0_RDRAZeroOne/phase1/
-    - RDRA_Knowledge/0_RDRAZeroOne/phase3/   -> /0_RDRAZeroOne/phase3/
-    - RDRA_Knowledge/0_RDRAZeroOne/phase4/   -> /0_RDRAZeroOne/phase4/
-    - RDRA_Knowledge/2_RDRASpec/phase1/      -> /2_RDRASpec/ および /2_RDRASpec/phase1/
-    - RDRA_Knowledge/2_RDRASpec/phase2/      -> /2_RDRASpec/
+    - RDRA_Knowledge/_0_RDRAZeroOne/phase1/   -> /0_RDRAZeroOne/phase1/
+    - RDRA_Knowledge/_0_RDRAZeroOne/phase3/   -> /0_RDRAZeroOne/phase3/
+    - RDRA_Knowledge/_0_RDRAZeroOne/phase4/   -> /0_RDRAZeroOne/phase4/
+    - RDRA_Knowledge/_2_RDRASpec/phase1/      -> /2_RDRASpec/ および /2_RDRASpec/phase1/
+    - RDRA_Knowledge/_2_RDRASpec/phase2/      -> /2_RDRASpec/
+    - RDRA_Knowledge/_3_RDRASdd/              -> /3_RDRASdd/ domain,application,UI
 
 ### 主要コンポーネント
 
 1. **`menu.js`**（エントリーポイント）
    - Node.js `readline` を使った対話型 CLI メニュー
-
-2. **指示実行用の設定**（`RDRA_Knowledge/helper_tools/settings/`）
-   - `rdraConfig.js` AI実行のphase毎の並列実行するPromptファイルを定義する
-
-## アプリ起動
+   - アプリ起動
 ```bash
 node menu.js
 ```
-メニューを持つ対話型 CLI が起動します。
+2. **指示実行用の設定**（`RDRA_Knowledge/helper_tools/settings/`）
+   - `rdraDependency.js` … ZeroOne 各プロンプトの **依存関係（inputs/outputs）** と Phase1〜4 の成果物ファイル名を定義する
+   - `rdraConfig.js` … 成果物ファイル名の再エクスポートと、**仕様（2_RDRASpec）用プロンプト**（`specPhase1PromptMap` / `specPhase2PromptMap`）を保持する
+
+3. **DAG ランナー**（`RDRA_Knowledge/helper_tools/parallelRun/`）
+   - `dag-runner.js` … `--menu2`（未完了の最小フェーズを 1 回だけフェーズ内並列）、`--menu3`（入力充足ノードをファイル単位で波状並列）。互換のため `--menu7` / `--menu8` も同義として受け付ける。完了後に `makeBUC` → `attachContext` → `rdraFileCopy` → `makeGraphData` を実行する
+   - `parallel-runner.js` … 複数プロンプトの並列 AI 実行（従来どおり CLI でも利用可）
+
+## Cursor / Claude Skills（`.cursor/skills/` と `.claude/skills/`）
+
+同一内容の `SKILL.md` を **両フォルダに並置**する。スキル間の相互リンクは **自フォルダ内**（`.cursor/skills/...` または `.claude/skills/...`）で完結させる。
+
+| Skill | 用途 |
+|-------|------|
+| `rdra-core-references` | `RDRA.md` / `RDRAGraph.md` / `RDRASheet.md` への統一エントリ（正典参照・用語・行形式・シート列） |
+| `rdra-relation-explain` | `1_RDRA/if/関連データ.txt` の行ごとの構造説明と RDRA 規則への対応付け |
+| `rdra-business-system-qa` | 関連データに基づく業務／システム問合せ、網羅性・静的整合性（A/B/C 観点） |
+| `rdra-impact-analysis` | オブジェクト変更・追加時の波及（グラフ辿り、情報をハブとした BFS） |
+
+## メニュー（`node menu.js`）ZeroOne 系
+
+- **1** … `0_RDRAZeroOne/phase1〜4` と `1_RDRA` を削除後、`dag-runner` の `--menu3` 相当で一括生成
+- **2** … 未完了の **最小 Phase** を 1 回だけ実行（フェーズ内は全プロンプト並列）。Phase1〜4 が揃っていれば 1_RDRA 再構築と関連データ生成
+- **3** … 依存 DAG に従い **未生成ノードだけ** を波状並列実行（フェーズをまたぐ並列化あり）
 
 ## TSV ファイル形式ルール
 - **区切り文字**: ソースコード中の `、` は、ファイル書き出し時に実タブへ変換
@@ -105,7 +133,3 @@ node menu.js
 4. **モデル設定**:
    - `モデル設定.json` で AI プロバイダとモデルを管理
    - `default.provider` で使用するプロバイダを切り替える
-## 外部リソース
-
-- **RDRAGraph 可視化**: https://vsa.co.jp/rdratool/graph/v0.94/
-- **Google スプレッドシートテンプレート**: https://docs.google.com/spreadsheets/d/1h7J70l6DyXcuG0FKYqIpXXfdvsaqjdVFwc6jQXSh9fM/
